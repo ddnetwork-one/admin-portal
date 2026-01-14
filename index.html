@@ -17,43 +17,41 @@
 
     <style>
         :root {
-            /* SaaS Theme Colors - Developer Dark (Obsidian) */
+            /* Developer Dark Theme - Deep & Rich */
             --bg-app: #050505; 
-            --bg-sidebar: #09090b;
-            --bg-surface: #0c0c0f; 
-            --bg-surface-hover: #121216;
-            --bg-input: #0f0f12;
+            --bg-sidebar: #0a0a0c;
+            --bg-surface: #0f0f12; 
+            --bg-surface-hover: #18181b;
+            --bg-input: #121214;
             
             --border: #27272a;
-            --border-light: rgba(255,255,255,0.06);
-            --border-focus: rgba(59, 130, 246, 0.5);
+            --border-active: #3f3f46;
+            --border-light: rgba(255,255,255,0.08);
 
-            --text-main: #e4e4e7;
+            --text-main: #f4f4f5;
             --text-muted: #a1a1aa;
             --text-faint: #52525b;
 
-            /* Accents - Neon/Cyberpunk vibes */
+            /* Accents */
             --primary: #3b82f6; /* Electric Blue */
-            --primary-glow: rgba(59, 130, 246, 0.25);
             --primary-hover: #2563eb;
+            --primary-glow: rgba(59, 130, 246, 0.2);
             
-            --success: #10b981; /* Emerald */
-            --success-glow: rgba(16, 185, 129, 0.15);
-            
-            --warning: #f59e0b; /* Amber */
-            --warning-glow: rgba(245, 158, 11, 0.15);
-            
-            --danger: #ef4444; /* Red */
-            --ticket: #8b5cf6; /* Violet */
-            --info: #06b6d4; /* Cyan */
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --ticket: #8b5cf6; 
+            --info: #0ea5e9;
             
             --font-main: 'Inter', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
             
-            --sidebar-width: 280px;
+            --sidebar-width: 260px;
+            --sidebar-width-collapsed: 70px;
             --header-height: 64px;
 
             /* Z-Index Layers */
+            --z-base: 1;
             --z-sidebar: 100;
             --z-header: 200;
             --z-dropdown: 300;
@@ -64,7 +62,6 @@
 
         /* RESET & BASE */
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-        
         body { 
             background: var(--bg-app); 
             color: var(--text-main); 
@@ -86,30 +83,31 @@
         .gap-2 { gap: 0.5rem; } 
         .gap-4 { gap: 1rem; }
         .w-full { width: 100%; }
-        .mb-2 { margin-bottom: 0.5rem; }
-        .mb-4 { margin-bottom: 1rem; }
         .mt-2 { margin-top: 0.5rem; }
         .mt-4 { margin-top: 1rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
         .p-4 { padding: 1rem; }
         .text-center { text-align: center; }
         .text-sm { font-size: 0.85rem; }
         .font-bold { font-weight: 700; }
         .text-muted { color: var(--text-muted); }
-        .text-faint { color: var(--text-faint); }
-        .font-mono { font-family: var(--font-mono); }
         .block { display: block; }
+        
+        /* Monospace font for IDs/Code */
+        .font-mono { font-family: var(--font-mono); letter-spacing: -0.5px; }
 
         /* SCROLLBAR */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius:4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #444; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
 
-        /* BUTTONS */
+        /* BUTTONS (Developer SaaS Style) */
         .btn {
-            padding: 0.55rem 1.1rem; 
-            border-radius: 8px; 
-            border: 1px solid transparent; 
+            padding: 0.6rem 1.2rem; 
+            border-radius: 6px; 
+            border:1px solid transparent; 
             cursor: pointer; 
             font-weight: 500; 
             font-size: 0.85rem; 
@@ -121,17 +119,14 @@
             text-decoration: none;
             white-space: nowrap;
             color: var(--text-main);
-            background: var(--bg-surface);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            background: var(--bg-surface-hover);
             position: relative;
-            z-index: 1;
             overflow: hidden;
         }
         .btn:hover { 
-            transform: translateY(-1px); 
-            background: var(--bg-surface-hover);
-            border-color: var(--border);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            background: #2a2a35;
+            border-color: var(--border-active);
+            transform: translateY(-1px);
         }
         .btn:active { transform: translateY(0); }
 
@@ -139,28 +134,28 @@
             background: var(--primary); 
             color: white; 
             border:1px solid var(--primary); 
-            box-shadow: 0 0 15px var(--primary-glow);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); 
         }
-        .btn-primary:hover { background: var(--primary-hover); box-shadow: 0 0 25px var(--primary-glow); border-color: var(--primary-hover); }
+        .btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
 
-        .btn-success { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
-        .btn-success:hover { background: rgba(16, 185, 129, 0.2); border-color: var(--success); box-shadow: 0 0 10px var(--success-glow); }
+        .btn-success { background: rgba(16, 185, 129, 0.1); color: var(--success); border:1px solid rgba(16, 185, 129, 0.2); }
+        .btn-success:hover { background: rgba(16, 185, 129, 0.2); border-color: var(--success); }
 
-        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border:1px solid rgba(239, 68, 68, 0.2); }
         .btn-danger:hover { background: rgba(239, 68, 68, 0.2); border-color: var(--danger); }
         
         .btn-danger-solid { background: var(--danger); color: white; border:1px solid var(--danger); }
         .btn-danger-solid:hover { background: #dc2626; }
 
-        .btn-info { background: rgba(14, 165, 233, 0.1); color: var(--info); border: 1px solid rgba(14, 165, 233, 0.2); }
+        .btn-info { background: rgba(14, 165, 233, 0.1); color: var(--info); border:1px solid rgba(14, 165, 233, 0.2); }
         .btn-secondary { background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-main); }
-        .btn-secondary:hover { border-color: var(--text-muted); }
+        .btn-secondary:hover { border-color: var(--text-muted); background: var(--bg-surface-hover); }
         
-        .btn-sm { padding: 0.35rem 0.8rem; font-size: 0.75rem; border-radius: 6px; }
+        .btn-sm { padding: 0.35rem 0.8rem; font-size: 0.75rem; border-radius: 4px; }
         
         .btn-icon { 
             padding: 0.5rem; 
-            border-radius: 8px; 
+            border-radius: 6px; 
             background: transparent; 
             color: var(--text-muted); 
             cursor: pointer; 
@@ -170,6 +165,7 @@
             width: 36px; height: 36px;
         }
         .btn-icon:hover { color: white; background: rgba(255,255,255,0.05); }
+        .btn-icon.spin:hover i { animation: spin 1s linear infinite; }
 
         /* FORMS */
         input, select, textarea {
@@ -177,15 +173,15 @@
             padding: 0.65rem 0.85rem; 
             background: var(--bg-input); 
             border:1px solid var(--border); 
-            border-radius: 8px; 
-            color: var(--text-main); 
+            border-radius: 6px; 
+            color: white; 
             font-family: inherit; 
             font-size: 0.9rem; 
             transition: 0.2s;
         }
         input:focus, select:focus, textarea:focus { 
             border-color: var(--primary); 
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); 
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); 
             background: #000;
         }
         input[readonly], textarea[readonly] { 
@@ -199,7 +195,7 @@
         /* AUTH SCREEN */
         #auth-screen { 
             position: fixed; inset: 0; 
-            background: radial-gradient(circle at 50% 50%, #18181b 0%, #000 100%); 
+            background: radial-gradient(circle at 50% 50%, #1e1e24 0%, #000 100%); 
             z-index: 9999; 
             display: flex; 
             align-items: center; 
@@ -209,9 +205,9 @@
         .auth-card { 
             width: 100%; max-width: 400px; 
             padding: 2.5rem; 
-            background: rgba(12, 12, 15, 0.8); 
+            background: rgba(18, 18, 22, 0.8); 
             backdrop-filter: blur(20px);
-            border-radius: 24px; 
+            border-radius: 16px; 
             border:1px solid var(--border); 
             text-align: center; 
             box-shadow: 0 40px 80px rgba(0,0,0,0.6);
@@ -221,14 +217,14 @@
         /* LAYOUT STRUCTURE */
         #dashboard { display: flex; width: 100%; height: 100vh; overflow: hidden; position: relative; }
         
-        /* SIDEBAR OVERLAY */
+        /* SIDEBAR OVERLAY (Mobile) */
         .sidebar-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(2px);
-            z-index: var(--z-sidebar) - 1; opacity: 0; pointer-events: none; transition: 0.3s;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+            z-index: var(--z-sidebar); opacity: 0; pointer-events: none; transition: 0.3s;
         }
         .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
 
-        /* SIDEBAR (Off-canvas for ALL devices now) */
+        /* SIDEBAR (Updated with Collapse Logic) */
         aside { 
             width: var(--sidebar-width); 
             background: var(--bg-sidebar); 
@@ -236,17 +232,45 @@
             display: flex; 
             flex-direction: column; 
             z-index: var(--z-sidebar); 
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: fixed; top: 0; bottom: 0; left: 0;
-            transform: translateX(-100%); /* Hidden by default */
-            box-shadow: 10px 0 40px rgba(0,0,0,0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: fixed; top: var(--header-height); bottom: 0; left: 0;
         }
-        aside.open { transform: translateX(0); }
+
+        /* DESKTOP COLLAPSED STATE */
+        aside.collapsed {
+            width: var(--sidebar-width-collapsed);
+        }
+        aside.collapsed .nav-text, 
+        aside.collapsed .nav-section-title, 
+        aside.collapsed .u-details, 
+        aside.collapsed .user-mini-profile p {
+            opacity: 0;
+            pointer-events: none;
+            display: none; /* Hide completely to prevent layout shift issues */
+        }
+        aside.collapsed .nav-item {
+            padding: 0.8rem 0;
+            justify-content: center;
+        }
+        aside.collapsed .nav-item i {
+            font-size: 1.4rem;
+            margin: 0;
+        }
+        aside.collapsed .header-brand span {
+            display: none;
+        }
+        aside.collapsed .btn-danger span {
+            display: none;
+        }
+        aside.collapsed .user-mini-profile {
+            padding: 1rem 0;
+            justify-content: center;
+        }
 
         /* HEADER */
         header {
             height: var(--header-height);
-            background: rgba(5, 5, 5, 0.85);
+            background: rgba(5, 5, 5, 0.8);
             backdrop-filter: blur(12px);
             border-bottom:1px solid var(--border);
             display: flex;
@@ -257,7 +281,7 @@
             z-index: var(--z-header);
         }
         .header-left { display: flex; align-items: center; gap: 1rem; }
-        .header-brand { font-weight: 700; font-size: 1rem; color: white; letter-spacing: -0.3px; display: flex; align-items: center; gap: 10px; }
+        .header-brand { font-weight: 700; font-size: 1rem; color: white; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
         .header-brand img { height: 24px; filter: brightness(0) invert(1); }
         .header-actions { display: flex; align-items: center; gap: 0.25rem; position: relative; height: 100%; }
         
@@ -285,12 +309,12 @@
         .notif-time { font-size: 0.7rem; color: var(--text-faint); margin-top: 4px; display: block; }
 
         /* Sidebar Navigation */
-        .user-mini-profile { padding: 1.5rem 1.25rem; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.01); margin-top: var(--header-height); }
-        .u-info { display: flex; align-items: center; gap: 12px; }
+        .user-mini-profile { padding: 1.25rem; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.01); display: flex; align-items: center; gap: 12px; }
+        .u-info { display: flex; align-items: center; gap: 12px; width: 100%; }
         .u-avatar { 
-            width: 42px; height: 42px; 
+            width: 40px; height: 40px; 
             background: linear-gradient(135deg, var(--primary), #6366f1); 
-            border-radius: 10px; 
+            border-radius: 8px; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
@@ -298,13 +322,14 @@
             font-size: 1.1rem; 
             color: white; 
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            flex-shrink: 0;
         }
-        .u-details h4 { font-size: 0.9rem; color: white; font-weight: 600; margin-bottom: 2px; }
+        .u-details h4 { font-size: 0.9rem; color: white; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .u-details p { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
 
         .nav-scroll { flex: 1; overflow-y: auto; padding: 1rem 0; }
         .nav-section-title { 
-            padding: 1.25rem 1.5rem 0.5rem; 
+            padding: 1rem 1.5rem 0.5rem; 
             font-size: 0.65rem; 
             color: var(--text-faint); 
             text-transform: uppercase; 
@@ -312,7 +337,7 @@
             letter-spacing: 1px; 
         }
         .nav-item { 
-            padding: 0.75rem 1.5rem; 
+            padding: 0.7rem 1.5rem; 
             display: flex; 
             align-items: center; 
             gap: 12px; 
@@ -322,28 +347,31 @@
             border-left: 3px solid transparent; 
             font-weight: 500;
             margin-right: 0.5rem;
+            border-radius: 0 6px 6px 0;
             position: relative;
         }
         .nav-item:hover { background: rgba(255,255,255,0.03); color: white; }
         .nav-item.active { 
-            background: linear-gradient(90deg, rgba(59, 130, 246, 0.08), transparent); 
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.1), transparent); 
             color: var(--primary); 
             border-left-color: var(--primary); 
             font-weight: 600;
         }
         .nav-item i { font-size: 1.15rem; }
 
-        /* MAIN CONTENT */
+        /* MAIN CONTENT (Transition for Sidebar) */
         main { 
             flex: 1; 
             overflow-y: auto; 
             overflow-x: hidden; 
             background: var(--bg-app); 
-            padding: 1.5rem; 
+            padding: 2rem; 
             position: relative; 
             margin-top: var(--header-height);
             min-height: calc(100vh - var(--header-height));
             width: 100%;
+            margin-left: var(--sidebar-width);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* DASHBOARD CARDS */
@@ -363,16 +391,8 @@
             gap: 1.2rem;
             transition: all 0.2s;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            position: relative;
-            overflow: hidden;
         }
-        .stat-card:hover { transform: translateY(-2px); border-color: var(--border-active); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
-        .stat-card::before {
-            content:''; position: absolute; top:0; left:0; width:4px; height:100%; background: var(--border);
-            transition: 0.2s;
-        }
-        .stat-card:hover::before { background: var(--primary); }
-
+        .stat-card:hover { transform: translateY(-2px); border-color: var(--border-active); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
         .stat-icon { 
             width: 48px; height: 48px; 
             border-radius: 10px; 
@@ -384,8 +404,8 @@
             color: var(--text-main);
         }
         .stat-info { display: flex; flex-direction: column; }
-        .stat-val { font-size: 1.6rem; font-weight: 700; color: white; line-height: 1.1; margin-bottom: 2px; font-family: var(--font-mono); }
-        .stat-label { color: var(--text-muted); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-val { font-size: 1.6rem; font-weight: 700; color: white; line-height: 1.1; margin-bottom: 4px; letter-spacing: -1px; }
+        .stat-label { color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 
         /* LIST GROUP */
         .list-group { background: var(--bg-surface); border-radius: 12px; border: 1px solid var(--border); padding: 1.5rem; }
@@ -395,7 +415,7 @@
         .activity-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
         .activity-content h5 { font-size: 0.85rem; font-weight: 600; color: white; margin-bottom: 2px; }
         .activity-content p { font-size: 0.75rem; color: var(--text-muted); }
-        .activity-time { margin-left: auto; font-size: 0.7rem; color: var(--text-faint); white-space: nowrap; font-family: var(--font-mono); }
+        .activity-time { margin-left: auto; font-size: 0.7rem; color: var(--text-faint); white-space: nowrap; }
 
         /* TABLES */
         .table-container { 
@@ -404,7 +424,7 @@
             border: 1px solid var(--border); 
             overflow: hidden; 
             margin-bottom: 2rem; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
         .table-header { 
             padding: 1.2rem 1.5rem; 
@@ -412,25 +432,25 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            background: rgba(255,255,255,0.015); 
+            background: rgba(255,255,255,0.02); 
             flex-wrap: wrap; gap: 10px;
         }
-        .table-header h3 { font-size: 0.95rem; font-weight: 600; color: white; }
+        .table-header h3 { font-size: 0.95rem; font-weight: 600; color: white; letter-spacing: -0.3px; }
         .table-responsive { overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch; }
         table { width: 100%; border-collapse: collapse; min-width: 800px; }
         th { 
             text-align: left; 
             padding: 0.8rem 1.2rem; 
             color: var(--text-muted); 
-            font-size: 0.75rem; 
+            font-size: 0.7rem; 
             font-weight: 600; 
             text-transform: uppercase; 
-            background: rgba(0,0,0,0.2); 
+            background: rgba(0,0,0,0.3); 
             white-space: nowrap;
             border-bottom: 1px solid var(--border);
-            font-family: var(--font-mono);
+            letter-spacing: 0.5px;
         }
-        td { padding: 0.9rem 1.2rem; border-bottom: 1px solid var(--border); color: var(--text-main); font-size: 0.85rem; vertical-align: middle; transition: 0.1s;}
+        td { padding: 1rem 1.2rem; border-bottom: 1px solid var(--border); color: var(--text-main); font-size: 0.85rem; vertical-align: middle; transition: 0.1s; }
         tr:last-child td { border-bottom: none; }
         tr:hover td { background: rgba(255,255,255,0.02); }
 
@@ -438,7 +458,7 @@
         .modal-overlay { 
             position: fixed; inset: 0; 
             background: rgba(0,0,0,0.85); 
-            backdrop-filter: blur(6px); 
+            backdrop-filter: blur(8px); 
             z-index: var(--z-modal-overlay); 
             display: none; 
             justify-content: center; 
@@ -455,7 +475,7 @@
             display: flex; 
             flex-direction: column; 
             max-height: 90vh; 
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.8);
             animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
@@ -481,7 +501,7 @@
             padding: 1rem 1.25rem; 
             border-radius: 10px; 
             border: 1px solid var(--border); 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5); 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6); 
             display: flex; 
             align-items: center; 
             gap: 12px; 
@@ -555,8 +575,28 @@
             display: flex; justify-content: center; align-items: center; height: 300px; width: 100%;
         }
 
-        /* --- RESPONSIVENESS --- */
-        /* Note: Sidebar is handled by JS/CSS class .open for ALL sizes now */
+        /* --- RESPONSIVENESS TWEAKS --- */
+        @media(min-width: 1025px) {
+            aside { transform: translateX(0) !important; width: var(--sidebar-width); }
+            /* When collapsed, CSS handles width, but we ensure it's visible */
+            aside.collapsed { transform: translateX(0) !important; width: var(--sidebar-width-collapsed); }
+            
+            main { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); padding: 2rem; }
+            
+            aside.collapsed + main { margin-left: var(--sidebar-width-collapsed); width: calc(100% - var(--sidebar-width-collapsed)); }
+            
+            .sidebar-overlay { display: none !important; }
+        }
+
+        @media(max-width: 1024px) {
+            aside { transform: translateX(-100%); width: 280px; box-shadow: 20px 0 40px rgba(0,0,0,0.5); }
+            aside.mobile-open { transform: translateX(0); }
+            main { margin-left: 0 !important; width: 100% !important; padding: 1.5rem; padding-top: 5rem; }
+            .stats-grid { grid-template-columns:1fr; }
+            .price-grid { grid-template-columns:1fr; }
+            .header-brand span { display: none; }
+            .notif-dropdown { right: 0; width: 90vw; }
+        }
     </style>
 </head>
 <body>
@@ -567,7 +607,7 @@
     <div id="auth-screen">
         <div class="auth-card">
             <img src="https://raw.githubusercontent.com/ddnetwork-ent/ddnetwork/refs/heads/main/DDN%20Logo%20NoBG.png" alt="Logo">
-            <h2 class="mb-4" style="color:white; font-weight: 700; letter-spacing: -0.5px;">Admin Portal v10.0</h2>
+            <h2 class="mb-4" style="color:white; font-weight: 700; letter-spacing: -0.5px;">Admin Portal v10.1</h2>
             <form id="loginForm">
                 <input type="text" id="loginInput" class="mb-4" placeholder="Email or Crew ID" required>
                 <input type="password" id="loginPass" class="mb-4" placeholder="Password" required>
@@ -583,15 +623,14 @@
         <!-- GLOBAL HEADER -->
         <header>
             <div class="header-left">
-                <!-- Sidebar Toggle (Visible on ALL devices now) -->
-                <button class="btn-icon" onclick="toggleSidebar()"><i class="ri-menu-line" style="font-size: 1.4rem;"></i></button>
+                <button class="btn-icon" onclick="toggleSidebar()" title="Toggle Menu"><i class="ri-menu-line" style="font-size: 1.4rem;"></i></button>
                 <div class="header-brand">
                     <img src="https://raw.githubusercontent.com/ddnetwork-ent/ddnetwork/refs/heads/main/DDN%20Logo%20NoBG.png">
-                    <span>DDN v10.0</span>
+                    <span>DDN v10.1</span>
                 </div>
             </div>
             <div class="header-actions">
-                <button class="btn-icon" onclick="location.reload()" title="Force Refresh"><i class="ri-refresh-line"></i></button>
+                <button class="btn-icon spin" onclick="location.reload()" title="Force Refresh"><i class="ri-refresh-line"></i></button>
                 
                 <!-- Notifications (Admin Only) -->
                 <button class="btn-icon" id="notif-btn" onclick="toggleNotifications()" style="display:none;">
@@ -607,7 +646,7 @@
             </div>
         </header>
 
-        <!-- SIDEBAR (Off-canvas) -->
+        <!-- SIDEBAR -->
         <aside id="sidebar">
             <div class="user-mini-profile">
                 <div class="u-info">
@@ -620,28 +659,51 @@
             </div>
             
             <div class="nav-scroll">
-                <div class="nav-item active" onclick="navigateTo('/')"><i class="ri-dashboard-line"></i> Overview</div>
+                <div class="nav-item active" onclick="navigateTo('/')">
+                    <i class="ri-dashboard-line"></i> <span class="nav-text">Overview</span>
+                </div>
                 
-                <div class="nav-section-title">Operations</div>
-                <div class="nav-item" onclick="navigateTo('/orders')"><i class="ri-shopping-bag-3-line"></i> Orders</div>
-                <div class="nav-item" onclick="navigateTo('/clients')"><i class="ri-user-line"></i> Clients</div>
-                <!-- NEW LINK: CUSTOMER REQUESTS -->
-                <div class="nav-item" onclick="navigateTo('/requests')"><i class="ri-database-2-line"></i> Customer Requests</div>
-                <div class="nav-item" id="nav-crew" onclick="navigateTo('/crew')"><i class="ri-team-line"></i> Internal Crew</div>
-                <div class="nav-item" onclick="navigateTo('/support')"><i class="ri-customer-service-2-line"></i> Support Tickets</div>
-                <div class="nav-item" onclick="navigateTo('/vouchers')"><i class="ri-ticket-2-line"></i> Vouchers</div>
+                <div class="nav-section-title"><span class="nav-text">Operations</span></div>
+                <div class="nav-item" onclick="navigateTo('/orders')">
+                    <i class="ri-shopping-bag-3-line"></i> <span class="nav-text">Orders</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('/clients')">
+                    <i class="ri-user-line"></i> <span class="nav-text">Clients</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('/requests')">
+                    <i class="ri-database-2-line"></i> <span class="nav-text">Customer Requests</span>
+                </div>
+                <div class="nav-item" id="nav-crew" onclick="navigateTo('/crew')">
+                    <i class="ri-team-line"></i> <span class="nav-text">Internal Crew</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('/support')">
+                    <i class="ri-customer-service-2-line"></i> <span class="nav-text">Support Tickets</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('/vouchers')">
+                    <i class="ri-ticket-2-line"></i> <span class="nav-text">Vouchers</span>
+                </div>
                 
-                <div class="nav-section-title">Management</div>
-                <div class="nav-item" onclick="navigateTo('/portfolio')"><i class="ri-gallery-line"></i> Portfolio</div>
-                <div class="nav-item" onclick="navigateTo('/content')"><i class="ri-layout-masonry-line"></i> Content & Pkg</div>
-                <div class="nav-item" id="nav-config" onclick="navigateTo('/config')"><i class="ri-settings-4-line"></i> System Config</div>
+                <div class="nav-section-title"><span class="nav-text">Management</span></div>
+                <div class="nav-item" onclick="navigateTo('/portfolio')">
+                    <i class="ri-gallery-line"></i> <span class="nav-text">Portfolio</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('/content')">
+                    <i class="ri-layout-masonry-line"></i> <span class="nav-text">Content & Pkg</span>
+                </div>
+                <div class="nav-item" id="nav-config" onclick="navigateTo('/config')">
+                    <i class="ri-settings-4-line"></i> <span class="nav-text">System Config</span>
+                </div>
                 
-                <div class="nav-section-title">Personal</div>
-                <div class="nav-item" onclick="navigateTo('/my-profile')"><i class="ri-user-settings-line"></i> My Profile</div>
+                <div class="nav-section-title"><span class="nav-text">Personal</span></div>
+                <div class="nav-item" onclick="navigateTo('/my-profile')">
+                    <i class="ri-user-settings-line"></i> <span class="nav-text">My Profile</span>
+                </div>
             </div>
 
             <div style="padding: 1.5rem; border-top: 1px solid var(--border);">
-                <button class="btn btn-danger" style="width: 100%; justify-content: center;" onclick="handleLogout()"><i class="ri-logout-box-r-line"></i> Logout</button>
+                <button class="btn btn-danger" style="width: 100%; justify-content: center;" onclick="handleLogout()">
+                    <i class="ri-logout-box-r-line"></i> <span>Logout</span>
+                </button>
             </div>
         </aside>
 
@@ -872,7 +934,7 @@
             });
         }
 
-        // --- ROUTING SYSTEM (History Mode) ---
+        // --- ROUTING SYSTEM ---
         const routes = {
             '/': renderOverview,
             '/orders': renderOrders,
@@ -883,7 +945,7 @@
             '/content': renderContent,
             '/config': renderConfig,
             '/portfolio': renderPortfolio,
-            '/requests': renderRequests, 
+            '/requests': renderRequests,
             '/my-profile': renderMyProfile
         };
 
@@ -900,7 +962,11 @@
                 if(activeItem) activeItem.classList.add('active');
                 
                 renderFn();
-                toggleSidebar(true); // Force close sidebar on navigation
+
+                if(window.innerWidth <= 1024) {
+                    document.getElementById('sidebar').classList.remove('mobile-open');
+                    document.getElementById('sidebarOverlay').classList.remove('active');
+                }
             }
         }
 
@@ -920,21 +986,19 @@
             }
         };
 
-        // --- NAVIGATION HELPERS ---
-        function toggleSidebar(forceClose = false) { 
+        // --- SIDEBAR TOGGLE LOGIC (UPDATED FOR DESKTOP) ---
+        function toggleSidebar() { 
             const sb = document.getElementById('sidebar');
             const ov = document.getElementById('sidebarOverlay');
             
-            // If forcing close, remove classes
-            if(forceClose) {
-                sb.classList.remove('open');
-                ov.classList.remove('active');
-                return;
+            if(window.innerWidth > 1024) {
+                // DESKTOP: Toggle collapsed class
+                sb.classList.toggle('collapsed');
+            } else {
+                // MOBILE: Toggle off-canvas
+                sb.classList.toggle('mobile-open');
+                ov.classList.toggle('active');
             }
-
-            // Otherwise toggle
-            sb.classList.toggle('open');
-            ov.classList.toggle('active');
         }
 
         // --- UTILS ---
@@ -955,7 +1019,6 @@
             setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(), 400); }, 3500);
         }
 
-        // --- GLOBAL DELETE FUNCTION ---
         async function deleteUser(uid, name, type) {
             if(!isAdmin()) return showToast("Access Denied", "error");
             if(!confirm(`Are you sure you want to PERMANENTLY DELETE ${name}? This action cannot be undone.`)) return;
@@ -1052,13 +1115,13 @@
             });
         }
 
-        // --- 2. ORDERS ---
+        // --- 2. ORDERS (UPDATED: DOMAIN COLUMN) ---
         function renderOrders() {
             document.getElementById('main').innerHTML = `
                 <div class="table-container">
                     <div class="table-header">
                         <h3>Order Management</h3>
-                        <input type="text" id="orderSearch" placeholder="Search ID, Name..." style="width:200px;" onkeyup="filterTable('orders-tbody', this.value)">
+                        <input type="text" id="orderSearch" placeholder="Search ID, Name, Domain..." style="width:250px;" onkeyup="filterTable('orders-tbody', this.value)">
                     </div>
                     <div class="table-responsive">
                         <table>
@@ -1067,7 +1130,7 @@
                                     <th>Date</th>
                                     <th>Client</th>
                                     <th>Package</th>
-                                    <th>Voucher Used</th>
+                                    <th>Domain</th> <!-- NEW COLUMN -->
                                     <th>Total</th>
                                     <th>Status</th>
                                     <th>Action</th>
@@ -1092,6 +1155,11 @@
                 tbody.innerHTML = snap.docs.map(doc => {
                     const d = doc.data();
                     
+                    // Domain Logic: Display nicely or show N/A
+                    const domainDisplay = d.domain 
+                        ? `<span class="font-mono" style="color:var(--primary)">${d.domain}</span>` 
+                        : `<span style="color:var(--text-faint)">N/A</span>`;
+
                     let voucherBadge = '<span style="color:var(--text-faint)">None</span>';
                     if (d.voucherCode) {
                         voucherBadge = `<span class="badge badge-voucher"><i class="ri-coupon-line"></i> ${d.voucherCode}</span>`;
@@ -1103,10 +1171,10 @@
                     if(d.status === 'Cancelled') statusColor = 'var(--danger)';
                     
                     return `<tr>
-                        <td style="white-space:nowrap;" class="font-mono text-sm">${formatDateTime(d.timestamp)}</td>
+                        <td style="white-space:nowrap;">${formatDateTime(d.timestamp)}</td>
                         <td><strong>${d.customerName}</strong></td>
                         <td>${d.package}</td>
-                        <td>${voucherBadge}</td>
+                        <td>${domainDisplay}</td>
                         <td>${d.total}</td>
                         <td><span class="badge" style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}25">${d.status}</span></td>
                         <td>
@@ -1118,6 +1186,7 @@
             });
         }
 
+        // UPDATED: Manage Order Modal includes Domain Field
         function viewOrder(id) {
             db.collection("orders").doc(id).get().then(doc => {
                 const d = doc.data();
@@ -1133,6 +1202,14 @@
                         <div><label class="text-muted text-sm">Phone</label><input id="o-phone" value="${d.customerPhone||''}"></div>
                         <div><label class="text-muted text-sm">Total</label><input id="o-total" value="${d.total}"></div>
                     </div>
+                    <div class="mt-4">
+                        <label>Client Domain</label>
+                        <div style="display:flex; gap:10px;">
+                             <span style="padding:0.6rem; background:var(--bg-input); border:1px solid var(--border); border-radius:6px 0 0 6px; color:var(--text-muted);">https://</span>
+                             <input id="o-domain" value="${d.domain || ''}" placeholder="example.com" style="border-radius:0 6px 6px 0;">
+                        </div>
+                        <small class="text-muted">Leave empty if no domain yet.</small>
+                    </div>
                     <label class="mt-4 mb-2 block">Update Status</label>
                     <select id="upd-status">
                         <option value="Pending" ${d.status=='Pending'?'selected':''}>Pending</option>
@@ -1144,12 +1221,14 @@
             });
         }
 
+        // UPDATED: Save Order Details includes Domain
         function updateOrderDetails(id) {
             db.collection("orders").doc(id).update({
                 customerName: document.getElementById('o-name').value,
                 customerEmail: document.getElementById('o-email').value,
                 customerPhone: document.getElementById('o-phone').value,
                 total: document.getElementById('o-total').value,
+                domain: document.getElementById('o-domain').value.replace(/^https?:\/\//, ''), // Basic sanitization
                 status: document.getElementById('upd-status').value
             }).then(() => { 
                 closeModal(); showToast("Order Updated Successfully", "success"); logActivity(`Updated Order #${id.substr(0,6)}`);
@@ -1164,7 +1243,7 @@
             });
         }
 
-        // --- 3. CLIENTS (UPDATED: View Domain) ---
+        // --- 3. CLIENTS ---
         function renderClients() {
             document.getElementById('main').innerHTML = `
                 <div class="table-container">
@@ -1173,8 +1252,8 @@
                         <input type="text" id="clientSearch" placeholder="Search..." style="width:200px;" onkeyup="filterTable('client-tbody', this.value)">
                     </div>
                     <div class="table-responsive">
-                        <table><thead><tr><th>Name</th><th>Company</th><th>Domain</th><th>Contact</th><th>Voucher</th><th>Actions</th></tr></thead><tbody id="client-tbody">
-                        <tr><td colspan="6" class="text-center"><div class="loading-spinner"></div></td></tr>
+                        <table><thead><tr><th>Name</th><th>Company</th><th>Contact</th><th>Voucher</th><th>Actions</th></tr></thead><tbody id="client-tbody">
+                        <tr><td colspan="5" class="text-center"><div class="loading-spinner"></div></td></tr>
                         </tbody></table>
                     </div>
                 </div>`;
@@ -1182,7 +1261,7 @@
             db.collection("users").where("role", "==", "user").onSnapshot(snap => {
                 const tbody = document.getElementById('client-tbody');
                 if(!tbody) return;
-                if(snap.empty) { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No clients found</td></tr>'; return; }
+                if(snap.empty) { tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No clients found</td></tr>'; return; }
                 
                 tbody.innerHTML = snap.docs.map(doc => {
                     const u = doc.data();
@@ -1191,7 +1270,6 @@
                     return `<tr>
                         <td>${u.name}</td>
                         <td>${u.company||'-'}</td>
-                        <td class="font-mono text-sm" style="color:var(--primary)">${u.domain||'-'}</td>
                         <td>${u.email}<br><small style="color:var(--text-faint)">${u.phone||''}</small></td>
                         <td>${vStatus !== 'None' ? `<span class="badge" style="background:${vStatus==='active'?'var(--success)':'var(--text-faint)'}">${vCode}</span>` : '-'}</td>
                         <td>
@@ -1212,7 +1290,6 @@
                     <label>Email</label><input readonly id="e-email" class="mb-4" value="${u.email}">
                     <label>Phone</label><input id="e-phone" class="mb-4" value="${u.phone||''}">
                     <label>Company</label><input id="e-comp" class="mb-4" value="${u.company||''}">
-                    <label>Domain</label><input id="e-domain" class="mb-4" placeholder="example.com" value="${u.domain||''}">
                 `, `<button class="btn btn-primary" onclick="saveClient('${uid}')">Update</button>`);
             });
         }
@@ -1220,8 +1297,7 @@
             db.collection("users").doc(uid).update({ 
                 name: document.getElementById('e-name').value, 
                 phone: document.getElementById('e-phone').value, 
-                company: document.getElementById('e-comp').value,
-                domain: document.getElementById('e-domain').value.toLowerCase().trim()
+                company: document.getElementById('e-comp').value 
             }).then(() => { closeModal(); showToast("Client Updated", "success"); logActivity("Updated client details"); });
         }
         function resetPassword(email) {
@@ -1251,7 +1327,7 @@
                 tbody.innerHTML = snap.docs.map(doc => {
                     const u = doc.data();
                     return `<tr>
-                        <td style="font-family:monospace; color:var(--primary)">${u.crewId || 'N/A'}</td>
+                        <td class="font-mono" style="color:var(--primary)">${u.crewId || 'N/A'}</td>
                         <td>${u.name}</td>
                         <td>${u.email}</td>
                         <td><span class="badge badge-${u.role}">${u.role}</span></td>
@@ -1368,8 +1444,8 @@
                     else statusBadge = 'var(--warning)';
 
                     return `<tr>
-                        <td style="font-family:monospace; color:var(--ticket)">${d.ticketId || doc.id}</td>
-                        <td style="white-space:nowrap;" class="font-mono text-sm">${formatDateTime(d.timestamp)}</td>
+                        <td class="font-mono" style="color:var(--ticket)">${d.ticketId || doc.id}</td>
+                        <td style="white-space:nowrap;">${formatDateTime(d.timestamp)}</td>
                         <td>${d.name}</td><td>${d.type}</td>
                         <td>${d.assignedToName || 'Unassigned'}</td>
                         <td><span class="badge" style="background:${statusBadge}15; color:${statusBadge}">${d.status}</span></td>
@@ -1386,7 +1462,7 @@
             const newId = await getNextId('ticket');
             
             showModal("Create Support Ticket", `
-                <div class="mb-4"><label>Generated ID</label><input value="${newId}" readonly style="font-family:monospace; color:var(--ticket)"></div>
+                <div class="mb-4"><label>Generated ID</label><input value="${newId}" readonly class="font-mono" style="color:var(--ticket)"></div>
                 <div class="mb-4"><label>Client Name</label><input id="tk-name"></div>
                 <div class="mb-4"><label>Issue Type</label><select id="tk-type"><option>Technical</option><option>Billing</option><option>Other</option></select></div>
                 <div class="mb-4"><label>Details</label><textarea id="tk-msg"></textarea></div>
@@ -1498,6 +1574,7 @@
             document.getElementById('active-vouchers-container').classList.remove('hidden');
             document.getElementById('history-vouchers-container').classList.remove('hidden');
 
+            // Render Active
             db.collection("users").where("personalVoucher", "!=", null).onSnapshot(snap => {
                 const tbody = document.getElementById('vouch-active');
                 if(!tbody) return;
@@ -1512,7 +1589,7 @@
                     
                     tbody.innerHTML += `<tr>
                         <td>${u.name}</td>
-                        <td style="font-family:monospace; color:var(--primary)">${v.code}</td>
+                        <td class="font-mono" style="color:var(--primary)">${v.code}</td>
                         <td>
                             <span class="badge" style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}25">
                                 ${vStatus}
@@ -1529,6 +1606,7 @@
                 });
             });
 
+            // Render History
             const updateHistoryListener = (filterVal) => {
                 db.collection("vouchers_history").orderBy("movedAt", "desc").limit(50).onSnapshot(snap => {
                     const tbody = document.getElementById('vouch-history');
@@ -1548,10 +1626,10 @@
                         if (v.status === 'Disabled') statusColor = 'var(--text-faint)';
 
                         tbody.innerHTML += `<tr>
-                            <td style="font-family:monospace">${v.code}</td>
+                            <td class="font-mono">${v.code}</td>
                             <td>${v.assignedToName || '-'}</td>
                             <td><span class="badge" style="background:${statusColor}15; color:${statusColor}">${v.status}</span></td>
-                            <td class="font-mono text-sm">${v.movedAt ? formatDateTime(v.movedAt) : '-'}</td>
+                            <td>${v.movedAt ? formatDateTime(v.movedAt) : '-'}</td>
                             <td>${actionBtn}</td>
                         </tr>`;
                     });
@@ -1567,6 +1645,7 @@
         async function syncVoucherLogic() {
             const usersSnap = await db.collection("users").where("personalVoucher", "!=", null).get();
             if(usersSnap.empty) return;
+
             let movedCount = 0;
             for (const userDoc of usersSnap.docs) {
                 const uid = userDoc.id;
@@ -1785,7 +1864,7 @@
             });
         }
 
-        // --- 8. CONFIG (Payment Methods) ---
+        // --- 8. CONFIG (UPDATED: Payment Methods Listener) ---
         function renderConfig() {
             if(!isAdmin()) return;
             document.getElementById('main').innerHTML = `
@@ -1837,7 +1916,7 @@
                     </div>
                 </div>
 
-                <!-- Payment Gateways -->
+                <!-- Payment Gateways (UPDATED) -->
                 <div class="config-section">
                     <div class="config-header flex justify-between">
                         <span>Payment Gateways</span>
@@ -1861,6 +1940,7 @@
                 }
             });
 
+            // Listen to dedicated collection
             db.collection("payment_methods").onSnapshot(snap => {
                 const list = document.getElementById('gateway-list');
                 if(!list) return;
@@ -1907,6 +1987,7 @@
             `, `<button class="btn btn-primary" onclick="saveNewGateway()">Add</button>`);
         }
         
+        // UPDATED: Add to dedicated collection
         async function saveNewGateway() {
             const name = document.getElementById('gw-name').value;
             const link = document.getElementById('gw-link').value;
@@ -1927,6 +2008,7 @@
             });
         }
         
+        // UPDATED: Edit in dedicated collection
         async function saveEditedGateway(docId) {
             const name = document.getElementById('e-gw-name').value;
             const link = document.getElementById('e-gw-link').value;
@@ -1938,6 +2020,7 @@
             logActivity(`Edited payment gateway: ${name}`);
         }
         
+        // UPDATED: Toggle in dedicated collection
         async function toggleGatewayStatus(docId) {
             const docRef = await db.collection("payment_methods").doc(docId).get();
             const currentStatus = docRef.data().active;
@@ -1946,13 +2029,14 @@
             renderConfig();
         }
         
+        // UPDATED: Delete from dedicated collection
         async function deleteGateway(docId) {
             if(!confirm("Delete gateway?")) return;
             await db.collection("payment_methods").doc(docId).delete();
             renderConfig();
         }
 
-        // --- 9. PORTFOLIO MANAGEMENT ---
+        // --- 9. PORTFOLIO MANAGEMENT (UPDATED: ID GENERATION) ---
         function renderPortfolio() {
             if(!isAdmin()) return;
 
@@ -1985,6 +2069,7 @@
                 </div>
             `;
 
+            // Real-time listener for clients_portfolio
             db.collection("clients_portfolio").orderBy("timestamp", "desc").onSnapshot(snap => {
                 const tbody = document.getElementById('portfolio-tbody');
                 if(!tbody) return;
@@ -2036,7 +2121,7 @@
                 </div>
                 <div class="mb-4">
                     <label>Generated ID (Auto)</label>
-                    <input type="text" id="p-doc-id" readonly value="${initialId}" style="font-family:monospace; color:var(--primary); background:var(--bg-sidebar);">
+                    <input type="text" id="p-doc-id" readonly value="${initialId}" class="font-mono" style="color:var(--primary); background:var(--bg-sidebar);">
                 </div>
                 <div class="mb-4">
                     <label>Image URL</label>
@@ -2068,6 +2153,7 @@
                 return showToast("Please fill in all fields.", "error");
             }
 
+            // Use .doc(customId).set() instead of .add()
             db.collection("clients_portfolio").doc(customId).set({
                 name,
                 img,
@@ -2171,7 +2257,7 @@
             trs.forEach(tr => tr.style.display = tr.innerText.toLowerCase().includes(text)?'':'none');
         }
 
-        // --- 11. CUSTOMER REQUESTS ---
+        // --- 11. CUSTOMER REQUESTS (NEW) ---
         function renderRequests() {
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
@@ -2228,7 +2314,7 @@
                     const statusColor = d.status === 'Completed' ? 'var(--success)' : 'var(--warning)';
 
                     return `<tr>
-                        <td style="white-space:nowrap;" class="font-mono text-sm">${formatDateTime(d.timestamp)}</td>
+                        <td style="white-space:nowrap;">${formatDateTime(d.timestamp)}</td>
                         <td>
                             <strong>${d.name}</strong><br>
                             <small style="color:var(--text-faint)">${d.phone || ''}</small>
