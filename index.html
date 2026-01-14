@@ -1,0 +1,2341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin Portal v10.0 | DDNetwork One</title>
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+    <style>
+        :root {
+            /* SaaS Theme Colors - Slate Dark */
+            --bg-app: #09090b; /* Deepest background */
+            --bg-sidebar: #0c0c0f;
+            --bg-surface: #121216; /* Card background */
+            --bg-surface-hover: #1a1a21;
+            --bg-input: #18181b;
+            
+            --border: #27272a;
+            --border-active: #3f3f46;
+            --border-light: rgba(255,255,255,0.08);
+
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --text-faint: #52525b;
+
+            /* Accents */
+            --primary: #3b82f6; /* Modern Blue */
+            --primary-hover: #2563eb;
+            --primary-glow: rgba(59, 130, 246, 0.15);
+            
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --ticket: #8b5cf6; 
+            --info: #0ea5e9;
+            
+            --font: 'Inter', sans-serif;
+            --sidebar-width: 260px;
+            --header-height: 64px;
+
+            /* Z-Index Layers */
+            --z-base: 1;
+            --z-sidebar: 100;
+            --z-header: 200;
+            --z-dropdown: 300;
+            --z-modal-overlay: 1000;
+            --z-modal-content: 1010;
+            --z-toast: 2000;
+        }
+
+        /* RESET & BASE */
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        body { 
+            background: var(--bg-app); 
+            color: var(--text-main); 
+            font-family: var(--font); 
+            height: 100vh; 
+            display: flex; 
+            overflow: hidden; 
+            font-size: 14px;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* UTILITIES */
+        .hidden { display: none !important; }
+        .flex { display: flex; } 
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; } 
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .gap-2 { gap: 0.5rem; } 
+        .gap-4 { gap: 1rem; }
+        .w-full { width: 100%; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .p-4 { padding: 1rem; }
+        .text-center { text-align: center; }
+        .text-sm { font-size: 0.85rem; }
+        .font-bold { font-weight: 700; }
+        .text-muted { color: var(--text-muted); }
+        .block { display: block; }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius:4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+        /* BUTTONS (SaaS Style) */
+        .btn {
+            padding: 0.55rem 1.1rem; 
+            border-radius: 8px; 
+            border:1px solid transparent; 
+            cursor: pointer; 
+            font-weight: 500; 
+            font-size: 0.85rem; 
+            transition: all 0.2s ease; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            white-space: nowrap;
+            color: var(--text-main);
+            background: var(--bg-surface-hover);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 5;
+        }
+        .btn:hover { 
+            transform: translateY(-1px); 
+            background: #2a2a35;
+            border-color: var(--border-active);
+        }
+        .btn:active { transform: translateY(0); }
+
+        .btn-primary { 
+            background: var(--primary); 
+            color: white; 
+            border:1px solid var(--primary); 
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); 
+        }
+        .btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+
+        .btn-success { background: rgba(16, 185, 129, 0.1); color: var(--success); border:1px solid rgba(16, 185, 129, 0.2); }
+        .btn-success:hover { background: rgba(16, 185, 129, 0.2); border-color: var(--success); }
+
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border:1px solid rgba(239, 68, 68, 0.2); }
+        .btn-danger:hover { background: rgba(239, 68, 68, 0.2); border-color: var(--danger); }
+        
+        .btn-danger-solid { background: var(--danger); color: white; border:1px solid var(--danger); }
+        .btn-danger-solid:hover { background: #dc2626; }
+
+        .btn-info { background: rgba(14, 165, 233, 0.1); color: var(--info); border:1px solid rgba(14, 165, 233, 0.2); }
+        .btn-secondary { background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-main); }
+        .btn-secondary:hover { border-color: var(--text-muted); }
+        
+        .btn-sm { padding: 0.35rem 0.8rem; font-size: 0.75rem; border-radius: 6px; }
+        
+        .btn-icon { 
+            padding: 0.5rem; 
+            border-radius: 8px; 
+            background: transparent; 
+            color: var(--text-muted); 
+            cursor: pointer; 
+            border: none; 
+            transition: 0.2s;
+            display: flex; align-items: center; justify-content: center;
+            width: 36px; height: 36px;
+        }
+        .btn-icon:hover { color: white; background: rgba(255,255,255,0.05); }
+        .btn-icon.spin:hover i { animation: spin 1s linear infinite; }
+
+        /* FORMS */
+        input, select, textarea {
+            width:100%; 
+            padding: 0.65rem 0.85rem; 
+            background: var(--bg-input); 
+            border:1px solid var(--border); 
+            border-radius: 8px; 
+            color: white; 
+            font-family: inherit; 
+            font-size: 0.9rem; 
+            transition: 0.2s;
+        }
+        input:focus, select:focus, textarea:focus { 
+            border-color: var(--primary); 
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); 
+            background: #000;
+        }
+        input[readonly], textarea[readonly] { 
+            background: #141414; 
+            cursor: default; 
+            border-color: transparent; 
+            color: var(--text-muted); 
+        }
+        label { display: block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase; }
+
+        /* AUTH SCREEN */
+        #auth-screen { 
+            position: fixed; inset: 0; 
+            background: radial-gradient(circle at 50% 50%, #1e1e24 0%, #000 100%); 
+            z-index: 9999; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding:1rem;
+        }
+        .auth-card { 
+            width: 100%; max-width: 400px; 
+            padding: 2.5rem; 
+            background: rgba(18, 18, 22, 0.8); 
+            backdrop-filter: blur(20px);
+            border-radius: 24px; 
+            border:1px solid var(--border); 
+            text-align: center; 
+            box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+        }
+        .auth-card img { height: 50px; margin-bottom: 1.5rem; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
+
+        /* LAYOUT STRUCTURE */
+        #dashboard { display: flex; width: 100%; height: 100vh; overflow: hidden; position: relative; }
+        
+        /* SIDEBAR OVERLAY (Mobile) */
+        .sidebar-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+            z-index: var(--z-sidebar); opacity: 0; pointer-events: none; transition: 0.3s;
+        }
+        .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
+
+        /* SIDEBAR */
+        aside { 
+            width: var(--sidebar-width); 
+            background: var(--bg-sidebar); 
+            border-right:1px solid var(--border); 
+            display: flex; 
+            flex-direction: column; 
+            z-index: var(--z-sidebar); 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: fixed; top: var(--header-height); bottom: 0; left: 0;
+        }
+
+        /* HEADER */
+        header {
+            height: var(--header-height);
+            background: rgba(9, 9, 11, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom:1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            position: fixed; top: 0; left: 0; right: 0;
+            z-index: var(--z-header);
+        }
+        .header-left { display: flex; align-items: center; gap: 1rem; }
+        .header-brand { font-weight: 700; font-size: 1rem; color: white; letter-spacing: -0.3px; display: flex; align-items: center; gap: 10px; }
+        .header-brand img { height: 24px; filter: brightness(0) invert(1); }
+        .header-actions { display: flex; align-items: center; gap: 0.25rem; position: relative; height: 100%; }
+        
+        .notification-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--danger); border-radius: 50%; border: 2px solid var(--bg-sidebar); pointer-events: none; z-index: 10; }
+        
+        .notif-dropdown {
+            position: absolute; top: 70px; right: 10px; width: 320px;
+            background: var(--bg-surface); border:1px solid var(--border);
+            border-radius: 12px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            display: none; flex-direction: column; padding: 0;
+            z-index: var(--z-dropdown); 
+            max-height: 400px; overflow-y: auto;
+            transform-origin: top right;
+            animation: fadeIn 0.15s ease;
+        }
+        .notif-dropdown.show { display: flex; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .notif-item { padding: 0.9rem 1.2rem; border-bottom: 1px solid var(--border); transition: 0.2s; cursor: pointer; }
+        .notif-item:hover { background: rgba(255,255,255,0.03); }
+        .notif-item strong { color: white; display: block; margin-bottom: 2px; font-size: 0.85rem; }
+        .notif-item div { color: var(--text-muted); font-size: 0.8rem; line-height: 1.4; }
+        .notif-time { font-size: 0.7rem; color: var(--text-faint); margin-top: 4px; display: block; }
+
+        /* Sidebar Navigation */
+        .user-mini-profile { padding: 1.25rem; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.01); }
+        .u-info { display: flex; align-items: center; gap: 12px; }
+        .u-avatar { 
+            width: 40px; height: 40px; 
+            background: linear-gradient(135deg, var(--primary), #6366f1); 
+            border-radius: 10px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: 700; 
+            font-size: 1.1rem; 
+            color: white; 
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        .u-details h4 { font-size: 0.9rem; color: white; font-weight: 600; margin-bottom: 2px; }
+        .u-details p { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+
+        .nav-scroll { flex: 1; overflow-y: auto; padding: 1rem 0; }
+        .nav-section-title { 
+            padding: 1rem 1.5rem 0.5rem; 
+            font-size: 0.65rem; 
+            color: var(--text-faint); 
+            text-transform: uppercase; 
+            font-weight: 700; 
+            letter-spacing: 1px; 
+        }
+        .nav-item { 
+            padding: 0.7rem 1.5rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            color: var(--text-muted); 
+            cursor: pointer; 
+            transition: 0.2s; 
+            border-left: 3px solid transparent; 
+            font-weight: 500;
+            margin-right: 0.5rem;
+            border-radius: 0 8px 8px 0;
+            position: relative;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: white; }
+        .nav-item.active { 
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.08), transparent); 
+            color: var(--primary); 
+            border-left-color: var(--primary); 
+            font-weight: 600;
+        }
+        .nav-item i { font-size: 1.15rem; }
+
+        /* MAIN CONTENT */
+        main { 
+            flex: 1; 
+            overflow-y: auto; 
+            overflow-x: hidden; 
+            background: var(--bg-app); 
+            padding: 2rem; 
+            position: relative; 
+            margin-top: var(--header-height);
+            min-height: calc(100vh - var(--header-height));
+            width: 100%;
+        }
+
+        /* DASHBOARD CARDS */
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
+            gap: 1.25rem; 
+            margin-bottom: 2.5rem; 
+        }
+        .stat-card { 
+            background: var(--bg-surface); 
+            padding: 1.5rem; 
+            border-radius: 12px; 
+            border: 1px solid var(--border); 
+            display: flex; 
+            align-items: center; 
+            gap: 1.2rem;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .stat-card:hover { transform: translateY(-2px); border-color: var(--border-active); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+        .stat-icon { 
+            width: 48px; height: 48px; 
+            border-radius: 10px; 
+            background: rgba(255,255,255,0.03); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 1.4rem; 
+            color: var(--text-main);
+        }
+        .stat-info { display: flex; flex-direction: column; }
+        .stat-val { font-size: 1.5rem; font-weight: 700; color: white; line-height: 1.1; margin-bottom: 2px; }
+        .stat-label { color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* LIST GROUP */
+        .list-group { background: var(--bg-surface); border-radius: 12px; border: 1px solid var(--border); padding: 1.5rem; }
+        .list-group h3 { font-size: 1rem; font-weight: 600; margin-bottom:1.2rem; display: flex; justify-content: space-between; align-items: center; color: white; }
+        .activity-item { display: flex; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); }
+        .activity-item:last-child { border: none; }
+        .activity-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
+        .activity-content h5 { font-size: 0.85rem; font-weight: 600; color: white; margin-bottom: 2px; }
+        .activity-content p { font-size: 0.75rem; color: var(--text-muted); }
+        .activity-time { margin-left: auto; font-size: 0.7rem; color: var(--text-faint); white-space: nowrap; }
+
+        /* TABLES */
+        .table-container { 
+            background: var(--bg-surface); 
+            border-radius: 12px; 
+            border: 1px solid var(--border); 
+            overflow: hidden; 
+            margin-bottom: 2rem; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+        .table-header { 
+            padding: 1.2rem 1.5rem; 
+            border-bottom: 1px solid var(--border); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: rgba(255,255,255,0.015); 
+            flex-wrap: wrap; gap: 10px;
+        }
+        .table-header h3 { font-size: 0.95rem; font-weight: 600; color: white; }
+        .table-responsive { overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th { 
+            text-align: left; 
+            padding: 0.8rem 1.2rem; 
+            color: var(--text-muted); 
+            font-size: 0.75rem; 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            background: rgba(0,0,0,0.2); 
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+        }
+        td { padding: 0.9rem 1.2rem; border-bottom: 1px solid var(--border); color: var(--text-main); font-size: 0.85rem; vertical-align: middle; transition: 0.1s;}
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+
+        /* MODAL */
+        .modal-overlay { 
+            position: fixed; inset: 0; 
+            background: rgba(0,0,0,0.8); 
+            backdrop-filter: blur(6px); 
+            z-index: var(--z-modal-overlay); 
+            display: none; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 1rem;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal { 
+            background: var(--bg-surface); 
+            width: 100%; 
+            max-width: 520px; 
+            border-radius: 16px; 
+            border: 1px solid var(--border); 
+            display: flex; 
+            flex-direction: column; 
+            max-height: 90vh; 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        
+        .modal-header { 
+            padding: 1.25rem 1.5rem; 
+            border-bottom: 1px solid var(--border); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: rgba(255,255,255,0.02); 
+            border-radius: 16px 16px 0 0; 
+        }
+        .modal-title { font-size: 1.1rem; font-weight: 700; color: white; }
+        .modal-body { padding: 1.5rem; overflow-y: auto; }
+        .modal-footer { padding: 1.2rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; border-radius: 0 0 16px 16px; background: rgba(0,0,0,0.2); }
+
+        /* TOAST */
+        .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: var(--z-toast); display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { 
+            background: var(--bg-surface); 
+            color: white; 
+            padding: 1rem 1.25rem; 
+            border-radius: 10px; 
+            border: 1px solid var(--border); 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5); 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            transform: translateX(120%); 
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            min-width: 300px; pointer-events: auto;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+
+        /* Badges */
+        .badge { padding: 3px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; display: inline-block; letter-spacing: 0.3px; }
+        .badge-admin { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
+        .badge-crew { background: rgba(59, 130, 246, 0.15); color: var(--primary); border: 1px solid rgba(59, 130, 246, 0.2); }
+        .badge-user { background: rgba(255,255,255,0.1); color: white; }
+        .badge-voucher { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
+        
+        /* Request Badges */
+        .badge-content { background: rgba(14, 165, 233, 0.15); color: var(--info); border: 1px solid rgba(14, 165, 233, 0.2); }
+        .badge-upgrade { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .badge-renew { background: rgba(139, 92, 246, 0.15); color: var(--ticket); border: 1px solid rgba(139, 92, 246, 0.2); }
+        .badge-remove { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+
+        /* CONFIG TAB SPECIFICS */
+        .config-section { 
+            background: var(--bg-surface); 
+            border: 1px solid var(--border); 
+            border-radius: 12px; 
+            padding: 1.5rem; 
+            margin-bottom: 1.5rem; 
+        }
+        .config-header { 
+            font-size: 0.95rem; 
+            font-weight: 600; 
+            margin-bottom: 1rem; 
+            padding-bottom: 0.75rem; 
+            border-bottom: 1px solid var(--border); 
+            color: var(--text-main);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .toggle-switch {
+            position: relative; display: inline-block; width: 44px; height: 24px;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--bg-input); transition: .4s; border-radius: 34px; border: 1px solid var(--border);
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--primary); border-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(20px); }
+        
+        .price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .gateway-card { background: var(--bg-input); padding: 1rem; border-radius: 8px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 0.5rem; }
+
+        /* Loading State */
+        .loading-spinner {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-left-color: var(--primary);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .page-loader {
+            display: flex; justify-content: center; align-items: center; height: 300px; width: 100%;
+        }
+
+        /* --- MOBILE RESPONSIVENESS TWEAKS --- */
+        @media(min-width: 1025px) {
+            aside { transform: translateX(0) !important; width: var(--sidebar-width); }
+            main { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); padding: 2rem; }
+            .sidebar-overlay { display: none !important; }
+        }
+
+        @media(max-width: 1024px) {
+            aside { transform: translateX(-100%); width: 280px; box-shadow: 20px 0 40px rgba(0,0,0,0.5); }
+            aside.mobile-open { transform: translateX(0); }
+            main { margin-left: 0 !important; width: 100% !important; padding: 1.5rem; padding-top: 5rem; }
+            .stats-grid { grid-template-columns:1fr; }
+            .price-grid { grid-template-columns:1fr; }
+            .header-brand span { display: none; }
+            .notif-dropdown { right: 0; width: 90vw; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- AUTH SCREEN -->
+    <div id="auth-screen">
+        <div class="auth-card">
+            <img src="https://raw.githubusercontent.com/ddnetwork-ent/ddnetwork/refs/heads/main/DDN%20Logo%20NoBG.png" alt="Logo">
+            <h2 class="mb-4" style="color:white; font-weight: 700; letter-spacing: -0.5px;">Admin Portal v10.0</h2>
+            <form id="loginForm">
+                <input type="text" id="loginInput" class="mb-4" placeholder="Email or Crew ID" required>
+                <input type="password" id="loginPass" class="mb-4" placeholder="Password" required>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Secure Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboard" class="hidden">
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+        
+        <!-- GLOBAL HEADER -->
+        <header>
+            <div class="header-left">
+                <button class="btn-icon" onclick="toggleSidebar()"><i class="ri-menu-line" style="font-size: 1.4rem;"></i></button>
+                <div class="header-brand">
+                    <img src="https://raw.githubusercontent.com/ddnetwork-ent/ddnetwork/refs/heads/main/DDN%20Logo%20NoBG.png">
+                    <span>DDN v10.0</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn-icon spin" onclick="location.reload()" title="Force Refresh"><i class="ri-refresh-line"></i></button>
+                
+                <!-- Notifications (Admin Only) -->
+                <button class="btn-icon" id="notif-btn" onclick="toggleNotifications()" style="display:none;">
+                    <i class="ri-notification-3-line" style="font-size: 1.3rem;"></i>
+                    <span class="notification-dot" id="notifDot"></span>
+                    <!-- Dropdown positioned here via relative parent -->
+                    <div class="notif-dropdown" id="notifDropdown">
+                        <div class="p-4 text-center" style="color:var(--text-muted)">Loading activity logs...</div>
+                    </div>
+                </button>
+
+                <div class="u-avatar" style="width:32px; height:32px; font-size:0.85rem;" id="header-avatar">A</div>
+            </div>
+        </header>
+
+        <!-- SIDEBAR -->
+        <aside id="sidebar">
+            <div class="user-mini-profile">
+                <div class="u-info">
+                    <div class="u-avatar" id="side-avatar">A</div>
+                    <div class="u-details">
+                        <h4 id="side-name">Loading...</h4>
+                        <p id="side-job">Loading...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-scroll">
+                <div class="nav-item active" onclick="navigateTo('/')"><i class="ri-dashboard-line"></i> Overview</div>
+                
+                <div class="nav-section-title">Operations</div>
+                <div class="nav-item" onclick="navigateTo('/orders')"><i class="ri-shopping-bag-3-line"></i> Orders</div>
+                <div class="nav-item" onclick="navigateTo('/clients')"><i class="ri-user-line"></i> Clients</div>
+                <!-- NEW LINK: CUSTOMER REQUESTS -->
+                <div class="nav-item" onclick="navigateTo('/requests')"><i class="ri-database-2-line"></i> Customer Requests</div>
+                <div class="nav-item" id="nav-crew" onclick="navigateTo('/crew')"><i class="ri-team-line"></i> Internal Crew</div>
+                <div class="nav-item" onclick="navigateTo('/support')"><i class="ri-customer-service-2-line"></i> Support Tickets</div>
+                <div class="nav-item" onclick="navigateTo('/vouchers')"><i class="ri-ticket-2-line"></i> Vouchers</div>
+                
+                <div class="nav-section-title">Management</div>
+                <div class="nav-item" onclick="navigateTo('/portfolio')"><i class="ri-gallery-line"></i> Portfolio</div>
+                <div class="nav-item" onclick="navigateTo('/content')"><i class="ri-layout-masonry-line"></i> Content & Pkg</div>
+                <div class="nav-item" id="nav-config" onclick="navigateTo('/config')"><i class="ri-settings-4-line"></i> System Config</div>
+                
+                <div class="nav-section-title">Personal</div>
+                <div class="nav-item" onclick="navigateTo('/my-profile')"><i class="ri-user-settings-line"></i> My Profile</div>
+            </div>
+
+            <div style="padding: 1.5rem; border-top: 1px solid var(--border);">
+                <button class="btn btn-danger" style="width: 100%; justify-content: center;" onclick="handleLogout()"><i class="ri-logout-box-r-line"></i> Logout</button>
+            </div>
+        </aside>
+
+        <main id="main"></main>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Title</div>
+                <button class="btn-icon" onclick="closeModal()"><i class="ri-close-line"></i></button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer" id="modalFooter"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- FIREBASE SETUP ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAwf31b-wpYQwPbd-3DxnqGVRw8g3xq938",
+            authDomain: "ddnetwork-database.firebaseapp.com",
+            projectId: "ddnetwork-database",
+            storageBucket: "ddnetwork-database.firebasestorage.app",
+            messagingSenderId: "699127560990",
+            appId: "1:699127560990:web:50cfd61ff620bc85fb670f"
+        };
+        let db, auth, currentUser, userData = null;
+        try { firebase.initializeApp(firebaseConfig); db = firebase.firestore(); auth = firebase.auth(); } catch(e) { console.log("Firebase init error", e); }
+
+        // --- AUTO CREATE CONFIG & PAYMENT METHODS ON LOAD ---
+        async function initializeDatabase() {
+            const configRef = db.collection("config").doc("site_settings");
+            const doc = await configRef.get();
+            
+            if (!doc.exists) {
+                console.log("Config not found, creating default...");
+                await configRef.set({
+                    maintenance_active: false,
+                    maintenance_message: "We are currently performing scheduled maintenance.",
+                    prices: { html: 199, frontend:599 },
+                    packageDetails: {
+                        frontend: ["Up to 5 Pages", "Animations", "Contact Forms", "WhatsApp Integration"],
+                        ai: ["All Front-End Features", "AI Chatbot Integration", "Lead Auto-Response", "Smart Analytics"]
+                    },
+                    discountActive: false,
+                    discountPercent: 0.1
+                });
+                showToast("Database initialized!", "success");
+            }
+
+            // UPDATED: Initialize Dedicated Payment Methods Collection
+            const pmSnapshot = await db.collection("payment_methods").limit(1).get();
+            if (pmSnapshot.empty) {
+                console.log("Payment methods collection empty, adding defaults...");
+                const defaults = [
+                    { id: 'tng', name: 'TNG eWallet', link: 'https://payment.tngdigital.com.my/sc/bDLob7YcpG', active: true },
+                    { id: 'fpx', name: 'Online Banking (FPX)', link: 'https://toyyibpay.com', active: true }
+                ];
+                defaults.forEach(pm => db.collection("payment_methods").add(pm));
+            }
+        }
+
+        // --- LOGGING HELPER (ADMIN ONLY) ---
+        function logActivity(msg) {
+            if(!currentUser || !isAdmin()) return; 
+            db.collection("activity_logs").add({
+                message: msg,
+                actor: userData.email,
+                actorName: userData.name,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).catch(e => console.error("Log error:", e));
+        }
+
+        function formatDateTime(timestamp) {
+            if(!timestamp) return '-';
+            const d = timestamp instanceof Date ? timestamp : timestamp.toDate();
+            const pad = (n) => n.toString().padStart(2, '0');
+            return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+
+        // --- HELPER: GENERATE DOC ID FROM NAME ---
+        function generateDocIdFromName(name) {
+            if(!name) return 'new-project';
+            return name.trim()
+                       .toLowerCase()
+                       .replace(/[^a-z0-9]+/g, '-') // Replace spaces and symbols with dashes
+                       .replace(/^-+|-+$/g, ''); // Remove leading/trailing dashes
+        }
+
+        function updateDocIdPreview() {
+            const nameVal = document.getElementById('p-name').value;
+            const idVal = generateDocIdFromName(nameVal);
+            const idInput = document.getElementById('p-doc-id');
+            if(idInput) idInput.value = idVal;
+        }
+
+        // --- SMART ID GENERATOR ---
+        async function getNextId(type) {
+            if(type === 'crew') {
+                 try {
+                     const snap = await db.collection("users").where("crewId", "!=", null).get();
+                     let existingIds = [];
+                     snap.forEach(doc => {
+                         const id = doc.data().crewId;
+                         if(id) existingIds.push(parseInt(id));
+                     });
+                     existingIds.sort((a,b) => a-b);
+                     let nextId = 1;
+                     if(existingIds.length > 0) {
+                         for(let i=0; i<existingIds.length; i++) {
+                             if(existingIds[i] === nextId) {
+                                 nextId++;
+                             } else {
+                                 break;
+                             }
+                         }
+                     }
+                     return String(nextId).padStart(3, '0');
+                 } catch(e) { return "001"; }
+            } 
+            else if (type === 'ticket') {
+                try {
+                    const snap = await db.collection("tickets").orderBy("ticketId", "desc").limit(1).get();
+                    let nextNum = 1;
+                    if (!snap.empty) {
+                        const lastId = snap.docs[0].data().ticketId; 
+                        const parts = lastId.split('-');
+                        if (parts.length >1) {
+                            const lastNum = parseInt(parts[1], 10);
+                            if (!isNaN(lastNum)) {
+                                nextNum = lastNum + 1;
+                            }
+                        }
+                    }
+                    const paddedNum = String(nextNum).padStart(4, '0');
+                    return `#Ticket-${paddedNum}`;
+                } catch (e) {
+                    console.error("Error generating ticket ID", e);
+                    return "#Ticket-0001";
+                }
+            }
+            return null;
+        }
+
+        // --- AUTH ---
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('loginInput').value.trim();
+            const pass = document.getElementById('loginPass').value;
+            const isCrewId = /^\d{3,}$/.test(input);
+            let emailToUse = input;
+            if (isCrewId) {
+                const snap = await db.collection("users").where("crewId", "==", input).get();
+                if (snap.empty) return showToast("Crew ID not found.", "error");
+                emailToUse = snap.docs[0].data().email;
+            }
+            auth.signInWithEmailAndPassword(emailToUse, pass).catch(err => showToast(err.message, "error"));
+        });
+
+        auth.onAuthStateChanged((user) => {
+            if(user) {
+                db.collection("users").doc(user.uid).get().then(doc => {
+                    if(doc.exists && (doc.data().role === 'admin' || doc.data().role === 'crew')) {
+                        currentUser = user;
+                        userData = doc.data();
+                        document.getElementById('auth-screen').classList.add('hidden');
+                        document.getElementById('dashboard').classList.remove('hidden');
+                        
+                        document.getElementById('side-name').innerText = userData.name || 'User';
+                        document.getElementById('side-job').innerText = userData.jobTitle || userData.role;
+                        document.getElementById('side-avatar').innerText = (userData.name || 'A').charAt(0).toUpperCase();
+                        document.getElementById('header-avatar').innerText = (userData.name || 'A').charAt(0).toUpperCase();
+
+                        if(userData.role !== 'admin') {
+                            document.getElementById('nav-crew').classList.add('hidden');
+                            document.getElementById('nav-config').classList.add('hidden');
+                            document.getElementById('notif-btn').style.display = 'none'; 
+                        } else {
+                            document.getElementById('nav-crew').classList.remove('hidden');
+                            document.getElementById('nav-config').classList.remove('hidden');
+                            document.getElementById('notif-btn').style.display = 'flex';
+                            listenForNotifications(); 
+                        }
+
+                        // Initialize Router after auth
+                        initRouter();
+                        initializeDatabase(); 
+                    } else {
+                        showToast("Access Denied", "error"); auth.signOut();
+                    }
+                });
+            }
+        });
+
+        function handleLogout() { auth.signOut().then(() => location.reload()); }
+
+        // --- NOTIFICATIONS ---
+        function toggleNotifications() {
+            const el = document.getElementById('notifDropdown');
+            el.classList.toggle('show');
+        }
+        document.addEventListener('click', (e) => {
+            const dd = document.getElementById('notifDropdown');
+            const btn = document.getElementById('notif-btn');
+            if (!dd.contains(e.target) && !btn.contains(e.target)) {
+                dd.classList.remove('show');
+            }
+        });
+
+        function listenForNotifications() {
+            db.collection("activity_logs").orderBy("timestamp", "desc").limit(10).onSnapshot(snap => {
+                const container = document.getElementById('notifDropdown');
+                if(snap.empty) {
+                    container.innerHTML = '<div class="p-4 text-center" style="color:var(--text-muted)">No recent activity</div>';
+                    document.getElementById('notifDot').style.display = 'none';
+                    return;
+                }
+                document.getElementById('notifDot').style.display = 'block';
+                container.innerHTML = snap.docs.map(doc => {
+                    const d = doc.data();
+                    return `<div class="notif-item">
+                        <strong>${d.actorName || d.actor}</strong>
+                        <div>${d.message}</div>
+                        <span class="notif-time">${formatDateTime(d.timestamp)}</span>
+                    </div>`;
+                }).join('');
+            });
+        }
+
+        // --- ROUTING SYSTEM (History Mode) ---
+        const routes = {
+            '/': renderOverview,
+            '/orders': renderOrders,
+            '/clients': renderClients,
+            '/crew': renderCrew,
+            '/support': renderSupport,
+            '/vouchers': renderVouchers,
+            '/content': renderContent,
+            '/config': renderConfig,
+            '/portfolio': renderPortfolio,
+            '/requests': renderRequests, // NEW ROUTE
+            '/my-profile': renderMyProfile
+        };
+
+        function navigateTo(path) {
+            window.history.pushState({ path: path }, "", path);
+            loadRoute(path);
+        }
+
+        function loadRoute(path) {
+            const renderFn = routes[path];
+            if (renderFn) {
+                // Update Sidebar UI
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                const activeItem = document.querySelector(`.nav-item[onclick="navigateTo('${path}')"]`);
+                if(activeItem) activeItem.classList.add('active');
+                
+                // Render Content
+                renderFn();
+
+                // Close Mobile Drawer if open
+                if(window.innerWidth <= 1024) {
+                    document.getElementById('sidebar').classList.remove('mobile-open');
+                    document.getElementById('sidebarOverlay').classList.remove('active');
+                }
+            }
+        }
+
+        function initRouter() {
+            const path = window.location.pathname;
+            // Default to home if path is empty or just filename
+            const basePath = path.replace(/\/[^/]+\.html$/, '') || '/';
+            if (routes[basePath]) {
+                loadRoute(basePath);
+            } else {
+                navigateTo('/');
+            }
+        }
+
+        window.onpopstate = (event) => {
+            if (event.state && event.state.path) {
+                loadRoute(event.state.path);
+            }
+        };
+
+        // --- NAVIGATION HELPERS ---
+        function toggleSidebar() { 
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('sidebarOverlay');
+            if(window.innerWidth <= 1024) {
+                sb.classList.toggle('mobile-open');
+                ov.classList.toggle('active');
+            } else {
+                const mn = document.getElementById('main');
+                sb.classList.toggle('collapsed');
+                mn.classList.toggle('expanded');
+            }
+        }
+
+        // --- UTILS ---
+        function isAdmin() { return userData && userData.role === 'admin'; }
+        function showModal(title, body, footer='') {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalBody').innerHTML = body;
+            document.getElementById('modalFooter').innerHTML = footer;
+            document.getElementById('modalOverlay').classList.add('open');
+        }
+        function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+        function showToast(msg, type='info') {
+            const t = document.createElement('div'); t.className = `toast ${type}`;
+            const icon = type=='success'?'ri-checkbox-circle-fill':(type=='error'?'ri-error-warning-fill':'ri-information-fill');
+            t.innerHTML = `<i class="${icon}" style="font-size:1.2rem; color: ${type=='success'?'var(--success)':(type=='error'?'var(--danger)':'white')}"></i> <span>${msg}</span>`;
+            document.getElementById('toastContainer').appendChild(t);
+            setTimeout(()=>t.classList.add('show'), 10);
+            setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(), 400); }, 3500);
+        }
+
+        // --- GLOBAL DELETE FUNCTION ---
+        async function deleteUser(uid, name, type) {
+            if(!isAdmin()) return showToast("Access Denied", "error");
+            if(!confirm(`Are you sure you want to PERMANENTLY DELETE ${name}? This action cannot be undone.`)) return;
+            
+            try {
+                await db.collection("users").doc(uid).delete();
+                logActivity(`Deleted user: ${name} (${type})`);
+                showToast("User deleted successfully", "success");
+            } catch (error) {
+                console.error("Delete error:", error);
+                showToast("Error deleting user: " + error.message, "error");
+            }
+        }
+
+        // ---1. OVERVIEW ---
+        function renderOverview() {
+            const main = document.getElementById('main');
+            main.innerHTML = `
+                <div class="flex justify-between items-center mb-4" style="flex-wrap: wrap; gap:10px;">
+                    <h2 style="font-size:1.5rem; font-weight:700; letter-spacing:-0.5px;">Dashboard Overview</h2>
+                    <button class="btn btn-secondary btn-sm"><i class="ri-download-cloud-2-line"></i> Export Report</button>
+                </div>
+                <div class="stats-grid" id="stats-grid">
+                    <div class="page-loader" style="height:100px;"><div class="loading-spinner"></div></div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                    <div class="list-group">
+                        <h3><i class="ri-pulse-line" style="color:var(--success)"></i> Quick Actions</h3>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
+                            <button class="btn btn-secondary" onclick="navigateTo('/orders')"><i class="ri-shopping-bag-line"></i> New Order</button>
+                            <button class="btn btn-secondary" onclick="navigateTo('/support')"><i class="ri-ticket-line"></i> Check Tickets</button>
+                            <button class="btn btn-secondary" onclick="navigateTo('/requests')"><i class="ri-database-2-line"></i> Requests</button>
+                            ${isAdmin() ? `<button class="btn btn-secondary" onclick="navigateTo('/crew')"><i class="ri-user-add-line"></i> Add Crew</button>` : ''}
+                        </div>
+                    </div>
+                    <div class="list-group">
+                        <h3><i class="ri-history-line" style="color:var(--primary)"></i> Recent Activity</h3>
+                        <div id="activity-feed"><div class="text-center p-4 text-muted">Loading...</div></div>
+                    </div>
+                </div>
+            `;
+            
+            if(isAdmin()) {
+                listenForNotifications();
+                db.collection("activity_logs").orderBy("timestamp", "desc").limit(5).onSnapshot(snap => {
+                    const feed = document.getElementById('activity-feed');
+                    if(feed) {
+                        if(snap.empty) feed.innerHTML = '<div class="text-muted text-sm text-center mt-2">No recent activity</div>';
+                        else feed.innerHTML = snap.docs.map(doc => {
+                            const d = doc.data();
+                            return `<div class="activity-item">
+                                <div class="activity-icon"><i class="ri-shield-flash-line" style="color:var(--primary)"></i></div>
+                                <div class="activity-content">
+                                    <h5>${d.message}</h5>
+                                    <p>${d.actorName || d.actor}</p>
+                                </div>
+                                <div class="activity-time">${formatDateTime(d.timestamp)}</div>
+                            </div>`;
+                        }).join('');
+                    }
+                });
+            } else {
+                if(document.getElementById('activity-feed')) document.getElementById('activity-feed').innerHTML = '<div class="text-muted text-sm text-center mt-2">Restricted to Admins</div>';
+            }
+
+            const promises = [
+                db.collection("tickets").where("status", "in", ["Open", "In Progress"]).get(),
+                db.collection("users").where("role", "==", "user").get(),
+                db.collection("orders").where("status", "==", "Pending").get(),
+                db.collection("orders").where("status", "==", "Paid").get(),
+                db.collection("customer_requests").where("status", "==", "Pending").get() // NEW STATS
+            ];
+
+            Promise.all(promises).then(([tSnap, uSnap, oSnapP, oSnapPaid, rSnapP]) => {
+                const stats = [
+                    { label: "Active Cases", val: tSnap.size, icon: "ri-customer-service-2-line", color: "var(--ticket)" },
+                    { label: "Total Clients", val: uSnap.size, icon: "ri-user-smile-line", color: "var(--primary)" },
+                    { label: "Pending Orders", val: oSnapP.size, icon: "ri-shopping-basket-2-line", color: "var(--text-muted)" },
+                    { label: "Revenue (Est.)", val: `RM ${oSnapPaid.size * 300}`, icon: "ri-wallet-3-line", color: "var(--success)" }
+                ];
+                const grid = document.getElementById('stats-grid');
+                if(grid) {
+                    grid.innerHTML = stats.map(s => `
+                        <div class="stat-card">
+                            <div class="stat-icon" style="color:${s.color}; background:${s.color}15"><i class="${s.icon}"></i></div>
+                            <div class="stat-info">
+                                <div class="stat-val">${s.val}</div>
+                                <div class="stat-label">${s.label}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            });
+        }
+
+        // --- 2. ORDERS ---
+        function renderOrders() {
+            document.getElementById('main').innerHTML = `
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Order Management</h3>
+                        <input type="text" id="orderSearch" placeholder="Search ID, Name..." style="width:200px;" onkeyup="filterTable('orders-tbody', this.value)">
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Client</th>
+                                    <th>Package</th>
+                                    <th>Voucher Used</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-tbody">
+                                <tr><td colspan="7" class="text-center"><div class="loading-spinner"></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>`;
+            
+            db.collection("orders").orderBy("timestamp", "desc").onSnapshot(snap => {
+                const tbody = document.getElementById('orders-tbody');
+                if(!tbody) return;
+                
+                if(snap.empty) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No orders found</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = snap.docs.map(doc => {
+                    const d = doc.data();
+                    
+                    let voucherBadge = '<span style="color:var(--text-faint)">None</span>';
+                    if (d.voucherCode) {
+                        voucherBadge = `<span class="badge badge-voucher"><i class="ri-coupon-line"></i> ${d.voucherCode}</span>`;
+                    }
+
+                    let statusColor = '#71717a';
+                    if(d.status === 'Completed') statusColor = 'var(--success)';
+                    if(d.status === 'Paid') statusColor = 'var(--primary)';
+                    if(d.status === 'Cancelled') statusColor = 'var(--danger)';
+                    
+                    return `<tr>
+                        <td style="white-space:nowrap;">${formatDateTime(d.timestamp)}</td>
+                        <td><strong>${d.customerName}</strong></td>
+                        <td>${d.package}</td>
+                        <td>${voucherBadge}</td>
+                        <td>${d.total}</td>
+                        <td><span class="badge" style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}25">${d.status}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary" onclick="viewOrder('${doc.id}')">Manage</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteOrder('${doc.id}')"><i class="ri-delete-bin-line"></i></button>
+                        </td>
+                    </tr>`;
+                }).join('');
+            });
+        }
+
+        function viewOrder(id) {
+            db.collection("orders").doc(id).get().then(doc => {
+                const d = doc.data();
+                const voucherDisplay = d.voucherCode 
+                    ? `<div class="mb-4"><label>Voucher Used</label><input readonly value="${d.voucherCode}" style="color:var(--warning); border-color:var(--warning)"></div>` 
+                    : '';
+
+                showModal(`Manage Order`, `
+                    ${voucherDisplay}
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div><label class="text-muted text-sm">Name</label><input id="o-name" value="${d.customerName}"></div>
+                        <div><label class="text-muted text-sm">Email</label><input id="o-email" value="${d.customerEmail}"></div>
+                        <div><label class="text-muted text-sm">Phone</label><input id="o-phone" value="${d.customerPhone||''}"></div>
+                        <div><label class="text-muted text-sm">Total</label><input id="o-total" value="${d.total}"></div>
+                    </div>
+                    <label class="mt-4 mb-2 block">Update Status</label>
+                    <select id="upd-status">
+                        <option value="Pending" ${d.status=='Pending'?'selected':''}>Pending</option>
+                        <option value="Paid" ${d.status=='Paid'?'selected':''}>Paid</option>
+                        <option value="Completed" ${d.status=='Completed'?'selected':''}>Completed</option>
+                        <option value="Cancelled" ${d.status=='Cancelled'?'selected':''}>Cancelled</option>
+                    </select>
+                `, `<button class="btn btn-primary" onclick="updateOrderDetails('${id}')">Save Changes</button>`);
+            });
+        }
+
+        function updateOrderDetails(id) {
+            db.collection("orders").doc(id).update({
+                customerName: document.getElementById('o-name').value,
+                customerEmail: document.getElementById('o-email').value,
+                customerPhone: document.getElementById('o-phone').value,
+                total: document.getElementById('o-total').value,
+                status: document.getElementById('upd-status').value
+            }).then(() => { 
+                closeModal(); showToast("Order Updated Successfully", "success"); logActivity(`Updated Order #${id.substr(0,6)}`);
+            });
+        }
+
+        function deleteOrder(id) {
+            if(!confirm("Delete this order?")) return;
+            db.collection("orders").doc(id).delete().then(() => {
+                showToast("Order Deleted", "success");
+                logActivity(`Deleted Order #${id.substr(0,6)}`);
+            });
+        }
+
+        // --- 3. CLIENTS ---
+        function renderClients() {
+            document.getElementById('main').innerHTML = `
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Client Directory</h3>
+                        <input type="text" id="clientSearch" placeholder="Search..." style="width:200px;" onkeyup="filterTable('client-tbody', this.value)">
+                    </div>
+                    <div class="table-responsive">
+                        <table><thead><tr><th>Name</th><th>Company</th><th>Contact</th><th>Voucher</th><th>Actions</th></tr></thead><tbody id="client-tbody">
+                        <tr><td colspan="5" class="text-center"><div class="loading-spinner"></div></td></tr>
+                        </tbody></table>
+                    </div>
+                </div>`;
+            
+            db.collection("users").where("role", "==", "user").onSnapshot(snap => {
+                const tbody = document.getElementById('client-tbody');
+                if(!tbody) return;
+                if(snap.empty) { tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No clients found</td></tr>'; return; }
+                
+                tbody.innerHTML = snap.docs.map(doc => {
+                    const u = doc.data();
+                    const vStatus = u.personalVoucher ? u.personalVoucher.status : 'None';
+                    const vCode = u.personalVoucher ? u.personalVoucher.code : '-';
+                    return `<tr>
+                        <td>${u.name}</td>
+                        <td>${u.company||'-'}</td>
+                        <td>${u.email}<br><small style="color:var(--text-faint)">${u.phone||''}</small></td>
+                        <td>${vStatus !== 'None' ? `<span class="badge" style="background:${vStatus==='active'?'var(--success)':'var(--text-faint)'}">${vCode}</span>` : '-'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary" onclick="editClient('${doc.id}')">Edit</button>
+                            <button class="btn btn-sm btn-secondary" onclick="resetPassword('${u.email}')">Reset PW</button>
+                            <button class="btn btn-sm btn-primary" onclick="openAssignVoucherModal('${doc.id}', '${u.name}')">Assign Voucher</button>
+                            ${isAdmin() ? `<button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Client')"><i class="ri-delete-bin-line"></i></button>` : ''}
+                        </td>
+                    </tr>`;
+                }).join('');
+            });
+        }
+        function editClient(uid) {
+            db.collection("users").doc(uid).get().then(doc => {
+                const u = doc.data();
+                showModal("Edit Client", `
+                    <label>Name</label><input id="e-name" class="mb-4" value="${u.name}">
+                    <label>Email</label><input readonly id="e-email" class="mb-4" value="${u.email}">
+                    <label>Phone</label><input id="e-phone" class="mb-4" value="${u.phone||''}">
+                    <label>Company</label><input id="e-comp" class="mb-4" value="${u.company||''}">
+                `, `<button class="btn btn-primary" onclick="saveClient('${uid}')">Update</button>`);
+            });
+        }
+        function saveClient(uid) {
+            db.collection("users").doc(uid).update({ 
+                name: document.getElementById('e-name').value, 
+                phone: document.getElementById('e-phone').value, 
+                company: document.getElementById('e-comp').value 
+            }).then(() => { closeModal(); showToast("Client Updated", "success"); logActivity("Updated client details"); });
+        }
+        function resetPassword(email) {
+            if(confirm(`Send reset email to ${email}?`)) {
+                auth.sendPasswordResetEmail(email).then(() => showToast("Reset email sent", "success"));
+            }
+        }
+
+        // --- 4. CREW MANAGEMENT ---
+        function renderCrew() {
+            if(!isAdmin()) return;
+            document.getElementById('main').innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h2 style="font-size:1.25rem; font-weight:700;">Internal Crew</h2>
+                    <button class="btn btn-primary" onclick="openAddCrewModal()"><i class="ri-add-line"></i> Add Crew</button>
+                </div>
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table><thead><tr><th>Crew ID</th><th>Name</th><th>Email</th><th>Role</th><th>Job Title</th><th>Actions</th></tr></thead><tbody id="crew-tbody">
+                        <tr><td colspan="6" class="text-center"><div class="loading-spinner"></div></td></tr>
+                        </tbody></table>
+                    </div>
+                </div>`;
+            db.collection("users").where("role", "in", ["admin", "crew"]).onSnapshot(snap => {
+                const tbody = document.getElementById('crew-tbody');
+                if(!tbody) return;
+                tbody.innerHTML = snap.docs.map(doc => {
+                    const u = doc.data();
+                    return `<tr>
+                        <td style="font-family:monospace; color:var(--primary)">${u.crewId || 'N/A'}</td>
+                        <td>${u.name}</td>
+                        <td>${u.email}</td>
+                        <td><span class="badge badge-${u.role}">${u.role}</span></td>
+                        <td>${u.jobTitle||'-'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary" onclick="editCrew('${doc.id}')"><i class="ri-pencil-line"></i></button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Crew')"><i class="ri-delete-bin-line"></i></button>
+                        </td>
+                    </tr>`;
+                }).join('');
+            });
+        }
+        
+        async function openAddCrewModal() {
+            const newCrewId = await getNextId('crew');
+            showModal("Add New Crew", `
+                <div class="mb-4"><label>Crew ID</label><input id="c-id" value="${newCrewId}" readonly></div>
+                <div class="mb-4"><label>Full Name</label><input id="c-name"></div>
+                <div class="mb-4"><label>Email Address</label><input type="email" id="c-email"></div>
+                <div class="flex gap-4 mb-4">
+                    <div style="flex:1"><label>Role</label>
+                        <select id="c-role">
+                            <option value="crew">Crew</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div style="flex:1"><label>Job Title</label><input id="c-job"></div>
+                </div>
+                <div class="mb-4"><label>Temporary Password</label><input type="password" id="c-pass" placeholder="Set password"></div>
+            `, `<button class="btn btn-primary" onclick="saveCrew('${newCrewId}')">Create Crew</button>`);
+        }
+
+        async function saveCrew(newId) {
+            const name = document.getElementById('c-name').value;
+            const email = document.getElementById('c-email').value;
+            const pass = document.getElementById('c-pass').value;
+            const role = document.getElementById('c-role').value;
+            const job = document.getElementById('c-job').value;
+
+            if(!name || !email || !pass) return showToast("Please fill all fields", "error");
+
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, pass);
+                await db.collection("users").doc(userCredential.user.uid).set({
+                    crewId: newId,
+                    name: name,
+                    email: email,
+                    role: role,
+                    jobTitle: job,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                closeModal();
+                showToast("Crew created successfully", "success");
+                logActivity(`Created new crew member: ${name} (${newId})`);
+            } catch(e) {
+                showToast(e.message, "error");
+            }
+        }
+
+        function editCrew(uid) {
+            db.collection("users").doc(uid).get().then(doc => {
+                const u = doc.data();
+                showModal("Edit Crew Member", `
+                    <div class="mb-4"><label>Crew ID</label><input id="e-c-id" value="${u.crewId}"></div>
+                    <div class="mb-4"><label>Full Name</label><input id="e-c-name" value="${u.name}"></div>
+                    <div class="mb-4"><label>Job Title</label><input id="e-c-job" value="${u.jobTitle||''}"></div>
+                    <div class="mb-4"><label>Role</label>
+                        <select id="e-c-role">
+                            <option value="crew" ${u.role==='crew'?'selected':''}>Crew</option>
+                            <option value="admin" ${u.role==='admin'?'selected':''}>Admin</option>
+                        </select>
+                    </div>
+                `, `<button class="btn btn-primary" onclick="updateCrewData('${uid}')">Save</button>`);
+            });
+        }
+
+        function updateCrewData(uid) {
+            db.collection("users").doc(uid).update({
+                crewId: document.getElementById('e-c-id').value,
+                name: document.getElementById('e-c-name').value,
+                jobTitle: document.getElementById('e-c-job').value,
+                role: document.getElementById('e-c-role').value
+            }).then(() => {
+                closeModal();
+                showToast("Crew details updated", "success");
+                logActivity(`Updated crew member details`);
+            });
+        }
+
+        // --- 5. SUPPORT ---
+        function renderSupport() {
+            document.getElementById('main').innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <button class="btn btn-secondary" onclick="openCreateTicket()"><i class="ri-add-line"></i> Create New Ticket</button>
+                    <input type="text" id="ticketSearch" placeholder="Search ID, Client..." style="width:200px;" onkeyup="filterTable('supp-tbody', this.value)">
+                </div>
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table><thead><tr><th>ID</th><th>Date</th><th>Client</th><th>Issue</th><th>Assigned To</th><th>Status</th><th>Action</th></tr></thead><tbody id="supp-tbody">
+                        <tr><td colspan="7" class="text-center"><div class="loading-spinner"></div></td></tr>
+                        </tbody></table>
+                    </div>
+                </div>`;
+            db.collection("tickets").orderBy("timestamp", "desc").onSnapshot(snap => {
+                const tbody = document.getElementById('supp-tbody');
+                if(!tbody) return;
+                if(snap.empty) { tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No tickets found</td></tr>'; return; }
+
+                tbody.innerHTML = snap.docs.map(doc => {
+                    const d = doc.data();
+                    let statusBadge = '';
+                    if(d.status === 'Closed') statusBadge = 'var(--text-faint)';
+                    else if(d.status === 'In Progress') statusBadge = 'var(--primary)';
+                    else statusBadge = 'var(--warning)';
+
+                    return `<tr>
+                        <td style="font-family:monospace; color:var(--ticket)">${d.ticketId || doc.id}</td>
+                        <td style="white-space:nowrap;">${formatDateTime(d.timestamp)}</td>
+                        <td>${d.name}</td><td>${d.type}</td>
+                        <td>${d.assignedToName || 'Unassigned'}</td>
+                        <td><span class="badge" style="background:${statusBadge}15; color:${statusBadge}">${d.status}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary" onclick="viewTicket('${doc.id}')">Manage</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteItem('ticket','${doc.id}')"><i class="ri-delete-bin-line"></i></button>
+                        </td>
+                    </tr>`;
+                }).join('');
+            });
+        }
+
+        async function openCreateTicket() {
+            const newId = await getNextId('ticket');
+            
+            showModal("Create Support Ticket", `
+                <div class="mb-4"><label>Generated ID</label><input value="${newId}" readonly style="font-family:monospace; color:var(--ticket)"></div>
+                <div class="mb-4"><label>Client Name</label><input id="tk-name"></div>
+                <div class="mb-4"><label>Issue Type</label><select id="tk-type"><option>Technical</option><option>Billing</option><option>Other</option></select></div>
+                <div class="mb-4"><label>Details</label><textarea id="tk-msg"></textarea></div>
+            `, `<button class="btn btn-primary" onclick="saveNewTicket('${newId}')">Create</button>`);
+        }
+
+        function saveNewTicket(id) {
+            db.collection("tickets").add({ 
+                ticketId: id, 
+                name: document.getElementById('tk-name').value, 
+                type: document.getElementById('tk-type').value, 
+                message: document.getElementById('tk-msg').value, 
+                status: 'Open', 
+                timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+            }).then(() => { 
+                closeModal(); 
+                showToast("Ticket Created Successfully", "success"); 
+                logActivity(`Created new support ticket ${id}`);
+            });
+        }
+
+        function viewTicket(id) {
+            db.collection("tickets").doc(id).get().then(doc => {
+                const d = doc.data();
+                db.collection("users").where("role", "in", ["admin", "crew"]).get().then(snap => {
+                    const crewOpts = snap.docs.map(c => `<option value="${c.id}" ${d.assignedTo===c.id?'selected':''}>${c.data().name}</option>`).join('');
+                    
+                    showModal(`Ticket: ${d.ticketId || id}`, `
+                        <p class="mb-4 p-4" style="background:var(--bg-sidebar); border-radius:8px; border:1px solid var(--border)">${d.message}</p>
+                        <div class="flex gap-4 mb-4">
+                            <div style="flex:1"><label>Status</label>
+                                <select id="tk-status">
+                                    <option value="Open" ${d.status=='Open'?'selected':''}>Open</option>
+                                    <option value="In Progress" ${d.status=='In Progress'?'selected':''}>In Progress</option>
+                                    <option value="Closed" ${d.status=='Closed'?'selected':''}>Closed</option>
+                                </select>
+                            </div>
+                            <div style="flex:1"><label>Assign To Crew</label>
+                                <select id="tk-assign">
+                                    <option value="">Unassigned</option>
+                                    ${crewOpts}
+                                </select>
+                            </div>
+                        </div>
+                    `, `<button class="btn btn-primary" onclick="saveTicketDetails('${id}')">Save Changes</button>`);
+                });
+            });
+        }
+        function saveTicketDetails(id) {
+            const newStatus = document.getElementById('tk-status').value;
+            const newAssignId = document.getElementById('tk-assign').value;
+            const newAssignName = newAssignId ? document.getElementById('tk-assign').options[document.getElementById('tk-assign').selectedIndex].text : "";
+            
+            db.collection("tickets").doc(id).update({
+                status: newStatus,
+                assignedTo: newAssignId || null,
+                assignedToName: newAssignName
+            }).then(() => { closeModal(); showToast("Ticket Updated", "success"); logActivity(`Updated Ticket #${id}`); });
+        }
+
+        // --- 6. VOUCHERS ---
+        let currentVoucherFilter = 'All'; 
+
+        async function renderVouchers() {
+            if(!isAdmin()) return;
+            document.getElementById('main').innerHTML = `
+                <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+                    <h3 style="font-size:1.25rem; font-weight:700;">Voucher Management</h3>
+                    <div class="flex gap-2">
+                        <button class="btn btn-primary" onclick="openAssignVoucherModal(null, null)"><i class="ri-add-line"></i> Assign New</button>
+                        <button class="btn btn-secondary" onclick="renderVouchers()"><i class="ri-refresh-line"></i> Sync Data</button>
+                    </div>
+                </div>
+                
+                <div class="table-container" style="min-height: 200px; display:flex; justify-content:center; align-items:center;">
+                    <div id="voucher-loader" class="loading-spinner"></div>
+                </div>
+
+                <div class="table-container hidden" id="active-vouchers-container">
+                    <div class="table-header"><h3>Active Vouchers</h3></div>
+                    <div class="table-responsive">
+                        <table><thead><tr><th>User</th><th>Code</th><th>Status</th><th>Value</th><th>Expiry</th><th>Actions</th></tr></thead><tbody id="vouch-active"></tbody></table>
+                    </div>
+                </div>
+
+                <div class="table-container hidden" id="history-vouchers-container">
+                    <div class="table-header">
+                        <div class="flex items-center gap-4">
+                            <h3>Voucher History</h3>
+                            <div class="filter-group">
+                                <select id="voucher-filter" class="filter-select" onchange="updateHistoryFilter(this.value)">
+                                    <option value="All">Show All</option>
+                                    <option value="Redeemed">Redeemed Only</option>
+                                    <option value="Expired">Expired Only</option>
+                                    <option value="Disabled">Disabled Only</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table><thead><tr><th>Code</th><th>User</th><th>Status</th><th>Date Moved</th><th>Actions</th></tr></thead><tbody id="vouch-history"></tbody></table>
+                    </div>
+                </div>
+            `;
+
+            await syncVoucherLogic();
+
+            document.getElementById('voucher-loader').parentElement.classList.add('hidden');
+            document.getElementById('active-vouchers-container').classList.remove('hidden');
+            document.getElementById('history-vouchers-container').classList.remove('hidden');
+
+            // Render Active
+            db.collection("users").where("personalVoucher", "!=", null).onSnapshot(snap => {
+                const tbody = document.getElementById('vouch-active');
+                if(!tbody) return;
+                tbody.innerHTML = '';
+                snap.forEach(doc => {
+                    const u = doc.data();
+                    const v = u.personalVoucher;
+                    const vStatus = v.status ? v.status : 'Active';
+                    let statusColor = 'var(--success)';
+                    const statusLower = vStatus.toLowerCase();
+                    if (statusLower === 'suspended') statusColor = 'var(--danger)';
+                    
+                    tbody.innerHTML += `<tr>
+                        <td>${u.name}</td>
+                        <td style="font-family:monospace; color:var(--primary)">${v.code}</td>
+                        <td>
+                            <span class="badge" style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}25">
+                                ${vStatus}
+                            </span>
+                        </td>
+                        <td>${v.type=='fixed'?'RM '+v.value:v.value*100+'%'}</td>
+                        <td>${v.expiryDate ? new Date(v.expiryDate.seconds*1000).toLocaleDateString() : '-'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary" onclick="editVoucher('${doc.id}', '${v.code}')">Edit</button>
+                            <button class="btn btn-sm btn-success" onclick="markRedeem('${doc.id}', '${v.code}')"><i class="ri-check-double-line"></i> Redeem</button>
+                            <button class="btn btn-sm btn-danger" onclick="disableVoucher('${doc.id}', '${v.code}')"><i class="ri-delete-bin-line"></i> Disable</button>
+                        </td>
+                    </tr>`;
+                });
+            });
+
+            // Render History
+            const updateHistoryListener = (filterVal) => {
+                db.collection("vouchers_history").orderBy("movedAt", "desc").limit(50).onSnapshot(snap => {
+                    const tbody = document.getElementById('vouch-history');
+                    if(!tbody) return;
+                    tbody.innerHTML = '';
+                    snap.forEach(doc => {
+                        const v = doc.data();
+                        if(filterVal !== 'All' && v.status !== filterVal) return;
+
+                        let actionBtn = '';
+                        if (v.status === 'Redeemed') actionBtn = `<small style="color:var(--text-faint)">Locked</small>`;
+                        else actionBtn = `<button class="btn btn-sm btn-success" onclick="restoreVoucher('${v.code}', '${v.ownerUid}')">Restore</button>`;
+                        
+                        let statusColor = 'var(--text-faint)';
+                        if (v.status === 'Redeemed') statusColor = 'var(--success)';
+                        if (v.status === 'Expired') statusColor = 'var(--warning)'; 
+                        if (v.status === 'Disabled') statusColor = 'var(--text-faint)';
+
+                        tbody.innerHTML += `<tr>
+                            <td style="font-family:monospace">${v.code}</td>
+                            <td>${v.assignedToName || '-'}</td>
+                            <td><span class="badge" style="background:${statusColor}15; color:${statusColor}">${v.status}</span></td>
+                            <td>${v.movedAt ? formatDateTime(v.movedAt) : '-'}</td>
+                            <td>${actionBtn}</td>
+                        </tr>`;
+                    });
+                });
+            };
+            updateHistoryListener(currentVoucherFilter);
+        }
+
+        window.updateHistoryFilter = (val) => {
+            currentVoucherFilter = val;
+        };
+
+        async function syncVoucherLogic() {
+            const usersSnap = await db.collection("users").where("personalVoucher", "!=", null).get();
+            if(usersSnap.empty) return;
+
+            let movedCount = 0;
+            for (const userDoc of usersSnap.docs) {
+                const uid = userDoc.id;
+                const uData = userDoc.data();
+                const vouch = uData.personalVoucher;
+                const code = vouch.code;
+                
+                let moveToHistory = false;
+                let statusReason = "";
+
+                if(vouch.expiryDate) {
+                    const expDate = vouch.expiryDate.toDate ? vouch.expiryDate.toDate() : new Date(vouch.expiryDate);
+                    if(new Date() > expDate) {
+                        moveToHistory = true;
+                        statusReason = "Expired";
+                    }
+                }
+
+                const currentStatus = (vouch.status || '').toLowerCase();
+                if (currentStatus === 'redeemed' && !moveToHistory) {
+                    moveToHistory = true;
+                    statusReason = "Redeemed";
+                } else if (currentStatus === 'disabled' && !moveToHistory) {
+                    moveToHistory = true;
+                    statusReason = "Disabled";
+                }
+
+                if(moveToHistory) {
+                    await db.collection("vouchers_history").doc(code).set({
+                        ...vouch,
+                        ownerUid: uid,
+                        assignedToName: uData.name,
+                        status: statusReason,
+                        movedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    await db.collection("users").doc(uid).update({
+                        personalVoucher: firebase.firestore.FieldValue.delete()
+                    });
+                    console.log(`Moved ${code} to history as ${statusReason}`);
+                    movedCount++;
+                }
+            }
+            if(movedCount > 0) showToast(`Synced ${movedCount} vouchers to history`, "success");
+        }
+
+        function editVoucher(uid, code) {
+            db.collection("users").doc(uid).get().then(doc => {
+                const v = doc.data().personalVoucher;
+                const exp = v.expiryDate ? new Date(v.expiryDate.seconds*1000).toISOString().split('T')[0] : '';
+                const currentStatus = v.status ? v.status : 'Active';
+                
+                showModal(`Edit Voucher ${code}`, `
+                    <label>Code</label><input id="e-v-code" value="${v.code}" class="mb-4">
+                    <label>Status</label>
+                    <select id="e-v-status" class="mb-4">
+                        <option value="Active" ${currentStatus==='Active'?'selected':''}>Active</option>
+                        <option value="Suspended" ${currentStatus==='Suspended'?'selected':''}>Suspended</option>
+                    </select>
+                    <label>Value</label><input type="number" id="e-v-val" value="${v.value}" class="mb-4">
+                    <label>Expiry Date</label><input type="date" id="e-v-exp" value="${exp}" class="mb-4">
+                `, `<button class="btn btn-primary" onclick="saveEditVoucher('${uid}')">Save</button>`);
+            });
+        }
+
+        function saveEditVoucher(uid) {
+            const newCode = document.getElementById('e-v-code').value.toUpperCase();
+            const newStatus = document.getElementById('e-v-status').value;            
+            
+            db.collection("users").doc(uid).get().then(doc => {
+                const v = doc.data().personalVoucher;
+                db.collection("users").doc(uid).update({
+                    personalVoucher: { 
+                        ...v, 
+                        code: newCode, 
+                        value: parseFloat(document.getElementById('e-v-val').value), 
+                        expiryDate: document.getElementById('e-v-exp').value ? new Date(document.getElementById('e-v-exp').value) : null,
+                        status: newStatus 
+                    }
+                }).then(() => { closeModal(); showToast("Voucher Updated", "success"); logActivity(`Edited voucher ${newCode}`); });
+            });
+        }
+
+        async function markRedeem(uid, code) {
+            if(!confirm(`Mark voucher ${code} as Redeemed? This will move it to History.`)) return;
+            
+            const userDoc = await db.collection("users").doc(uid).get();
+            const uData = userDoc.data();
+            const vouch = uData.personalVoucher;
+
+            await db.collection("vouchers_history").doc(code).set({
+                ...vouch,
+                ownerUid: uid,
+                assignedToName: uData.name,
+                status: "Redeemed",
+                movedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            await db.collection("users").doc(uid).update({ personalVoucher: firebase.firestore.FieldValue.delete() });
+            showToast("Voucher Redeemed", "success");
+            logActivity(`Marked voucher ${code} as Redeemed`);
+        }
+
+        async function disableVoucher(uid, code) {
+            if(!confirm(`Disable voucher ${code}? This will move it to History.`)) return;
+            
+            const userDoc = await db.collection("users").doc(uid).get();
+            const uData = userDoc.data();
+            const vouch = uData.personalVoucher;
+
+            await db.collection("vouchers_history").doc(code).set({
+                ...vouch,
+                ownerUid: uid,
+                assignedToName: uData.name,
+                status: "Disabled",
+                movedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            await db.collection("users").doc(uid).update({ personalVoucher: firebase.firestore.FieldValue.delete() });
+            showToast("Voucher Disabled", "info");
+            logActivity(`Disabled voucher ${code}`);
+        }
+
+        function openAssignVoucherModal(uid, userName) {
+            const promise = uid ? Promise.resolve(null) : db.collection("users").where("role", "==", "user").get();
+            promise.then(snap => {
+                let userSelect = '';
+                if(snap) {
+                    userSelect = `<label>Select Client</label><select id="v-user" class="mb-4">${snap.docs.map(d => `<option value="${d.id}">${d.data().name}</option>`).join('')}</select>`;
+                } else {
+                    userSelect = `<input type="hidden" id="v-user" value="${uid}">`;
+                }
+                const autoCode = `GIFT-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+                showModal("Assign Voucher", `
+                    ${userSelect}
+                    <div class="mb-4"><label>Code</label><input id="v-code" value="${autoCode}"></div>
+                    <div class="flex gap-4 mb-4">
+                        <div style="flex:1"><label>Type</label><select id="v-val-type"><option value="fixed">Fixed (RM)</option><option value="percent">Percent (%)</option></select></div>
+                        <div style="flex:1"><label>Value</label><input type="number" id="v-val"></div>
+                    </div>
+                    <label>Expiry Date</label><input type="date" id="v-exp" class="mb-4">
+                `, `<button class="btn btn-primary" onclick="submitAssignVoucher()">Assign</button>`);
+            });
+        }
+        function submitAssignVoucher() {
+            const uid = document.getElementById('v-user').value;
+            const code = document.getElementById('v-code').value.toUpperCase();
+            db.collection("users").doc(uid).update({ personalVoucher: {
+                code: code, type: document.getElementById('v-val-type').value, value: parseFloat(document.getElementById('v-val').value), expiryDate: document.getElementById('v-exp').value ? new Date(document.getElementById('v-exp').value) : null, status: 'active', auditLog: [{ action: 'Created', by: userData.email, date: new Date().toISOString() }]
+            }}).then(() => { closeModal(); showToast(`Voucher ${code} Assigned!`, "success"); logActivity(`Assigned voucher ${code}`); });
+        }
+
+        function restoreVoucher(code, ownerUid) {
+            if(!confirm("Restore this voucher? It will move back to Active list.")) return;
+            db.collection("vouchers_history").doc(code).get().then(hist => {
+                if(!hist.exists) return showToast("Error", "error");
+                const v = hist.data();
+                db.collection("users").doc(ownerUid).update({ personalVoucher: { ...v, status: 'active' } }).then(() => {
+                    db.collection("vouchers_history").doc(code).delete().then(() => { showToast("Voucher Restored", "success"); logActivity(`Restored voucher ${code}`); });
+                });
+            });
+        }
+
+        // --- 7. CONTENT & PACKAGES ---
+        function renderContent() {
+            if(!isAdmin()) return;
+            
+            db.collection("config").doc("site_settings").get().then(doc => {
+                const siteData = doc.exists ? doc.data() : {};
+                const packages = siteData.packageDetails || {};
+                
+                const frontendFeatures = (packages.frontend && packages.frontend.features) 
+                    ? packages.frontend.features 
+                    : ["Up to 5 Pages", "Animations", "Contact Forms", "WhatsApp Integration"];
+                const aiFeatures = (packages.ai && packages.ai.features)
+                    ? packages.ai.features
+                    : ["All Front-End Features", "AI Chatbot Integration", "Lead Auto-Response", "Smart Analytics"];
+
+                document.getElementById('main').innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h2 style="font-size:1.25rem; font-weight:700;">Content & Packages</h2>
+                    <button class="btn btn-primary" onclick="saveContentChanges()"><i class="ri-save-line"></i> Save Changes</button>
+                </div>
+                
+                <div class="config-section">
+                    <h3 style="margin-bottom:1rem;">Frontend Package Features</h3>
+                    <p class="mb-4 text-sm text-muted">Edit feature list displayed on main website.</p>
+                    <textarea id="content-frontend" rows="6">${frontendFeatures.join('\n')}</textarea>
+                </div>
+
+                <div class="config-section">
+                    <h3 style="margin-bottom:1rem;">AI Package Features</h3>
+                    <p class="mb-4 text-sm text-muted">Edit feature list displayed on website.</p>
+                    <textarea id="content-ai" rows="6">${aiFeatures.join('\n')}</textarea>
+                </div>
+            `;
+            });
+        }
+
+        function saveContentChanges() {
+            const frontendLines = document.getElementById('content-frontend').value.split('\n').filter(l => l.trim() !== '');
+            const aiLines = document.getElementById('content-ai').value.split('\n').filter(l => l.trim() !== '');
+
+            db.collection("config").doc("site_settings").get().then(doc => {
+                const data = doc.exists ? doc.data() : {};
+                const newPkgDetails = data.packageDetails || {};
+                
+                newPkgDetails.frontend = { features: frontendLines };
+                newPkgDetails.ai = { features: aiLines };
+
+                db.collection("config").doc("site_settings").update({
+                    packageDetails: newPkgDetails
+                }).then(() => {
+                    showToast("Content updated successfully!", "success");
+                    logActivity("Updated website content features");
+                });
+            });
+        }
+
+        // --- 8. CONFIG (UPDATED: Payment Methods Listener) ---
+        function renderConfig() {
+            if(!isAdmin()) return;
+            document.getElementById('main').innerHTML = `
+                <h2 style="font-size:1.25rem; font-weight:700; margin-bottom:1.5rem;">System Configuration</h2>
+                
+                <!-- Maintenance -->
+                <div class="config-section">
+                    <div class="config-header flex justify-between">
+                        <span>Maintenance Mode</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="maint-toggle" onchange="toggleMaintenance()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <p class="text-muted text-sm mb-4">Toggle a warning banner on the main site and restrict access.</p>
+                    <div class="mb-4">
+                        <label>Maintenance Message</label>
+                        <textarea id="maint-msg" class="mb-2" rows="3">We are currently performing scheduled maintenance.</textarea>
+                        <button class="btn btn-sm btn-secondary" onclick="saveMaintMsg()">Update Message</button>
+                    </div>
+                </div>
+
+                <!-- Dynamic Pricing -->
+                <div class="config-section">
+                    <div class="config-header">Dynamic Pricing Override</div>
+                    <p class="text-muted text-sm mb-4">Base prices for different modules (Syncs with Main Site).</p>
+                    <div class="price-grid">
+                        <div>
+                            <label>HTML Package Price</label>
+                            <div class="flex gap-2">
+                                <input id="price-html" type="number">
+                                <button class="btn btn-primary" onclick="savePrice('html', 'price-html')">Save</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label>Frontend Package Price</label>
+                            <div class="flex gap-2">
+                                <input id="price-fe" type="number">
+                                <button class="btn btn-primary" onclick="savePrice('frontend', 'price-fe')">Save</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label>AI/Data Price (Base)</label>
+                            <div class="flex gap-2">
+                                <input id="price-ai" type="number">
+                                <button class="btn btn-primary" onclick="savePrice('ai', 'price-ai')">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Gateways (UPDATED) -->
+                <div class="config-section">
+                    <div class="config-header flex justify-between">
+                        <span>Payment Gateways</span>
+                        <button class="btn btn-sm btn-primary" onclick="addGateway()"><i class="ri-add-line"></i> Add Gateway</button>
+                    </div>
+                    <div id="gateway-list" class="flex flex-col gap-4"></div>
+                </div>
+            `;
+
+            db.collection("config").doc("site_settings").get().then(doc => {
+                if(doc.exists) {
+                    const d = doc.data();
+                    if(d.maintenance_active) document.getElementById('maint-toggle').checked = true;
+                    if(d.maintenance_message) document.getElementById('maint-msg').value = d.maintenance_message;
+                    
+                    if(d.prices) {
+                        if(d.prices.html) document.getElementById('price-html').value = d.prices.html;
+                        if(d.prices.frontend) document.getElementById('price-fe').value = d.prices.frontend;
+                        if(d.prices.ai) document.getElementById('price-ai').value = d.prices.ai;
+                    }
+                }
+            });
+
+            // UPDATED: Listen to dedicated collection
+            db.collection("payment_methods").onSnapshot(snap => {
+                const list = document.getElementById('gateway-list');
+                if(!list) return;
+                list.innerHTML = '';
+                snap.forEach(doc => {
+                    const gw = doc.data();
+                    list.innerHTML += `
+                        <div class="gateway-card">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <strong style="color:var(--primary)">${gw.name}</strong>
+                                <span class="badge ${gw.active?'badge-success':'badge-danger'}" style="${gw.active?'background:rgba(16,185,129,0.1);color:#10b981':'background:rgba(239,68,68,0.1);color:#ef4444'}">${gw.active?'Active':'Inactive'}</span>
+                            </div>
+                            <div class="text-sm text-muted" style="word-break:break-all;">${gw.link || 'No Link'}</div>
+                            <div style="display:flex; gap:8px; margin-top:8px;">
+                                <button class="btn btn-sm btn-secondary" onclick="editGateway('${doc.id}')"><i class="ri-pencil-line"></i></button>
+                                <button class="btn btn-sm btn-secondary" onclick="toggleGatewayStatus('${doc.id}')"><i class="ri-refresh-line"></i></button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteGateway('${doc.id}')"><i class="ri-delete-bin-line"></i></button>
+                            </div>
+                        </div>`;
+                });
+            });
+        }
+
+        function toggleMaintenance() {
+            const isActive = document.getElementById('maint-toggle').checked;
+            db.collection("config").doc("site_settings").update({ maintenance_active: isActive }).then(() => {
+                showToast(`Maintenance Mode ${isActive ? 'Enabled' : 'Disabled'}`, isActive?'warning':'success');
+                logActivity(`Toggled maintenance mode to ${isActive}`);
+            });
+        }
+        function saveMaintMsg() {
+            db.collection("config").doc("site_settings").update({ maintenance_message: document.getElementById('maint-msg').value }).then(() => showToast("Message Saved", "success"));
+        }
+        function savePrice(key, elemId) {
+            const theVal = parseFloat(document.getElementById(elemId).value);
+            if(!theVal) return showToast("Invalid price", "error");
+            db.collection("config").doc("site_settings").update({ [`prices.${key}`]:theVal }).then(() => showToast("Price Updated", "success"));
+        }
+        
+        function addGateway() {
+            showModal("Add Payment Gateway", `
+                <label>Gateway Name</label><input id="gw-name" class="mb-4">
+                <label>Payment Link / URL</label><input id="gw-link" class="mb-4">
+            `, `<button class="btn btn-primary" onclick="saveNewGateway()">Add</button>`);
+        }
+        
+        // UPDATED: Add to dedicated collection
+        async function saveNewGateway() {
+            const name = document.getElementById('gw-name').value;
+            const link = document.getElementById('gw-link').value;
+            
+            await db.collection("payment_methods").add({ name, link, active: true });
+            closeModal();
+            showToast("Gateway Added", "success");
+            logActivity(`Added payment gateway: ${name}`);
+        }
+        
+        function editGateway(docId) {
+            db.collection("payment_methods").doc(docId).get().then(doc => {
+                const gw = doc.data();
+                showModal("Edit Payment Gateway", `
+                    <label>Gateway Name</label><input id="e-gw-name" value="${gw.name}" class="mb-4">
+                    <label>Payment Link / URL</label><input id="e-gw-link" value="${gw.link}" class="mb-4">
+                `, `<button class="btn btn-primary" onclick="saveEditedGateway('${docId}')">Save</button>`);
+            });
+        }
+        
+        // UPDATED: Edit in dedicated collection
+        async function saveEditedGateway(docId) {
+            const name = document.getElementById('e-gw-name').value;
+            const link = document.getElementById('e-gw-link').value;
+            
+            await db.collection("payment_methods").doc(docId).update({ name, link });
+            closeModal();
+            renderConfig();
+            showToast("Gateway Updated", "success");
+            logActivity(`Edited payment gateway: ${name}`);
+        }
+        
+        // UPDATED: Toggle in dedicated collection
+        async function toggleGatewayStatus(docId) {
+            const docRef = await db.collection("payment_methods").doc(docId).get();
+            const currentStatus = docRef.data().active;
+            
+            await db.collection("payment_methods").doc(docId).update({ active: !currentStatus });
+            renderConfig();
+        }
+        
+        // UPDATED: Delete from dedicated collection
+        async function deleteGateway(docId) {
+            if(!confirm("Delete gateway?")) return;
+            await db.collection("payment_methods").doc(docId).delete();
+            renderConfig();
+        }
+
+        // --- 9. PORTFOLIO MANAGEMENT (UPDATED: ID GENERATION) ---
+        function renderPortfolio() {
+            if(!isAdmin()) return;
+
+            document.getElementById('main').innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h2 style="font-size:1.25rem; font-weight:700;">Client Portfolio</h2>
+                    <button class="btn btn-primary" onclick="openAddPortfolioModal()"><i class="ri-add-line"></i> Add Project</button>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Projects (clients_portfolio)</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Thumbnail</th>
+                                    <th>Project Name</th>
+                                    <th>Website Link</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="portfolio-tbody">
+                                <tr><td colspan="5" class="text-center"><div class="loading-spinner"></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            // Real-time listener for clients_portfolio
+            db.collection("clients_portfolio").orderBy("timestamp", "desc").onSnapshot(snap => {
+                const tbody = document.getElementById('portfolio-tbody');
+                if(!tbody) return;
+
+                if(snap.empty) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No portfolio projects found.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = snap.docs.map(doc => {
+                    const p = doc.data();
+                    
+                    const statusBadge = p.status 
+                        ? `<span class="badge" style="background:var(--success)15; color:var(--success); border:1px solid var(--success)25">Active</span>`
+                        : `<span class="badge" style="background:var(--text-faint); color:var(--text-muted); border:1px solid var(--border)">Inactive</span>`;
+
+                    return `<tr>
+                        <td>
+                            <img src="${p.img}" alt="thumb" 
+                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border);"
+                                 onerror="this.src='https://placehold.co/50?text=No+Img'">
+                        </td>
+                        <td><strong>${p.name}</strong></td>
+                        <td>
+                            <a href="${p.link}" target="_blank" class="btn btn-sm btn-secondary">
+                                <i class="ri-external-link-line"></i> Visit
+                            </a>
+                        </td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary" onclick="editPortfolio('${doc.id}')"><i class="ri-pencil-line"></i></button>
+                            <button class="btn btn-sm ${p.status ? 'btn-danger' : 'btn-success'}" onclick="togglePortfolioStatus('${doc.id}', ${!p.status})">
+                                <i class="${p.status ? 'ri-eye-off-line' : 'ri-eye-line'}"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deletePortfolio('${doc.id}')"><i class="ri-delete-bin-line"></i></button>
+                        </td>
+                    </tr>`;
+                }).join('');
+            });
+        }
+
+        function openAddPortfolioModal() {
+            const initialId = generateDocIdFromName('');
+            showModal("Add New Project", `
+                <div class="mb-4">
+                    <label>Project Name</label>
+                    <input type="text" id="p-name" placeholder="e.g. Clinic Azam" oninput="updateDocIdPreview()">
+                    <small style="color:var(--text-faint)">ID will be generated from name</small>
+                </div>
+                <div class="mb-4">
+                    <label>Generated ID (Auto)</label>
+                    <input type="text" id="p-doc-id" readonly value="${initialId}" style="font-family:monospace; color:var(--primary); background:var(--bg-sidebar);">
+                </div>
+                <div class="mb-4">
+                    <label>Image URL</label>
+                    <input type="text" id="p-img" placeholder="https://...">
+                    <small style="color:var(--text-faint)">Direct link to image file.</small>
+                </div>
+                <div class="mb-4">
+                    <label>Website Link</label>
+                    <input type="text" id="p-link" placeholder="https://...">
+                </div>
+                <div class="flex items-center gap-4">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="p-status" checked>
+                        <span class="slider"></span>
+                    </label>
+                    <span style="font-size:0.9rem; color:var(--text-main);">Visible on Main Site</span>
+                </div>
+            `, `<button class="btn btn-primary" onclick="saveNewPortfolio()">Create Project</button>`);
+        }
+
+        function saveNewPortfolio() {
+            const name = document.getElementById('p-name').value;
+            const img = document.getElementById('p-img').value;
+            const link = document.getElementById('p-link').value;
+            const status = document.getElementById('p-status').checked;
+            const customId = document.getElementById('p-doc-id').value;
+
+            if(!name || !img || !link) {
+                return showToast("Please fill in all fields.", "error");
+            }
+
+            // Use .doc(customId).set() instead of .add()
+            db.collection("clients_portfolio").doc(customId).set({
+                name,
+                img,
+                link,
+                status,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                closeModal();
+                showToast("Project added successfully", "success");
+                logActivity(`Added portfolio project: ${name} (ID: ${customId})`);
+            }).catch(err => {
+                showToast("Error: " + err.message, "error");
+            });
+        }
+
+        function editPortfolio(docId) {
+            db.collection("clients_portfolio").doc(docId).get().then(doc => {
+                const p = doc.data();
+                showModal("Edit Project", `
+                    <div class="mb-4">
+                        <label>Project Name</label>
+                        <input type="text" id="e-p-name" value="${p.name}">
+                        <small style="color:var(--text-faint)">Editing name does not change ID</small>
+                    </div>
+                    <div class="mb-4">
+                        <label>Image URL</label>
+                        <input type="text" id="e-p-img" value="${p.img}">
+                    </div>
+                    <div class="mb-4">
+                        <label>Website Link</label>
+                        <input type="text" id="e-p-link" value="${p.link}">
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="e-p-status" ${p.status ? 'checked' : ''}>
+                            <span class="slider"></span>
+                        </label>
+                        <span style="font-size:0.9rem; color:var(--text-main);">Visible on Main Site</span>
+                    </div>
+                `, `<button class="btn btn-primary" onclick="updatePortfolio('${docId}')">Save Changes</button>`);
+            });
+        }
+
+        function updatePortfolio(docId) {
+            const updates = {
+                name: document.getElementById('e-p-name').value,
+                img: document.getElementById('e-p-img').value,
+                link: document.getElementById('e-p-link').value,
+                status: document.getElementById('e-p-status').checked
+            };
+
+            db.collection("clients_portfolio").doc(docId).update(updates).then(() => {
+                closeModal();
+                showToast("Project updated", "success");
+                logActivity(`Updated portfolio project: ${updates.name}`);
+            }).catch(err => {
+                showToast("Error updating: " + err.message, "error");
+            });
+        }
+
+        function togglePortfolioStatus(docId, newStatus) {
+            const action = newStatus ? "Activated" : "Deactivated";
+            db.collection("clients_portfolio").doc(docId).update({ status: newStatus }).then(() => {
+                showToast(`Project ${action}`, "info");
+                logActivity(`${action} portfolio project`);
+            });
+        }
+
+        function deletePortfolio(docId) {
+            if(!confirm("Are you sure you want to delete this project? This cannot be undone.")) return;
+            
+            db.collection("clients_portfolio").doc(docId).delete().then(() => {
+                showToast("Project deleted", "success");
+                logActivity(`Deleted portfolio project`);
+            }).catch(err => {
+                showToast("Error deleting: " + err.message, "error");
+            });
+        }
+
+        // --- 10. PROFILE ---
+        function renderMyProfile() {
+            document.getElementById('main').innerHTML = `
+                <div class="p-4" style="background:var(--bg-surface); border:1px solid var(--border); border-radius:12px; max-width:500px; margin:0 auto;">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="u-avatar" style="width:50px; height:50px; font-size:1.5rem;">${(userData.name || 'A').charAt(0)}</div>
+                        <div>
+                            <h2 style="font-size:1.25rem;">${userData.name}</h2>
+                            <span class="badge badge-${userData.role}">${userData.role}</span>
+                        </div>
+                    </div>
+                    <div class="mb-4"><label class="text-muted">Name</label><input value="${userData.name}" readonly></div>
+                    <div class="mb-4"><label class="text-muted">Email</label><input value="${userData.email}" readonly></div>
+                    <div class="mb-4"><label class="text-muted">Crew ID</label><input value="${userData.crewId || 'N/A'}" readonly></div>
+                    <div class="mb-4"><label class="text-muted">Job Title</label><input value="${userData.jobTitle||'N/A'}" readonly></div>
+                </div>`;
+        }
+
+        function filterTable(id, text) {
+            const trs = document.querySelectorAll(`#${id} tr`);
+            text = text.toLowerCase();
+            trs.forEach(tr => tr.style.display = tr.innerText.toLowerCase().includes(text)?'':'none');
+        }
+
+        // --- 11. CUSTOMER REQUESTS (NEW) ---
+        function renderRequests() {
+            document.getElementById('main').innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h2 style="font-size:1.25rem; font-weight:700;">Customer Requests</h2>
+                    <input type="text" id="reqSearch" placeholder="Search Client..." style="width:200px;" onkeyup="filterTable('req-tbody', this.value)">
+                </div>
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Client</th>
+                                    <th>Type</th>
+                                    <th>Summary</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="req-tbody">
+                                <tr><td colspan="6" class="text-center"><div class="loading-spinner"></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            db.collection("customer_requests").orderBy("timestamp", "desc").onSnapshot(snap => {
+                const tbody = document.getElementById('req-tbody');
+                if(!tbody) return;
+                if(snap.empty) { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No requests found</td></tr>'; return; }
+
+                tbody.innerHTML = snap.docs.map(doc => {
+                    const d = doc.data();
+                    const type = d.type || 'content';
+
+                    // Determine Badge & Summary based on type
+                    let badgeClass = 'badge-content';
+                    let summaryText = '';
+
+                    if(type === 'content') {
+                        summaryText = d.details ? d.details.substring(0, 30) + '...' : 'Update Content';
+                        badgeClass = 'badge-content';
+                    } else if (type === 'upgrade') {
+                        summaryText = `${d.currentPlan || 'Old'} → ${d.newPlan || 'New'}`;
+                        badgeClass = 'badge-upgrade';
+                    } else if (type === 'renew') {
+                        summaryText = `${d.plan || 'Plan'} (${d.duration || '1yr'})`;
+                        badgeClass = 'badge-renew';
+                    } else if (type === 'remove') {
+                        summaryText = d.details ? 'Remove Content' : 'Remove Item';
+                        badgeClass = 'badge-remove';
+                    }
+
+                    const statusColor = d.status === 'Completed' ? 'var(--success)' : 'var(--warning)';
+
+                    return `<tr>
+                        <td style="white-space:nowrap;">${formatDateTime(d.timestamp)}</td>
+                        <td>
+                            <strong>${d.name}</strong><br>
+                            <small style="color:var(--text-faint)">${d.phone || ''}</small>
+                        </td>
+                        <td><span class="badge ${badgeClass}">${type.toUpperCase()}</span></td>
+                        <td>${summaryText} ${d.hasFile ? '<i class="ri-attachment-line" title="File Attached" style="color:var(--primary)"></i>' : ''}</td>
+                        <td><span class="badge" style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}25">${d.status}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary" onclick="viewRequestDetails('${doc.id}')">View</button>
+                            <button class="btn btn-sm btn-success" onclick="updateRequestStatus('${doc.id}', 'Completed')">Done</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteItem('request','${doc.id}')"><i class="ri-delete-bin-line"></i></button>
+                        </td>
+                    </tr>`;
+                }).join('');
+            });
+        }
+
+        function viewRequestDetails(id) {
+            db.collection("customer_requests").doc(id).get().then(doc => {
+                const d = doc.data();
+                const type = d.type;
+
+                let detailsHTML = '';
+
+                if(type === 'content') {
+                    detailsHTML = `
+                        <div class="mb-4">
+                            <label>Description</label>
+                            <textarea readonly rows="4">${d.details || 'No description provided.'}</textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label>Attachments</label>
+                            <div class="flex items-center gap-2 text-sm">
+                                <i class="${d.hasFile ? 'ri-checkbox-circle-fill text-success' : 'ri-close-circle-fill text-muted'}"></i>
+                                ${d.hasFile ? 'User attached a file via the website form.' : 'No file attached.'}
+                            </div>
+                        </div>
+                    `;
+                } else if (type === 'upgrade') {
+                    detailsHTML = `
+                        <div class="flex gap-4 mb-4">
+                            <div style="flex:1"><label>Current Plan</label><input value="${d.currentPlan || '-'}" readonly></div>
+                            <div style="flex:1"><label>New Plan</label><input value="${d.newPlan || '-'}" readonly></div>
+                        </div>
+                        <div class="mb-4"><label>Additional Notes</label><textarea readonly rows="3">${d.details || '-'}</textarea></div>
+                    `;
+                } else if (type === 'renew') {
+                    detailsHTML = `
+                        <div class="flex gap-4 mb-4">
+                            <div style="flex:1"><label>Plan to Renew</label><input value="${d.plan || '-'}" readonly></div>
+                            <div style="flex:1"><label>Duration</label><input value="${d.duration || '-'}" readonly></div>
+                        </div>
+                    `;
+                } else if (type === 'remove') {
+                    detailsHTML = `
+                        <div class="mb-4"><label>Items to Remove</label><textarea readonly rows="3">${d.details || '-'}</textarea></div>
+                    `;
+                }
+
+                showModal(`Request Details (${type.toUpperCase()})`, `
+                    <div class="mb-4 p-4" style="background:var(--bg-sidebar); border-radius:8px; border:1px solid var(--border)">
+                        <div class="text-sm text-muted mb-1">Client Info</div>
+                        <strong>${d.name}</strong> (${d.phone})<br>
+                        ${d.userId ? `<small class="text-muted">User ID: ${d.userId}</small>` : ''}
+                    </div>
+                    ${detailsHTML}
+                    
+                    <div class="mt-4">
+                        <label>Update Status</label>
+                        <select id="req-status-select">
+                            <option value="Pending" ${d.status==='Pending'?'selected':''}>Pending</option>
+                            <option value="Completed" ${d.status==='Completed'?'selected':''}>Completed</option>
+                        </select>
+                    </div>
+                `, `<button class="btn btn-primary" onclick="updateRequestStatus('${id}', null, true)">Save Status</button>`);
+            });
+        }
+
+        function updateRequestStatus(id, newStatus = null, fromModal = false) {
+            const statusToSet = newStatus || document.getElementById('req-status-select').value;
+            
+            db.collection("customer_requests").doc(id).update({
+                status: statusToSet
+            }).then(() => {
+                if(fromModal) closeModal();
+                showToast("Request Status Updated", "success");
+                logActivity(`Updated request status to ${statusToSet}`);
+            }).catch(err => {
+                showToast("Error updating: " + err.message, "error");
+            });
+        }
+
+        function deleteItem(collection, id) {
+            if(!confirm("Delete this item permanently?")) return;
+            db.collection(collection).doc(id).delete().then(() => {
+                showToast("Item deleted", "success");
+                logActivity(`Deleted item from ${collection}`);
+            });
+        }
+
+    </script>
+</body>
+</html>
