@@ -498,43 +498,46 @@
         .modal-body { padding: 1.5rem; overflow-y: auto; }
         .modal-footer { padding: 1.2rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; border-radius: 0 0 16px 16px; background: rgba(0,0,0,0.2); }
 
-        /* --- IMPROVED INVOICE STYLES --- */
+        /* --- IMPROVED INVOICE STYLES (A4 OPTIMIZED) --- */
         #invoiceModalOverlay {
             z-index: 2000;
             background: rgba(0,0,0,0.9);
         }
         
-        /* The container for the white invoice paper */
+        /* The container for white invoice paper */
         #invoice-paper {
-            background: white;
-            color: #111;
-            padding: 40px;
-            border-radius: 4px; /* Slight radius on screen, flat on print */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            font-family: 'Inter', sans-serif;
+            background: #ffffff; /* Pure White */
+            color: #000000; /* Pure Black for clarity */
+            padding: 60px; /* More padding for clarity */
+            border-radius: 0; /* No radius for print */
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            font-family: 'Inter', 'Helvetica', 'Arial', sans-serif;
             width: 100%;
-            max-width: 800px; /* A4 aspect ratio approx */
+            max-width: 210mm; /* Exact A4 width */
+            min-height: 297mm; /* Exact A4 height */
             margin: 0 auto;
+            box-sizing: border-box;
         }
 
-        .inv-header { display: flex; justify-content: space-between; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #eee; }
-        .inv-title { font-size: 2rem; font-weight: 800; color: #000; margin: 0; letter-spacing: -1px; }
-        .inv-meta { text-align: right; font-size: 0.9rem; color: #555; line-height: 1.6; }
+        .inv-header { display: flex; justify-content: space-between; margin-bottom: 40px; border-bottom: 4px solid #000; padding-bottom: 20px; }
+        .inv-title { font-size: 2.5rem; font-weight: 800; color: #000; margin: 0; letter-spacing: -2px; text-transform: uppercase; }
+        .inv-meta { text-align: right; font-size: 0.9rem; color: #333; line-height: 1.6; }
+        .inv-meta strong { display: block; font-size: 1.1rem; color: #000; margin-bottom: 5px; }
         
-        .inv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
-        .inv-box h4 { margin: 0 0 8px 0; font-size: 0.85rem; text-transform: uppercase; color: #888; font-weight: 600; }
-        .inv-box p { margin: 0 0 4px 0; color: #222; font-size: 0.95rem; }
-        .inv-box small { color: #666; }
+        .inv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+        .inv-box h4 { margin: 0 0 10px 0; font-size: 0.85rem; text-transform: uppercase; color: #666; font-weight: 700; letter-spacing: 1px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .inv-box p { margin: 0 0 8px 0; color: #111; font-size: 0.95rem; font-weight: 500; }
+        .inv-box small { color: #555; font-weight: 400; }
 
         .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .inv-table th { background: #f8f9fa; color: #222; border-bottom: 2px solid #ddd; font-weight: 700; font-size: 0.85rem; text-align: left; padding: 12px; }
-        .inv-table td { padding: 12px; border-bottom: 1px solid #eee; color: #333; vertical-align: top; font-size: 0.9rem; }
-        .inv-table tr:last-child td { border-bottom: none; }
-        .inv-total-row td { padding: 15px 12px; background: #fcfcfc; border-top: 2px solid #eee; }
-        .inv-final-total { font-size: 1.5rem; font-weight: 800; color: #000; }
+        .inv-table th { background: #f0f0f0; color: #000; border: 1px solid #000; border-bottom: 2px solid #000; font-weight: 700; font-size: 0.85rem; text-align: left; padding: 12px; }
+        .inv-table td { padding: 14px 12px; border: 1px solid #ccc; color: #000; vertical-align: top; font-size: 0.9rem; }
+        .inv-table tr:last-child td { border-bottom: 2px solid #000; }
+        .inv-total-row td { padding: 15px 12px; background: #fafafa; border: 1px solid #ccc; }
+        .inv-final-total { font-size: 1.8rem; font-weight: 900; color: #000; }
 
-        .inv-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #888; font-size: 0.8rem; }
-        .inv-footer p { margin-bottom: 5px; }
+        .inv-footer { margin-top: 60px; padding-top: 20px; border-top: 2px solid #eee; text-align: center; color: #666; font-size: 0.8rem; }
+        .inv-footer p { margin-bottom: 8px; }
 
         /* TOAST */
         .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: var(--z-toast); display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
@@ -642,7 +645,7 @@
 
         /* PRINT STYLES FOR INVOICE */
         @media print {
-            /* Hide everything on the page by default */
+            /* Hide everything on page by default */
             body * {
                 visibility: hidden;
             }
@@ -676,7 +679,7 @@
                 box-shadow: none;
                 border-radius: 0;
                 margin: 0;
-                padding: 20px;
+                padding: 50px; /* Ensure padding in print */
                 color: black;
                 background: white;
                 position: absolute;
@@ -1316,7 +1319,7 @@
             });
         }
 
-        // FEATURE: Better Invoice Generate with PDF Download
+        // FEATURE: Better Invoice Generate with PDF Download (UPDATED A4)
         function generateInvoice(id) {
             db.collection("orders").doc(id).get().then(doc => {
                 if(!doc.exists) return;
@@ -1329,13 +1332,13 @@
                 const invoiceHTML = `
                     <div class="inv-header">
                         <div>
-                            <img src="${logoUrl}" alt="DDNetwork Logo" style="height: 50px; margin-bottom: 10px; display:block;">
+                            <img src="${logoUrl}" alt="DDNetwork Logo" style="height: 60px; margin-bottom: 15px; display:block;">
                             <h1 class="inv-title">INVOICE</h1>
                         </div>
                         <div class="inv-meta">
-                            <strong>DDNetwork One</strong><br>
-                            Reg No: PG0572133-K<br>
-                            <a href="mailto:sales@ddn.one" style="color: #0066cc; text-decoration:none;">sales@ddn.one</a>
+                            <strong>DDNetwork One</strong>
+                            <small>Reg No: PG0572133-K</small>
+                            <a href="mailto:sales@ddnet.my" style="color: #000; text-decoration:underline;">sales@ddnet.my</a>
                         </div>
                     </div>
                     
@@ -1351,7 +1354,7 @@
                             <h4>Invoice Details:</h4>
                             <p>Order ID: <span class="font-mono">${id.substr(0,8).toUpperCase()}</span></p>
                             <p>Date Issued: ${date}</p>
-                            <p>Status: <strong style="color: #0066cc;">${d.status}</strong></p>
+                            <p>Status: <strong style="color: #000;">${d.status}</strong></p>
                             <p>Billing Cycle: ${d.billingCycle || 'One-time'}</p>
                         </div>
                     </div>
@@ -1377,24 +1380,24 @@
                             </tr>
                             ${d.voucherCode ? `
                             <tr>
-                                <td colspan="2" style="color: #10b981; text-align: right;"><strong>Discount Applied (${d.voucherCode})</strong></td>
-                                <td style="text-align: right; color: #10b981;">-</td>
+                                <td colspan="2" style="color: #000; text-align: right;"><strong>Discount Applied (${d.voucherCode})</strong></td>
+                                <td style="text-align: right; color: #000;">-</td>
                             </tr>` : ''}
                         </tbody>
                     </table>
                     
                     <div style="display: flex; justify-content: flex-end;">
                         <div style="width: 40%;">
-                            <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #000; margin-bottom: 10px;">
                                 <span>Subtotal</span>
                                 <span>${d.total}</span>
                             </div>
-                            <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #ccc; margin-bottom: 5px;">
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #000; margin-bottom: 10px;">
                                 <span>Tax (0%)</span>
                                 <span>RM 0.00</span>
                             </div>
-                            <div class="inv-total-row" style="display: flex; justify-content: space-between; align-items: center;">
-                                <span style="font-weight: 600; font-size: 1rem;">Total Due</span>
+                            <div class="inv-total-row" style="display: flex; justify-content: space-between; align-items: center; padding: 20px 10px;">
+                                <span style="font-weight: 700; font-size: 1.2rem;">Total Due</span>
                                 <span class="inv-final-total">${d.total}</span>
                             </div>
                         </div>
@@ -1416,17 +1419,17 @@
             });
         }
 
-        // NEW: High Resolution PDF Download Function
+        // UPDATED: High Resolution A4 PDF Download
         function downloadInvoicePDF() {
             const element = document.getElementById('invoice-paper');
             const customerName = element.querySelector('.inv-box p strong').innerText;
             
-            // Configuration for html2pdf
+            // Configuration for html2pdf (Optimized for A4)
             const opt = {
-                margin:       0,
+                margin:       [15, 15, 15, 15], // Top, Left, Bottom, Right in mm (Standard A4 Margins)
                 filename:     `Invoice_${customerName.replace(/\s+/g, '_')}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true }, // Scale 2 for High Res
+                html2canvas:  { scale: 2, useCORS: true, logging: false }, // Scale 2 for High Res
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
