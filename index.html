@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Admin Portal v10.1 | DDNetwork One</title>
+    <title>Admin Portal v11.0 | DDNetwork One</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,7 +17,7 @@
 
     <style>
         :root {
-            /* Developer Dark Theme - Deep & Rich */
+            /* Developer Dark Theme */
             --bg-app: #050505; 
             --bg-sidebar: #0a0a0c;
             --bg-surface: #0f0f12; 
@@ -103,7 +103,7 @@
         ::-webkit-scrollbar-thumb { background: #333; border-radius:4px; }
         ::-webkit-scrollbar-thumb:hover { background: #555; }
 
-        /* BUTTONS (Developer SaaS Style) */
+        /* BUTTONS */
         .btn {
             padding: 0.6rem 1.2rem; 
             border-radius: 6px; 
@@ -148,6 +148,8 @@
         .btn-danger-solid:hover { background: #dc2626; }
 
         .btn-info { background: rgba(14, 165, 233, 0.1); color: var(--info); border:1px solid rgba(14, 165, 233, 0.2); }
+        .btn-info:hover { background: rgba(14, 165, 233, 0.2); border-color: var(--info); }
+
         .btn-secondary { background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-main); }
         .btn-secondary:hover { border-color: var(--text-muted); background: var(--bg-surface-hover); }
         
@@ -246,7 +248,7 @@
         aside.collapsed .user-mini-profile p {
             opacity: 0;
             pointer-events: none;
-            display: none; /* Hide completely to prevent layout shift issues */
+            display: none;
         }
         aside.collapsed .nav-item {
             padding: 0.8rem 0;
@@ -493,6 +495,18 @@
         .modal-body { padding: 1.5rem; overflow-y: auto; }
         .modal-footer { padding: 1.2rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; border-radius: 0 0 16px 16px; background: rgba(0,0,0,0.2); }
 
+        /* --- INVOICE STYLES --- */
+        #invoice-modal-content {
+            background: white; color: black; padding: 2rem; border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+        .invoice-header { display: flex; justify-content: space-between; margin-bottom: 2rem; border-bottom: 2px solid #eee; padding-bottom: 1rem; }
+        .invoice-title { font-size: 2rem; font-weight: 800; color: #333; }
+        .invoice-meta { text-align: right; font-size: 0.9rem; color: #666; }
+        .invoice-details-row { display: flex; justify-content: space-between; margin-bottom: 1rem; font-size: 1rem; }
+        .invoice-total { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #ddd; text-align: right; font-size: 1.5rem; font-weight: 700; }
+        .invoice-footer { margin-top: 3rem; text-align: center; color: #888; font-size: 0.8rem; }
+
         /* TOAST */
         .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: var(--z-toast); display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast { 
@@ -578,7 +592,6 @@
         /* --- RESPONSIVENESS TWEAKS --- */
         @media(min-width: 1025px) {
             aside { transform: translateX(0) !important; width: var(--sidebar-width); }
-            /* When collapsed, CSS handles width, but we ensure it's visible */
             aside.collapsed { transform: translateX(0) !important; width: var(--sidebar-width-collapsed); }
             
             main { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); padding: 2rem; }
@@ -597,17 +610,24 @@
             .header-brand span { display: none; }
             .notif-dropdown { right: 0; width: 90vw; }
         }
+
+        /* PRINT STYLES FOR INVOICE */
+        @media print {
+            aside, header, .toast-container, .sidebar-overlay, #dashboard > div:not(.modal-overlay) { display: none !important; }
+            main { margin: 0; padding: 0; overflow: visible; }
+            .modal-overlay { position: static; background: none; display: block; }
+            .modal { box-shadow: none; max-width: 100%; border: none; }
+            .invoice-header, .invoice-total { border-color: #000; }
+        }
     </style>
 </head>
 <body>
-
-    <div class="toast-container" id="toastContainer"></div>
 
     <!-- AUTH SCREEN -->
     <div id="auth-screen">
         <div class="auth-card">
             <img src="https://raw.githubusercontent.com/ddnetwork-ent/ddnetwork/refs/heads/main/DDN%20Logo%20NoBG.png" alt="Logo">
-            <h2 class="mb-4" style="color:white; font-weight: 700; letter-spacing: -0.5px;">Admin Portal v10.1</h2>
+            <h2 class="mb-4" style="color:white; font-weight: 700; letter-spacing: -0.5px;">Admin Portal v11.0</h2>
             <form id="loginForm">
                 <input type="text" id="loginInput" class="mb-4" placeholder="Email or Crew ID" required>
                 <input type="password" id="loginPass" class="mb-4" placeholder="Password" required>
@@ -626,7 +646,7 @@
                 <button class="btn-icon" onclick="toggleSidebar()" title="Toggle Menu"><i class="ri-menu-line" style="font-size: 1.4rem;"></i></button>
                 <div class="header-brand">
                     <img src="https://raw.githubusercontent.com/ddnetwork-ent/ddnetwork/refs/heads/main/DDN%20Logo%20NoBG.png">
-                    <span>DDN v10.1</span>
+                    <span>DDN v11.0</span>
                 </div>
             </div>
             <div class="header-actions">
@@ -713,7 +733,7 @@
         <main id="main"></main>
     </div>
 
-    <!-- MODAL -->
+    <!-- MAIN MODAL -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal">
             <div class="modal-header">
@@ -725,6 +745,24 @@
         </div>
     </div>
 
+    <!-- INVOICE MODAL (Specific) -->
+    <div class="modal-overlay" id="invoiceModalOverlay" style="z-index: 2000;">
+        <div class="modal" style="max-width: 800px; background: white;">
+            <div class="modal-header" style="background: transparent; border: none; padding-bottom: 0;">
+                <button class="btn-icon" onclick="closeInvoiceModal()" style="color: black; background: #f0f0f0;"><i class="ri-close-line"></i></button>
+            </div>
+            <div id="invoice-modal-content">
+                <!-- Content injected via JS -->
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #ddd;">
+                <button class="btn btn-primary" style="background: #000;" onclick="window.print()">Print / Save PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- JAVASCRIPT -->
     <script>
         // --- FIREBASE SETUP ---
         const firebaseConfig = {
@@ -736,6 +774,7 @@
             appId: "1:699127560990:web:50cfd61ff620bc85fb670f"
         };
         let db, auth, currentUser, userData = null;
+        
         try { firebase.initializeApp(firebaseConfig); db = firebase.firestore(); auth = firebase.auth(); } catch(e) { console.log("Firebase init error", e); }
 
         // --- AUTO CREATE CONFIG & PAYMENT METHODS ON LOAD ---
@@ -885,7 +924,7 @@
                         if(userData.role !== 'admin') {
                             document.getElementById('nav-crew').classList.add('hidden');
                             document.getElementById('nav-config').classList.add('hidden');
-                            document.getElementById('nav-public-promos').classList.add('hidden');
+                            document.getElementById('nav-public-promos').classList.add('hidden'); 
                             document.getElementById('notif-btn').style.display = 'none'; 
                         } else {
                             document.getElementById('nav-crew').classList.remove('hidden');
@@ -952,7 +991,7 @@
             '/portfolio': renderPortfolio,
             '/requests': renderRequests,
             '/my-profile': renderMyProfile,
-            '/public-promos': renderPublicPromos
+            '/public-promos': renderPublicPromos 
         };
 
         function navigateTo(path) {
@@ -992,16 +1031,14 @@
             }
         };
 
-        // --- SIDEBAR TOGGLE LOGIC (UPDATED FOR DESKTOP) ---
+        // --- SIDEBAR TOGGLE LOGIC ---
         function toggleSidebar() { 
             const sb = document.getElementById('sidebar');
             const ov = document.getElementById('sidebarOverlay');
             
             if(window.innerWidth > 1024) {
-                // DESKTOP: Toggle collapsed class
                 sb.classList.toggle('collapsed');
             } else {
-                // MOBILE: Toggle off-canvas
                 sb.classList.toggle('mobile-open');
                 ov.classList.toggle('active');
             }
@@ -1121,7 +1158,7 @@
             });
         }
 
-        // --- 2. ORDERS (UPDATED: REMIND BUTTON & BILLING CYCLE) ---
+        // --- 2. ORDERS (UPDATED: INVOICE & REMAINDER) ---
         function renderOrders() {
             document.getElementById('main').innerHTML = `
                 <div class="table-container">
@@ -1136,14 +1173,13 @@
                                     <th>Date</th>
                                     <th>Client</th>
                                     <th>Package</th>
-                                    <th>Domain</th>
                                     <th>Total</th>
                                     <th>Status</th>
-                                    <th>Action</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="orders-tbody">
-                                <tr><td colspan="8" class="text-center"><div class="loading-spinner"></div></td></tr>
+                                <tr><td colspan="6" class="text-center"><div class="loading-spinner"></div></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1154,14 +1190,13 @@
                 if(!tbody) return;
                 
                 if(snap.empty) {
-                    tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No orders found</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No orders found</td></tr>';
                     return;
                 }
 
                 tbody.innerHTML = snap.docs.map(doc => {
                     const d = doc.data();
                     
-                    // Domain Logic: Display nicely or show N/A
                     const domainDisplay = d.domain 
                         ? `<span class="font-mono" style="color:var(--primary)">${d.domain}</span>` 
                         : `<span style="color:var(--text-faint)">N/A</span>`;
@@ -1180,43 +1215,129 @@
                         <td style="white-space:nowrap;">${formatDateTime(d.timestamp)}</td>
                         <td><strong>${d.customerName}</strong></td>
                         <td>${d.package}</td>
-                        <td>${domainDisplay}</td>
                         <td>${d.total}</td>
                         <td><span class="badge" style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}25">${d.status}</span></td>
                         <td>
-                            <!-- UPDATE 1: REMIND BUTTON -->
-                            <button class="btn btn-sm btn-info" onclick="remindClient('${doc.id}')" title="Send Reminder/Invoice"><i class="ri-whatsapp-line"></i> Remind</button>
-                            <button class="btn btn-sm btn-secondary" onclick="viewOrder('${doc.id}')">Manage</button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteOrder('${doc.id}')"><i class="ri-delete-bin-line"></i></button>
+                            <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                                <button class="btn btn-sm btn-secondary" onclick="viewOrder('${doc.id}')">Manage</button>
+                                <button class="btn btn-sm btn-info" title="Generate Invoice" onclick="generateInvoice('${doc.id}')"><i class="ri-file-list-2-line"></i></button>
+                                <button class="btn btn-sm btn-success" title="Send WhatsApp Remainder" onclick="sendPaymentReminder('${doc.id}')"><i class="ri-whatsapp-line"></i></button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteOrder('${doc.id}')"><i class="ri-delete-bin-line"></i></button>
+                            </div>
                         </td>
                     </tr>`;
                 }).join('');
             });
         }
 
-        // UPDATE 2: FUNCTION TO SEND REMINDER/INVOICE VIA WHATSAPP
-        function remindClient(orderId) {
-            db.collection("orders").doc(orderId).get().then(doc => {
-                if(!doc.exists) return showToast("Order not found", "error");
+        // FEATURE: Generate Invoice
+        function generateInvoice(id) {
+            db.collection("orders").doc(id).get().then(doc => {
+                if(!doc.exists) return;
                 const d = doc.data();
+                const date = formatDateTime(d.timestamp);
                 
-                // Ensure phone number is clean (digits only)
-                let phone = d.customerPhone || "";
-                phone = phone.replace(/\D/g, ''); // Remove non-digits
-                if (!phone.startsWith('60')) phone = '60' + phone; // Add Malaysia code if missing
+                const invoiceHTML = `
+                    <div class="invoice-header">
+                        <div class="invoice-title">INVOICE</div>
+                        <div class="invoice-meta">
+                            <strong>DDNetwork One</strong><br>
+                            PG0572133-K<br>
+                            Sales: sales@ddn.one
+                        </div>
+                    </div>
+                    
+                    <div class="invoice-details-row">
+                        <div>
+                            <strong>Bill To:</strong><br>
+                            ${d.customerName}<br>
+                            ${d.customerCompany ? d.customerCompany + '<br>' : ''}
+                            ${d.customerEmail}<br>
+                            ${d.customerPhone}
+                        </div>
+                        <div>
+                            <strong>Invoice Details:</strong><br>
+                            Order ID: ${id.substr(0,6).toUpperCase()}<br>
+                            Date: ${date}<br>
+                            Status: <span style="color:var(--primary); font-weight:bold;">${d.status}</span>
+                        </div>
+                    </div>
 
-                const message = `Hi ${d.customerName},\n\nThis is a reminder regarding your order for ${d.package}.\n\nOrder ID: ${orderId.substring(0,6)}\nTotal Due: ${d.total}\nStatus: ${d.status}\n\nPlease proceed with payment or renewal at your earliest convenience.\n\nThank you,\nDDNetwork Team`;
-                
-                const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-                window.open(url, '_blank');
-                
-                logActivity(`Sent payment reminder/invoice for Order #${orderId.substring(0,6)}`);
+                    <div style="margin-top: 2rem; border: 1px solid #ddd; border-radius: 8px; overflow:hidden;">
+                        <table style="width:100%; min-width:auto;">
+                            <thead>
+                                <tr style="background:#f4f4f5; color:#000;">
+                                    <th style="padding:1rem; text-align:left;">Description</th>
+                                    <th style="padding:1rem; text-align:right;">Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding:1rem;">
+                                        <strong>${d.package}</strong><br>
+                                        <span style="font-size:0.9rem; color:#666;">
+                                            Billing Cycle: ${d.billingCycle}<br>
+                                            ${d.domain ? `Domain: ${d.domain}` : ''}
+                                        </span>
+                                    </td>
+                                    <td style="padding:1rem; text-align:right;">${d.total}</td>
+                                </tr>
+                                ${d.voucherCode ? `
+                                <tr>
+                                    <td style="padding:1rem; color:var(--success);">Discount (${d.voucherCode})</td>
+                                    <td style="padding:1rem; text-align:right;">-</td>
+                                </tr>` : ''}
+                                <tr style="border-top:1px solid #ddd;">
+                                    <td style="padding:1rem; font-weight:700;">Total Due</td>
+                                    <td style="padding:1rem; text-align:right; font-size:1.2rem;">${d.total}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="invoice-total">
+                        Grand Total: ${d.total}
+                    </div>
+
+                    <div class="invoice-footer">
+                        Thank you for your business. Please proceed payment to the link sent via WhatsApp.<br>
+                        DDNetwork One | sales@ddn.one
+                    </div>
+                `;
+
+                document.getElementById('invoice-modal-content').innerHTML = invoiceHTML;
+                document.getElementById('invoiceModalOverlay').classList.add('open');
             }).catch(err => {
                 console.error(err);
-                showToast("Error fetching order details", "error");
+                showToast("Error loading order", "error");
             });
         }
 
+        function closeInvoiceModal() {
+            document.getElementById('invoiceModalOverlay').classList.remove('open');
+        }
+
+        // FEATURE: Send Payment Reminder
+        function sendPaymentReminder(id) {
+            db.collection("orders").doc(id).get().then(doc => {
+                if(!doc.exists) return;
+                const d = doc.data();
+                
+                const msg = `Hi ${d.customerName},\n\n*Reminder for your DDNetwork One order.*\n\nOrder ID: ${id.substr(0,6).toUpperCase()}\nPackage: ${d.package}\nTotal Amount: ${d.total}\n\nPlease click the payment link provided in our previous email or contact us if you need a new link.\n\nThank you!`;
+                
+                // Clean phone number (remove leading 0 if exists, add +60)
+                let cleanPhone = d.customerPhone ? d.customerPhone.replace(/^0/, '60') : '60123456789';
+                if(!cleanPhone.startsWith('+')) cleanPhone = '+' + cleanPhone;
+
+                window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+                showToast("Opening WhatsApp...", "success");
+            }).catch(err => {
+                console.error(err);
+                showToast("Error sending reminder", "error");
+            });
+        }
+
+        // UPDATED: Manage Order Modal includes Billing Cycle display
         function viewOrder(id) {
             db.collection("orders").doc(id).get().then(doc => {
                 const d = doc.data();
@@ -1244,7 +1365,7 @@
                     <div class="mt-4">
                         <label>Client Domain</label>
                         <div style="display:flex; gap:10px;">
-                             <span style="padding:0.6rem; background:var(--bg-input); border:1px solid var(--border); border-radius:6px 0 0 6px; color:var(--text-muted);">https://</span>
+                             <span style="padding:0.6rem; background:var(--bg-input); border:1px solid var(--border); border-radius:6px 0 0 6px 0; color:var(--text-muted);">https://</span>
                              <input id="o-domain" value="${d.domain || ''}" placeholder="example.com" style="border-radius:0 6px 6px 0;">
                         </div>
                         <small class="text-muted">Leave empty if no domain yet.</small>
@@ -1846,16 +1967,15 @@
             });
         }
 
-        // --- 7. CONTENT & PACKAGES (UPDATED: EDIT PRICES HERE TOO) ---
+        // --- 7. CONTENT & PACKAGES (UPDATED) ---
         function renderContent() {
             if(!isAdmin()) return;
             
-            // Fetch both features AND prices
             db.collection("config").doc("site_settings").get().then(doc => {
                 const siteData = doc.exists ? doc.data() : {};
                 const packages = siteData.packageDetails || {};
-                const prices = siteData.prices || {};
                 
+                // Safely get features or default to empty array
                 const frontendFeatures = (packages.frontend && packages.frontend.features) 
                     ? packages.frontend.features 
                     : ["Up to 5 Pages", "Animations", "Contact Forms", "WhatsApp Integration"];
@@ -1866,64 +1986,32 @@
                 document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:700;">Content & Packages</h2>
-                    <button class="btn btn-primary" onclick="saveContentChanges()"><i class="ri-save-line"></i> Save All Changes</button>
+                    <button class="btn btn-primary" onclick="saveContentChanges()"><i class="ri-save-line"></i> Save Changes</button>
                 </div>
                 
-                <!-- UPDATE: PRICING SECTION ADDED HERE -->
-                <div class="config-section">
-                    <div class="config-header">
-                        <span>Pricing (Base RM)</span>
-                        <i class="ri-money-dollar-circle-line" style="color:var(--warning)"></i>
-                    </div>
-                    <div class="price-grid">
-                        <div>
-                            <label>HTML Package</label>
-                            <input id="price-html" type="number" placeholder="e.g. 199" value="${prices.html || ''}">
-                        </div>
-                        <div>
-                            <label>Frontend Package</label>
-                            <input id="price-fe" type="number" placeholder="e.g. 599" value="${prices.frontend || ''}">
-                        </div>
-                        <div>
-                            <label>AI/Data Package</label>
-                            <input id="price-ai" type="number" placeholder="e.g. 599" value="${prices.ai || ''}">
-                        </div>
-                    </div>
-                </div>
-
                 <div class="config-section">
                     <h3 style="margin-bottom:1rem;">Frontend Package Features</h3>
-                    <p class="mb-4 text-sm text-muted">Edit feature list displayed on main website.</p>
+                    <p class="mb-4 text-sm text-muted">Edit feature list displayed on main website. (One feature per line)</p>
                     <textarea id="content-frontend" rows="6">${frontendFeatures.join('\n')}</textarea>
                 </div>
 
                 <div class="config-section">
                     <h3 style="margin-bottom:1rem;">AI Package Features</h3>
-                    <p class="mb-4 text-sm text-muted">Edit feature list displayed on website.</p>
+                    <p class="mb-4 text-sm text-muted">Edit feature list displayed on website. (One feature per line)</p>
                     <textarea id="content-ai" rows="6">${aiFeatures.join('\n')}</textarea>
                 </div>
             `;
             });
         }
 
-        // UPDATED: SAVE CONTENT NOW SAVES PRICES TOO
         function saveContentChanges() {
             const frontendLines = document.getElementById('content-frontend').value.split('\n').filter(l => l.trim() !== '');
             const aiLines = document.getElementById('content-ai').value.split('\n').filter(l => l.trim() !== '');
 
-            const priceHtml = parseFloat(document.getElementById('price-html').value);
-            const priceFe = parseFloat(document.getElementById('price-fe').value);
-            const priceAi = parseFloat(document.getElementById('price-ai').value);
-
-            if(isNaN(priceHtml) || isNaN(priceFe) || isNaN(priceAi)) {
-                return showToast("Please enter valid prices for all packages.", "error");
-            }
-
-            const newPrices = {
-                html: priceHtml,
-                frontend: priceFe,
-                ai: priceAi
-            };
+            // Show loading state on button temporarily
+            const btnText = document.querySelector('button[onclick="saveContentChanges()"] span');
+            const originalBtnHTML = document.querySelector('button[onclick="saveContentChanges()"]').innerHTML;
+            document.querySelector('button[onclick="saveContentChanges()"]').innerHTML = `<div class="loading-spinner" style="width:16px; height:16px; border-width:2px;"></div> Saving...`;
 
             db.collection("config").doc("site_settings").get().then(doc => {
                 const data = doc.exists ? doc.data() : {};
@@ -1933,16 +2021,24 @@
                 newPkgDetails.ai = { features: aiLines };
 
                 db.collection("config").doc("site_settings").update({
-                    packageDetails: newPkgDetails,
-                    prices: newPrices // Save prices alongside
+                    packageDetails: newPkgDetails
                 }).then(() => {
-                    showToast("Content & Pricing updated successfully!", "success");
-                    logActivity("Updated website content and pricing");
+                    showToast("Content updated successfully!", "success");
+                    logActivity("Updated website content features");
+                    // Restore button
+                    const main = document.getElementById('main');
+                    const btn = main.querySelector('button[onclick="saveContentChanges()"]');
+                    if(btn) btn.innerHTML = `<i class="ri-save-line"></i> Save Changes`;
                 });
+            }).catch(err => {
+                showToast("Error updating: " + err.message, "error");
+                 // Restore button
+                 const btn = document.querySelector('button[onclick="saveContentChanges()"]');
+                 if(btn) btn.innerHTML = `<i class="ri-save-line"></i> Save Changes`;
             });
         }
 
-        // --- 8. CONFIG (UPDATED: Payment Methods Listener) ---
+        // --- 8. CONFIG ---
         function renderConfig() {
             if(!isAdmin()) return;
             document.getElementById('main').innerHTML = `
@@ -1957,7 +2053,7 @@
                             <span class="slider"></span>
                         </label>
                     </div>
-                    <p class="text-muted text-sm mb-4">Toggle a warning banner on the main site and restrict access.</p>
+                    <p class="text-muted text-sm mb-4">Toggle a warning banner on main site and restrict access.</p>
                     <div class="mb-4">
                         <label>Maintenance Message</label>
                         <textarea id="maint-msg" class="mb-2" rows="3">We are currently performing scheduled maintenance.</textarea>
@@ -1965,14 +2061,36 @@
                     </div>
                 </div>
 
-                <!-- Dynamic Pricing (Redundant but kept for safety, prices moved to Content tab) -->
-                <div class="config-section" style="opacity:0.5;">
+                <!-- Dynamic Pricing -->
+                <div class="config-section">
                     <div class="config-header">Dynamic Pricing Override</div>
-                    <p class="text-muted text-sm mb-4">Base prices moved to <strong>Content & Pkg</strong> tab for easier management.</p>
-                    <button class="btn btn-secondary btn-sm" onclick="navigateTo('/content')">Go to Pricing</button>
+                    <p class="text-muted text-sm mb-4">Base prices for different modules (Syncs with Main Site).</p>
+                    <div class="price-grid">
+                        <div>
+                            <label>HTML Package Price</label>
+                            <div class="flex gap-2">
+                                <input id="price-html" type="number">
+                                <button class="btn btn-primary" onclick="savePrice('html', 'price-html')">Save</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label>Frontend Package Price</label>
+                            <div class="flex gap-2">
+                                <input id="price-fe" type="number">
+                                <button class="btn btn-primary" onclick="savePrice('frontend', 'price-fe')">Save</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label>AI/Data Price (Base)</label>
+                            <div class="flex gap-2">
+                                <input id="price-ai" type="number">
+                                <button class="btn btn-primary" onclick="savePrice('ai', 'price-ai')">Save</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Payment Gateways (UPDATED) -->
+                <!-- Payment Gateways -->
                 <div class="config-section">
                     <div class="config-header flex justify-between">
                         <span>Payment Gateways</span>
@@ -1996,7 +2114,6 @@
                 }
             });
 
-            // Listen to dedicated collection
             db.collection("payment_methods").onSnapshot(snap => {
                 const list = document.getElementById('gateway-list');
                 if(!list) return;
@@ -2030,6 +2147,11 @@
         function saveMaintMsg() {
             db.collection("config").doc("site_settings").update({ maintenance_message: document.getElementById('maint-msg').value }).then(() => showToast("Message Saved", "success"));
         }
+        function savePrice(key, elemId) {
+            const theVal = parseFloat(document.getElementById(elemId).value);
+            if(!theVal) return showToast("Invalid price", "error");
+            db.collection("config").doc("site_settings").update({ [`prices.${key}`]:theVal }).then(() => showToast("Price Updated", "success"));
+        }
         
         function addGateway() {
             showModal("Add Payment Gateway", `
@@ -2038,7 +2160,6 @@
             `, `<button class="btn btn-primary" onclick="saveNewGateway()">Add</button>`);
         }
         
-        // UPDATED: Add to dedicated collection
         async function saveNewGateway() {
             const name = document.getElementById('gw-name').value;
             const link = document.getElementById('gw-link').value;
@@ -2059,7 +2180,6 @@
             });
         }
         
-        // UPDATED: Edit in dedicated collection
         async function saveEditedGateway(docId) {
             const name = document.getElementById('e-gw-name').value;
             const link = document.getElementById('e-gw-link').value;
@@ -2071,7 +2191,6 @@
             logActivity(`Edited payment gateway: ${name}`);
         }
         
-        // UPDATED: Toggle in dedicated collection
         async function toggleGatewayStatus(docId) {
             const docRef = await db.collection("payment_methods").doc(docId).get();
             const currentStatus = docRef.data().active;
@@ -2080,14 +2199,13 @@
             renderConfig();
         }
         
-        // UPDATED: Delete from dedicated collection
         async function deleteGateway(docId) {
             if(!confirm("Delete gateway?")) return;
             await db.collection("payment_methods").doc(docId).delete();
             renderConfig();
         }
 
-        // --- 9. PORTFOLIO MANAGEMENT (UPDATED: ID GENERATION) ---
+        // --- 9. PORTFOLIO MANAGEMENT ---
         function renderPortfolio() {
             if(!isAdmin()) return;
 
@@ -2120,7 +2238,6 @@
                 </div>
             `;
 
-            // Real-time listener for clients_portfolio
             db.collection("clients_portfolio").orderBy("timestamp", "desc").onSnapshot(snap => {
                 const tbody = document.getElementById('portfolio-tbody');
                 if(!tbody) return;
@@ -2204,7 +2321,6 @@
                 return showToast("Please fill in all fields.", "error");
             }
 
-            // Use .doc(customId).set() instead of .add()
             db.collection("clients_portfolio").doc(customId).set({
                 name,
                 img,
@@ -2308,7 +2424,7 @@
             trs.forEach(tr => tr.style.display = tr.innerText.toLowerCase().includes(text)?'':'none');
         }
 
-        // --- 11. CUSTOMER REQUESTS (NEW) ---
+        // --- 11. CUSTOMER REQUESTS ---
         function renderRequests() {
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
@@ -2329,7 +2445,7 @@
                                 </tr>
                             </thead>
                             <tbody id="req-tbody">
-                                <tr><td colspan="7" class="text-center"><div class="loading-spinner"></div></td></tr>
+                                <tr><td colspan="6" class="text-center"><div class="loading-spinner"></div></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -2339,7 +2455,7 @@
             db.collection("customer_requests").orderBy("timestamp", "desc").onSnapshot(snap => {
                 const tbody = document.getElementById('req-tbody');
                 if(!tbody) return;
-                if(snap.empty) { tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No requests found</td></tr>'; return; }
+                if(snap.empty) { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No requests found</td></tr>'; return; }
 
                 tbody.innerHTML = snap.docs.map(doc => {
                     const d = doc.data();
@@ -2466,7 +2582,7 @@
             });
         }
 
-        // --- 12. PUBLIC PROMO CODES (NEW) ---
+        // --- 12. PUBLIC PROMO CODES ---
         function renderPublicPromos() {
             if(!isAdmin()) return;
 
@@ -2497,7 +2613,6 @@
                 </div>
             `;
 
-            // Listen to 'promo_codes' subcollection in 'config'
             db.collection("promo_codes").onSnapshot(snap => {
                 const tbody = document.getElementById('public-promos-tbody');
                 if(!tbody) return;
@@ -2508,7 +2623,7 @@
                 }
 
                 tbody.innerHTML = snap.docs.map(doc => {
-                    const code = doc.id; // Doc ID is Code
+                    const code = doc.id; 
                     const data = doc.data();
                     const discountPercent = (data.discount * 100) + '%';
                     
@@ -2545,7 +2660,6 @@
             if(!code || isNaN(discount)) return showToast("Invalid Input", "error");
 
             try {
-                // Doc ID acts as Code
                 await db.collection("promo_codes").doc(code).set({
                     discount: discount
                 });
