@@ -58,6 +58,7 @@
             --z-modal-overlay: 1000;
             --z-modal-content: 1010;
             --z-toast: 2000;
+            --z-invoice-modal: 5000; /* Highest for print */
         }
 
         /* RESET & BASE */
@@ -80,6 +81,7 @@
         .items-center { align-items: center; } 
         .justify-between { justify-content: space-between; }
         .justify-center { justify-content: center; }
+        .justify-end { justify-content: flex-end; }
         .gap-2 { gap: 0.5rem; } 
         .gap-4 { gap: 1rem; }
         .w-full { width: 100%; }
@@ -92,6 +94,7 @@
         .text-sm { font-size: 0.85rem; }
         .font-bold { font-weight: 700; }
         .text-muted { color: var(--text-muted); }
+        .text-right { text-align: right; }
         .block { display: block; }
         
         /* Monospace font for IDs/Code */
@@ -493,6 +496,69 @@
         .modal-body { padding: 1.5rem; overflow-y: auto; }
         .modal-footer { padding: 1.2rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; border-radius: 0 0 16px 16px; background: rgba(0,0,0,0.2); }
 
+        /* INVOICE MODAL SPECIFIC STYLES */
+        #invoice-modal-overlay {
+            z-index: var(--z-invoice-modal);
+            background: rgba(0,0,0,0.9);
+        }
+        #invoice-paper {
+            background: #ffffff;
+            color: #1f2937;
+            font-family: 'Inter', sans-serif;
+            padding: 40px;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        .inv-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 2px solid #eee; padding-bottom: 20px; }
+        .inv-logo img { height: 50px; }
+        .inv-meta { text-align: right; }
+        .inv-meta h2 { font-size: 1.8rem; font-weight: 800; color: var(--primary); margin-bottom: 5px; }
+        .inv-meta p { color: #6b7280; font-size: 0.9rem; }
+        .inv-client-details { margin-bottom: 30px; }
+        .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        .inv-table th { background: #f3f4f6; color: #374151; border-bottom: 2px solid #e5e7eb; text-align: left; padding: 12px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
+        .inv-table td { border-bottom: 1px solid #f3f4f6; padding: 12px; color: #374151; font-size: 0.95rem; }
+        .inv-total-row { display: flex; justify-content: flex-end; gap: 40px; margin-top: 20px; }
+        .inv-total-val { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+        .inv-footer { margin-top: 40px; padding-top: 20px; border-top: 1px dashed #d1d5db; text-align: center; color: #6b7280; font-size: 0.85rem; }
+        
+        .btn-print-invoice {
+            background: var(--bg-surface);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+        .btn-print-invoice:hover { background: var(--bg-surface-hover); color: white; }
+
+        /* PRINT STYLES */
+        @media print {
+            body * { visibility: hidden; }
+            #invoice-modal-overlay, #invoice-modal-overlay * {
+                visibility: visible;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: auto;
+                background: white;
+                z-index: 99999;
+            }
+            #invoice-modal-overlay {
+                position: absolute;
+                background: white;
+            }
+            .modal-header, .modal-footer, .btn-icon {
+                display: none !important;
+            }
+            #invoice-paper {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+
         /* TOAST */
         .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: var(--z-toast); display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast { 
@@ -690,6 +756,9 @@
                 <div class="nav-item" onclick="navigateTo('/content')">
                     <i class="ri-layout-masonry-line"></i> <span class="nav-text">Content & Pkg</span>
                 </div>
+                <div class="nav-item" id="nav-public-promos" onclick="navigateTo('/public-promos')">
+                    <i class="ri-coupon-3-line"></i> <span class="nav-text">Public Promos</span>
+                </div>
                 <div class="nav-item" id="nav-config" onclick="navigateTo('/config')">
                     <i class="ri-settings-4-line"></i> <span class="nav-text">System Config</span>
                 </div>
@@ -719,6 +788,22 @@
             </div>
             <div class="modal-body" id="modalBody"></div>
             <div class="modal-footer" id="modalFooter"></div>
+        </div>
+    </div>
+
+    <!-- INVOICE MODAL -->
+    <div class="modal-overlay" id="invoice-modal-overlay">
+        <div class="modal" style="background: white; border: none; max-width: 800px; max-height: 95vh;">
+            <div class="modal-header" style="background: #f9fafb; border-bottom: 1px solid #e5e7eb; padding: 1rem 1.5rem;">
+                <div class="modal-title" id="invoice-title" style="color: #1f2937;">Invoice</div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn btn-primary btn-sm" onclick="window.print()"><i class="ri-printer-line"></i> Print</button>
+                    <button class="btn btn-danger btn-sm" onclick="closeInvoiceModal()"><i class="ri-close-line"></i></button>
+                </div>
+            </div>
+            <div class="modal-body" style="background: #fff;" id="invoice-paper">
+                <!-- Invoice Content injected here -->
+            </div>
         </div>
     </div>
 
@@ -882,10 +967,12 @@
                         if(userData.role !== 'admin') {
                             document.getElementById('nav-crew').classList.add('hidden');
                             document.getElementById('nav-config').classList.add('hidden');
+                            document.getElementById('nav-public-promos').classList.add('hidden');
                             document.getElementById('notif-btn').style.display = 'none'; 
                         } else {
                             document.getElementById('nav-crew').classList.remove('hidden');
                             document.getElementById('nav-config').classList.remove('hidden');
+                            document.getElementById('nav-public-promos').classList.remove('hidden');
                             document.getElementById('notif-btn').style.display = 'flex';
                             listenForNotifications(); 
                         }
@@ -946,7 +1033,8 @@
             '/config': renderConfig,
             '/portfolio': renderPortfolio,
             '/requests': renderRequests,
-            '/my-profile': renderMyProfile
+            '/my-profile': renderMyProfile,
+            '/public-promos': renderPublicPromos
         };
 
         function navigateTo(path) {
@@ -1115,7 +1203,7 @@
             });
         }
 
-        // --- 2. ORDERS (UPDATED: DOMAIN COLUMN) ---
+        // --- 2. ORDERS (UPDATED: REMAINDER BUTTON & INVOICE) ---
         function renderOrders() {
             document.getElementById('main').innerHTML = `
                 <div class="table-container">
@@ -1130,14 +1218,14 @@
                                     <th>Date</th>
                                     <th>Client</th>
                                     <th>Package</th>
-                                    <th>Domain</th> <!-- NEW COLUMN -->
+                                    <th>Domain</th>
                                     <th>Total</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="orders-tbody">
-                                <tr><td colspan="7" class="text-center"><div class="loading-spinner"></div></td></tr>
+                                <tr><td colspan="8" class="text-center"><div class="loading-spinner"></div></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1148,7 +1236,7 @@
                 if(!tbody) return;
                 
                 if(snap.empty) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No orders found</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No orders found</td></tr>';
                     return;
                 }
 
@@ -1186,15 +1274,30 @@
             });
         }
 
-        // UPDATED: Manage Order Modal includes Domain Field
+        // UPDATED: Manage Order Modal includes Billing Cycle, Payment Request, Invoice
+        let currentEditingOrderId = null;
+        let currentEditingOrderData = null;
+
         function viewOrder(id) {
+            currentEditingOrderId = id;
             db.collection("orders").doc(id).get().then(doc => {
                 const d = doc.data();
+                currentEditingOrderData = d;
+
                 const voucherDisplay = d.voucherCode 
                     ? `<div class="mb-4"><label>Voucher Used</label><input readonly value="${d.voucherCode}" style="color:var(--warning); border-color:var(--warning)"></div>` 
                     : '';
 
+                // Billing Cycle Display
+                const cycleDisplay = d.billingCycle ? `<div class="mb-4 p-2" style="background:rgba(59,130,246,0.05); border-radius:6px; border:1px solid rgba(59,130,246,0.1);">
+                        <div class="flex justify-between items-center">
+                            <span style="font-size:0.8rem; color:var(--text-muted);">Billing Cycle</span>
+                            <span class="font-bold" style="color:var(--primary);">${d.billingCycle}</span>
+                        </div>
+                    </div>` : '';
+
                 showModal(`Manage Order`, `
+                    ${cycleDisplay}
                     ${voucherDisplay}
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                         <div><label class="text-muted text-sm">Name</label><input id="o-name" value="${d.customerName}"></div>
@@ -1205,7 +1308,7 @@
                     <div class="mt-4">
                         <label>Client Domain</label>
                         <div style="display:flex; gap:10px;">
-                             <span style="padding:0.6rem; background:var(--bg-input); border:1px solid var(--border); border-radius:6px 0 0 6px; color:var(--text-muted);">https://</span>
+                             <span style="padding:0.6rem; background:var(--bg-input); border:1px solid var(--border); border-radius:6px 0 0 6px 0; color:var(--text-muted);">https://</span>
                              <input id="o-domain" value="${d.domain || ''}" placeholder="example.com" style="border-radius:0 6px 6px 0;">
                         </div>
                         <small class="text-muted">Leave empty if no domain yet.</small>
@@ -1217,11 +1320,18 @@
                         <option value="Completed" ${d.status=='Completed'?'selected':''}>Completed</option>
                         <option value="Cancelled" ${d.status=='Cancelled'?'selected':''}>Cancelled</option>
                     </select>
-                `, `<button class="btn btn-primary" onclick="updateOrderDetails('${id}')">Save Changes</button>`);
+                `, `
+                    <div class="flex gap-2">
+                        <button class="btn btn-primary" onclick="updateOrderDetails('${id}')">Save Changes</button>
+                    </div>
+                    <div class="flex gap-2 mt-2" style="border-top: 1px solid var(--border); padding-top: 10px;">
+                        <button class="btn btn-success flex-1" onclick="sendPaymentLink('${id}')"><i class="ri-whatsapp-line"></i> Send Payment Request</button>
+                        <button class="btn btn-secondary flex-1" onclick="openInvoiceModal('${id}')"><i class="ri-file-list-3-line"></i> Generate Invoice</button>
+                    </div>
+                `);
             });
         }
 
-        // UPDATED: Save Order Details includes Domain
         function updateOrderDetails(id) {
             db.collection("orders").doc(id).update({
                 customerName: document.getElementById('o-name').value,
@@ -1241,6 +1351,105 @@
                 showToast("Order Deleted", "success");
                 logActivity(`Deleted Order #${id.substr(0,6)}`);
             });
+        }
+
+        // --- NEW: SEND PAYMENT LINK ---
+        async function sendPaymentLink(id) {
+            if(!currentEditingOrderData) return;
+            const d = currentEditingOrderData;
+
+            // Get current active payment method
+            const methods = siteConfig.payment_methods && siteConfig.payment_methods.length > 0 
+                            ? siteConfig.payment_methods 
+                            : DEFAULT_PAYMENT_METHODS;
+
+            const activeMethod = methods.find(m => m.active === true);
+            const link = activeMethod ? activeMethod.link : "No payment link configured";
+            const methodLabel = activeMethod ? activeMethod.name : "Unknown";
+
+            const message = `Hi ${d.customerName},\n\nPlease proceed with your payment for the balance/remainder.\n\n*Order ID:* ${id.substr(0,8).toUpperCase()}\n*Package:* ${d.package}\n*Total Amount:* ${d.total}\n*Payment Method:* ${methodLabel}\n\nPayment Link: ${link}\n\nThank you, DDNetwork One.`;
+
+            const encodedMsg = encodeURIComponent(message);
+            window.open(`https://wa.me/${ADMIN_PHONE_NO}?text=${encodedMsg}`, '_blank');
+        }
+
+        // --- NEW: INVOICE GENERATOR ---
+        function openInvoiceModal(id) {
+            if(!currentEditingOrderData) return;
+            const d = currentEditingOrderData;
+            const today = new Date();
+            const invoiceNum = `INV-${id.substr(0,6).toUpperCase()}-${today.getFullYear()}`;
+            const formattedDate = today.toLocaleDateString();
+
+            const invPaper = document.getElementById('invoice-paper');
+            invPaper.innerHTML = `
+                <div class="inv-header">
+                    <div class="inv-logo">
+                        <h2 style="color:var(--primary); margin:0; font-size:1.5rem;">DDNetwork One</h2>
+                        <p style="color:#6b7280; margin:5px 0 0 0;">Web Solutions & AI Integration</p>
+                    </div>
+                    <div class="inv-meta">
+                        <h2>INVOICE</h2>
+                        <p>#${invoiceNum}</p>
+                        <p>Date: ${formattedDate}</p>
+                    </div>
+                </div>
+
+                <div class="inv-client-details">
+                    <p style="color:#374151; font-size:0.9rem;"><strong>Bill To:</strong></p>
+                    <h3 style="color:#111827; font-size:1.2rem; margin-bottom:5px;">${d.customerName}</h3>
+                    <p style="color:#6b7280; margin-bottom:2px;">${d.customerEmail}</p>
+                    ${d.customerPhone ? `<p style="color:#6b7280;">${d.customerPhone}</p>` : ''}
+                    ${d.companyName ? `<p style="color:#6b7280;">${d.companyName}</p>` : ''}
+                    ${d.domain ? `<p style="color:var(--primary); font-weight:600; margin-top:5px;">Domain: ${d.domain}</p>` : ''}
+                </div>
+
+                <table class="inv-table">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th style="text-align:right;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <strong>${d.package}</strong>
+                                ${d.billingCycle ? `<span style="display:block; font-size:0.85rem; font-weight:400; color:#6b7280;">Cycle: ${d.billingCycle}</span>` : ''}
+                            </td>
+                            <td style="text-align:right;">${d.total}</td>
+                        </tr>
+                        ${d.setupFee && parseFloat(d.setupFee) > 0 ? `
+                        <tr>
+                            <td>Setup Fee (One-time)</td>
+                            <td style="text-align:right;">RM ${d.setupFee}</td>
+                        </tr>` : ''}
+                    </tbody>
+                </table>
+
+                <div class="inv-total-row">
+                    <div>
+                        <p style="font-size:0.9rem; color:#6b7280; margin-bottom:5px;">Status: <span style="background:#f3f4f6; padding:2px 6px; border-radius:4px; font-size:0.8rem;">${d.status}</span></p>
+                        ${d.voucherCode ? `<p style="font-size:0.85rem; color:var(--warning);">Discount: ${d.voucherCode}</p>` : ''}
+                    </div>
+                    <div style="text-align:right;">
+                        <p style="font-size:0.9rem; color:#374151;">Total Due</p>
+                        <div class="inv-total-val">${d.total}</div>
+                    </div>
+                </div>
+
+                <div class="inv-footer">
+                    <p>Thank you for your business!</p>
+                    <p>Bank Details: (Admin to manually insert bank details here if needed)</p>
+                    <p>DDNetwork One &copy; ${today.getFullYear()}</p>
+                </div>
+            `;
+            
+            document.getElementById('invoice-modal-overlay').classList.add('open');
+        }
+
+        function closeInvoiceModal() {
+            document.getElementById('invoice-modal-overlay').classList.remove('open');
         }
 
         // --- 3. CLIENTS ---
@@ -2349,7 +2558,7 @@
                             <label>Attachments</label>
                             <div class="flex items-center gap-2 text-sm">
                                 <i class="${d.hasFile ? 'ri-checkbox-circle-fill text-success' : 'ri-close-circle-fill text-muted'}"></i>
-                                ${d.hasFile ? 'User attached a file via the website form.' : 'No file attached.'}
+                                ${d.hasFile ? 'User attached a file via website form.' : 'No file attached.'}
                             </div>
                         </div>
                     `;
@@ -2413,6 +2622,109 @@
                 showToast("Item deleted", "success");
                 logActivity(`Deleted item from ${collection}`);
             });
+        }
+
+        // --- 12. PUBLIC PROMO CODES (NEW) ---
+        function renderPublicPromos() {
+            if(!isAdmin()) return;
+
+            document.getElementById('main').innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h2 style="font-size:1.25rem; font-weight:700;">Public Promo Codes</h2>
+                    <button class="btn btn-primary" onclick="addPublicPromo()"><i class="ri-add-line"></i> Add Code</button>
+                </div>
+                
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Active Codes (config/promo_codes)</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Discount (%)</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="public-promos-tbody">
+                                <tr><td colspan="3" class="text-center"><div class="loading-spinner"></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            // Listen to 'promo_codes' subcollection in 'config'
+            db.collection("promo_codes").onSnapshot(snap => {
+                const tbody = document.getElementById('public-promos-tbody');
+                if(!tbody) return;
+                
+                if(snap.empty) {
+                    tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No public promo codes found.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = snap.docs.map(doc => {
+                    const code = doc.id; // Doc ID is Code
+                    const data = doc.data();
+                    const discountPercent = (data.discount * 100) + '%';
+                    
+                    return `<tr>
+                        <td class="font-mono" style="color:var(--warning); font-weight:700;">${code}</td>
+                        <td><span class="badge" style="background:var(--success)15; color:var(--success); border:1px solid var(--success)25">${discountPercent}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-danger" onclick="deletePublicPromo('${code}')"><i class="ri-delete-bin-line"></i> Delete</button>
+                        </td>
+                    </tr>`;
+                }).join('');
+            });
+        }
+
+        function addPublicPromo() {
+            showModal("Add Public Promo Code", `
+                <div class="mb-4">
+                    <label>Promo Code (ID)</label>
+                    <input type="text" id="pub-promo-code" placeholder="e.g. WELCOME10" style="text-transform:uppercase;">
+                    <small class="text-muted">Users will enter this exact code.</small>
+                </div>
+                <div class="mb-4">
+                    <label>Discount Percentage</label>
+                    <input type="number" id="pub-promo-discount" placeholder="0.1 for 10%">
+                    <small class="text-muted">Decimal (e.g., 0.10 = 10%)</small>
+                </div>
+            `, `<button class="btn btn-primary" onclick="savePublicPromo()">Create Code</button>`);
+        }
+
+        async function savePublicPromo() {
+            const code = document.getElementById('pub-promo-code').value.trim().toUpperCase();
+            const discount = parseFloat(document.getElementById('pub-promo-discount').value);
+
+            if(!code || isNaN(discount)) return showToast("Invalid Input", "error");
+
+            try {
+                // Doc ID acts as Code
+                await db.collection("promo_codes").doc(code).set({
+                    discount: discount
+                });
+                closeModal();
+                showToast("Promo Code Created", "success");
+                logActivity(`Created public promo code: ${code}`);
+            } catch(e) {
+                showToast("Error: " + e.message, "error");
+            }
+        }
+
+        async function deletePublicPromo(code) {
+            if(!confirm(`Delete promo code ${code}?`)) return;
+            
+            try {
+                await db.collection("promo_codes").doc(code).delete();
+                showToast("Promo Code Deleted", "success");
+                logActivity(`Deleted public promo code: ${code}`);
+            } catch(e) {
+                showToast("Error deleting: " + e.message, "error");
+            }
         }
 
     </script>
