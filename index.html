@@ -10,6 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 
+    <!-- html2pdf Library for PDF Download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -495,17 +498,43 @@
         .modal-body { padding: 1.5rem; overflow-y: auto; }
         .modal-footer { padding: 1.2rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; border-radius: 0 0 16px 16px; background: rgba(0,0,0,0.2); }
 
-        /* --- INVOICE STYLES --- */
-        #invoice-modal-content {
-            background: white; color: black; padding: 2rem; border-radius: 8px;
-            font-family: 'Inter', sans-serif;
+        /* --- IMPROVED INVOICE STYLES --- */
+        #invoiceModalOverlay {
+            z-index: 2000;
+            background: rgba(0,0,0,0.9);
         }
-        .invoice-header { display: flex; justify-content: space-between; margin-bottom: 2rem; border-bottom: 2px solid #eee; padding-bottom: 1rem; }
-        .invoice-title { font-size: 2rem; font-weight: 800; color: #333; }
-        .invoice-meta { text-align: right; font-size: 0.9rem; color: #666; }
-        .invoice-details-row { display: flex; justify-content: space-between; margin-bottom: 1rem; font-size: 1rem; }
-        .invoice-total { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #ddd; text-align: right; font-size: 1.5rem; font-weight: 700; }
-        .invoice-footer { margin-top: 3rem; text-align: center; color: #888; font-size: 0.8rem; }
+        
+        /* The container for the white invoice paper */
+        #invoice-paper {
+            background: white;
+            color: #111;
+            padding: 40px;
+            border-radius: 4px; /* Slight radius on screen, flat on print */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            font-family: 'Inter', sans-serif;
+            width: 100%;
+            max-width: 800px; /* A4 aspect ratio approx */
+            margin: 0 auto;
+        }
+
+        .inv-header { display: flex; justify-content: space-between; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #eee; }
+        .inv-title { font-size: 2rem; font-weight: 800; color: #000; margin: 0; letter-spacing: -1px; }
+        .inv-meta { text-align: right; font-size: 0.9rem; color: #555; line-height: 1.6; }
+        
+        .inv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
+        .inv-box h4 { margin: 0 0 8px 0; font-size: 0.85rem; text-transform: uppercase; color: #888; font-weight: 600; }
+        .inv-box p { margin: 0 0 4px 0; color: #222; font-size: 0.95rem; }
+        .inv-box small { color: #666; }
+
+        .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .inv-table th { background: #f8f9fa; color: #222; border-bottom: 2px solid #ddd; font-weight: 700; font-size: 0.85rem; text-align: left; padding: 12px; }
+        .inv-table td { padding: 12px; border-bottom: 1px solid #eee; color: #333; vertical-align: top; font-size: 0.9rem; }
+        .inv-table tr:last-child td { border-bottom: none; }
+        .inv-total-row td { padding: 15px 12px; background: #fcfcfc; border-top: 2px solid #eee; }
+        .inv-final-total { font-size: 1.5rem; font-weight: 800; color: #000; }
+
+        .inv-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #888; font-size: 0.8rem; }
+        .inv-footer p { margin-bottom: 5px; }
 
         /* TOAST */
         .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: var(--z-toast); display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
@@ -613,11 +642,58 @@
 
         /* PRINT STYLES FOR INVOICE */
         @media print {
-            aside, header, .toast-container, .sidebar-overlay, #dashboard > div:not(.modal-overlay) { display: none !important; }
-            main { margin: 0; padding: 0; overflow: visible; }
-            .modal-overlay { position: static; background: none; display: block; }
-            .modal { box-shadow: none; max-width: 100%; border: none; }
-            .invoice-header, .invoice-total { border-color: #000; }
+            /* Hide everything on the page by default */
+            body * {
+                visibility: hidden;
+            }
+            
+            /* Only show the invoice modal and its children */
+            #invoiceModalOverlay, #invoiceModalOverlay * {
+                visibility: visible;
+            }
+
+            /* Position the invoice overlay to cover the paper */
+            #invoiceModalOverlay {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white;
+                z-index: 99999;
+            }
+
+            /* Style the specific invoice container */
+            .modal {
+                box-shadow: none;
+                max-width: 100%;
+                width: 100%;
+                border: none;
+                margin: 0;
+                padding: 0;
+            }
+            
+            #invoice-paper {
+                box-shadow: none;
+                border-radius: 0;
+                margin: 0;
+                padding: 20px;
+                color: black;
+                background: white;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+
+            /* Hide buttons in print */
+            .modal-header, .modal-footer, .btn-icon {
+                display: none !important;
+            }
+            
+            /* Reset text colors for print */
+            th, td, p, h1, h2, h3, h4, h5, small {
+                color: black !important;
+            }
         }
     </style>
 </head>
@@ -746,16 +822,26 @@
     </div>
 
     <!-- INVOICE MODAL (Specific) -->
-    <div class="modal-overlay" id="invoiceModalOverlay" style="z-index: 2000;">
-        <div class="modal" style="max-width: 800px; background: white;">
-            <div class="modal-header" style="background: transparent; border: none; padding-bottom: 0;">
-                <button class="btn-icon" onclick="closeInvoiceModal()" style="color: black; background: #f0f0f0;"><i class="ri-close-line"></i></button>
-            </div>
-            <div id="invoice-modal-content">
+    <div class="modal-overlay" id="invoiceModalOverlay">
+        <div class="modal" style="max-width: 850px; background: transparent; box-shadow: none;">
+            <!-- Close Button (Absolute positioned for clear access) -->
+            <button onclick="closeInvoiceModal()" style="position: absolute; top: -40px; right: 0; background: rgba(0,0,0,0.5); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; z-index: 10;">
+                <i class="ri-close-line"></i> Close Preview
+            </button>
+            
+            <!-- The Invoice Paper -->
+            <div id="invoice-paper">
                 <!-- Content injected via JS -->
             </div>
-            <div class="modal-footer" style="border-top: 1px solid #ddd;">
-                <button class="btn btn-primary" style="background: #000;" onclick="window.print()">Print / Save PDF</button>
+
+            <!-- Footer Actions for Screen -->
+            <div style="margin-top: 20px; display: flex; justify-content: center; gap: 15px;">
+                <button class="btn btn-primary" onclick="downloadInvoicePDF()" style="background: var(--success); border-color: var(--success); padding: 12px 24px; font-weight: 600;">
+                    <i class="ri-download-line"></i> Download PDF
+                </button>
+                <button class="btn btn-secondary" onclick="window.print()" style="padding: 12px 24px; font-weight: 600;">
+                    <i class="ri-printer-line"></i> Print
+                </button>
             </div>
         </div>
     </div>
@@ -1230,82 +1316,99 @@
             });
         }
 
-        // FEATURE: Generate Invoice
+        // FEATURE: Better Invoice Generate with PDF Download
         function generateInvoice(id) {
             db.collection("orders").doc(id).get().then(doc => {
                 if(!doc.exists) return;
                 const d = doc.data();
                 const date = formatDateTime(d.timestamp);
                 
+                // Clean logo URL for print
+                const logoUrl = "https://raw.githubusercontent.com/ddnetwork-ent/ddnetwork/refs/heads/main/DDN%20Logo%20NoBG.png";
+                
                 const invoiceHTML = `
-                    <div class="invoice-header">
-                        <div class="invoice-title">INVOICE</div>
-                        <div class="invoice-meta">
+                    <div class="inv-header">
+                        <div>
+                            <img src="${logoUrl}" alt="DDNetwork Logo" style="height: 50px; margin-bottom: 10px; display:block;">
+                            <h1 class="inv-title">INVOICE</h1>
+                        </div>
+                        <div class="inv-meta">
                             <strong>DDNetwork One</strong><br>
-                            PG0572133-K<br>
-                            Sales: sales@ddn.one
+                            Reg No: PG0572133-K<br>
+                            <a href="mailto:sales@ddn.one" style="color: #0066cc; text-decoration:none;">sales@ddn.one</a>
                         </div>
                     </div>
                     
-                    <div class="invoice-details-row">
-                        <div>
-                            <strong>Bill To:</strong><br>
-                            ${d.customerName}<br>
-                            ${d.customerCompany ? d.customerCompany + '<br>' : ''}
-                            ${d.customerEmail}<br>
-                            ${d.customerPhone}
+                    <div class="inv-grid">
+                        <div class="inv-box">
+                            <h4>Bill To:</h4>
+                            <p><strong>${d.customerName}</strong></p>
+                            ${d.customerCompany ? `<p>${d.customerCompany}</p>` : ''}
+                            <p>${d.customerEmail}</p>
+                            <p>${d.customerPhone || '-'}</p>
                         </div>
-                        <div>
-                            <strong>Invoice Details:</strong><br>
-                            Order ID: ${id.substr(0,6).toUpperCase()}<br>
-                            Date: ${date}<br>
-                            Status: <span style="color:var(--primary); font-weight:bold;">${d.status}</span>
+                        <div class="inv-box" style="text-align: right;">
+                            <h4>Invoice Details:</h4>
+                            <p>Order ID: <span class="font-mono">${id.substr(0,8).toUpperCase()}</span></p>
+                            <p>Date Issued: ${date}</p>
+                            <p>Status: <strong style="color: #0066cc;">${d.status}</strong></p>
+                            <p>Billing Cycle: ${d.billingCycle || 'One-time'}</p>
                         </div>
                     </div>
 
-                    <div style="margin-top: 2rem; border: 1px solid #ddd; border-radius: 8px; overflow:hidden;">
-                        <table style="width:100%; min-width:auto;">
-                            <thead>
-                                <tr style="background:#f4f4f5; color:#000;">
-                                    <th style="padding:1rem; text-align:left;">Description</th>
-                                    <th style="padding:1rem; text-align:right;">Price</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td style="padding:1rem;">
-                                        <strong>${d.package}</strong><br>
-                                        <span style="font-size:0.9rem; color:#666;">
-                                            Billing Cycle: ${d.billingCycle}<br>
-                                            ${d.domain ? `Domain: ${d.domain}` : ''}
-                                        </span>
-                                    </td>
-                                    <td style="padding:1rem; text-align:right;">${d.total}</td>
-                                </tr>
-                                ${d.voucherCode ? `
-                                <tr>
-                                    <td style="padding:1rem; color:var(--success);">Discount (${d.voucherCode})</td>
-                                    <td style="padding:1rem; text-align:right;">-</td>
-                                </tr>` : ''}
-                                <tr style="border-top:1px solid #ddd;">
-                                    <td style="padding:1rem; font-weight:700;">Total Due</td>
-                                    <td style="padding:1rem; text-align:right; font-size:1.2rem;">${d.total}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <table class="inv-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 60%;">Description</th>
+                                <th style="width: 20%;">Notes</th>
+                                <th style="width: 20%; text-align: right;">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <strong>${d.package}</strong><br>
+                                    <small>Web Development & Services</small>
+                                </td>
+                                <td>
+                                    ${d.domain ? `Domain: ${d.domain}` : 'No Domain'}
+                                </td>
+                                <td style="text-align: right;">${d.total}</td>
+                            </tr>
+                            ${d.voucherCode ? `
+                            <tr>
+                                <td colspan="2" style="color: #10b981; text-align: right;"><strong>Discount Applied (${d.voucherCode})</strong></td>
+                                <td style="text-align: right; color: #10b981;">-</td>
+                            </tr>` : ''}
+                        </tbody>
+                    </table>
                     
-                    <div class="invoice-total">
-                        Grand Total: ${d.total}
+                    <div style="display: flex; justify-content: flex-end;">
+                        <div style="width: 40%;">
+                            <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                                <span>Subtotal</span>
+                                <span>${d.total}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #ccc; margin-bottom: 5px;">
+                                <span>Tax (0%)</span>
+                                <span>RM 0.00</span>
+                            </div>
+                            <div class="inv-total-row" style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 600; font-size: 1rem;">Total Due</span>
+                                <span class="inv-final-total">${d.total}</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="invoice-footer">
-                        Thank you for your business. Please proceed payment to the link sent via WhatsApp.<br>
-                        DDNetwork One | sales@ddn.one
+                    <div class="inv-footer">
+                        <p><strong>Payment Instructions:</strong> Please proceed payment using payment link sent via WhatsApp or Email.</p>
+                        <p>Bank transfers may take 1-3 business days to reflect.</p>
+                        <br>
+                        <small>Thank you for choosing DDNetwork One.</small>
                     </div>
                 `;
 
-                document.getElementById('invoice-modal-content').innerHTML = invoiceHTML;
+                document.getElementById('invoice-paper').innerHTML = invoiceHTML;
                 document.getElementById('invoiceModalOverlay').classList.add('open');
             }).catch(err => {
                 console.error(err);
@@ -1313,23 +1416,71 @@
             });
         }
 
+        // NEW: High Resolution PDF Download Function
+        function downloadInvoicePDF() {
+            const element = document.getElementById('invoice-paper');
+            const customerName = element.querySelector('.inv-box p strong').innerText;
+            
+            // Configuration for html2pdf
+            const opt = {
+                margin:       0,
+                filename:     `Invoice_${customerName.replace(/\s+/g, '_')}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true }, // Scale 2 for High Res
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            showToast("Generating PDF...", "info");
+            
+            // Generate and save
+            html2pdf().set(opt).from(element).save().then(() => {
+                showToast("PDF Downloaded Successfully!", "success");
+            }).catch(err => {
+                console.error(err);
+                showToast("Failed to generate PDF", "error");
+            });
+        }
+
         function closeInvoiceModal() {
             document.getElementById('invoiceModalOverlay').classList.remove('open');
         }
 
-        // FEATURE: Send Payment Reminder
+        // FEATURE: Robust WhatsApp Reminder
         function sendPaymentReminder(id) {
             db.collection("orders").doc(id).get().then(doc => {
                 if(!doc.exists) return;
                 const d = doc.data();
                 
-                const msg = `Hi ${d.customerName},\n\n*Reminder for your DDNetwork One order.*\n\nOrder ID: ${id.substr(0,6).toUpperCase()}\nPackage: ${d.package}\nTotal Amount: ${d.total}\n\nPlease click the payment link provided in our previous email or contact us if you need a new link.\n\nThank you!`;
+                // --- FIX: Robust Phone Sanitization ---
+                let phone = d.customerPhone || "";
                 
-                // Clean phone number (remove leading 0 if exists, add +60)
-                let cleanPhone = d.customerPhone ? d.customerPhone.replace(/^0/, '60') : '60123456789';
-                if(!cleanPhone.startsWith('+')) cleanPhone = '+' + cleanPhone;
+                if(!phone) {
+                    showToast("No phone number saved for this client.", "error");
+                    return;
+                }
 
-                window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+                // Remove all non-numeric characters
+                phone = phone.replace(/[^0-9]/g, '');
+                
+                // Logic: If starts with '0', replace with '60' (Malaysia)
+                if(phone.startsWith('0')) {
+                    phone = '60' + phone.substring(1);
+                } 
+                // Logic: If it doesn't start with country code but is long enough, assume 60
+                else if(!phone.startsWith('60') && phone.length > 9) {
+                    phone = '60' + phone;
+                }
+
+                if(phone.length < 10) {
+                    showToast("Invalid phone number format.", "error");
+                    return;
+                }
+                
+                const msg = `Hi ${d.customerName},\n\n*Friendly Reminder from DDNetwork One.*\n\nWe noticed your payment for Order #${id.substr(0,6).toUpperCase()} (${d.package}) is pending.\n\nTotal: ${d.total}\n\nPlease click payment link sent previously or reply to this message for a new link.\n\nThank you!`;
+                
+                const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+                
+                window.open(url, '_blank');
                 showToast("Opening WhatsApp...", "success");
             }).catch(err => {
                 console.error(err);
@@ -2148,7 +2299,7 @@
             db.collection("config").doc("site_settings").update({ maintenance_message: document.getElementById('maint-msg').value }).then(() => showToast("Message Saved", "success"));
         }
         function savePrice(key, elemId) {
-            const theVal = parseFloat(document.getElementById(elemId).value);
+            constVal = parseFloat(document.getElementById(elemId).value);
             if(!theVal) return showToast("Invalid price", "error");
             db.collection("config").doc("site_settings").update({ [`prices.${key}`]:theVal }).then(() => showToast("Price Updated", "success"));
         }
