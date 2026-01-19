@@ -16,7 +16,7 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
     <style>
         :root {
@@ -110,7 +110,7 @@
         .btn {
             padding: 0.6rem 1.2rem; 
             border-radius: 6px; 
-            border:1px solid transparent; 
+            border: 1px solid transparent; 
             cursor: pointer; 
             font-weight: 500; 
             font-size: 0.85rem; 
@@ -136,25 +136,25 @@
         .btn-primary { 
             background: var(--primary); 
             color: white; 
-            border:1px solid var(--primary); 
+            border: 1px solid var(--primary); 
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); 
         }
         .btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
 
-        .btn-success { background: rgba(16, 185, 129, 0.1); color: var(--success); border:1px solid rgba(16, 185, 129, 0.2); }
+        .btn-success { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
         .btn-success:hover { background: rgba(16, 185, 129, 0.2); border-color: var(--success); }
 
-        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border:1px solid rgba(239, 68, 68, 0.2); }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
         .btn-danger:hover { background: rgba(239, 68, 68, 0.2); border-color: var(--danger); }
         
-        .btn-danger-solid { background: var(--danger); color: white; border:1px solid var(--danger); }
+        .btn-danger-solid { background: var(--danger); color: white; border: 1px solid var(--danger); }
         .btn-danger-solid:hover { background: #dc2626; }
 
-        .btn-info { background: rgba(14, 165, 233, 0.1); color: var(--info); border:1px solid rgba(14, 165, 233, 0.2); }
-        .btn-info:hover { background: rgba(14, 165, 233, 0.2); border-color: var(--info); }
+        .btn-info { background: rgba(14, 165, 233, 0.1); color: var(--info); border: 1px solid rgba(14, 165, 233, 0.2); }
+        .btn-info:hover { background: rgba(14, 165, 433, 0.2); border-color: var(--info); }
 
         .btn-secondary { background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-main); }
-        .btn-secondary:hover { border-color: var(--text-muted); background: var(--bg-surface-hover); }
+        .btn-secondary:hover { border-color: calc(var(--text-muted)); background: var(--bg-surface-hover); }
         
         .btn-sm { padding: 0.35rem 0.8rem; font-size: 0.75rem; border-radius: 4px; }
         
@@ -177,7 +177,7 @@
             width:100%; 
             padding: 0.65rem 0.85rem; 
             background: var(--bg-input); 
-            border:1px solid var(--border); 
+            border: 1px solid var(--border); 
             border-radius: 6px; 
             color: white; 
             font-family: inherit; 
@@ -205,7 +205,7 @@
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            padding:1rem;
+            padding: 1rem;
         }
         .auth-card { 
             width: 100%; max-width: 400px; 
@@ -213,7 +213,7 @@
             background: rgba(18, 18, 22, 0.8); 
             backdrop-filter: blur(20px);
             border-radius: 16px; 
-            border:1px solid var(--border); 
+            border: 1px solid var(--border); 
             text-align: center; 
             box-shadow: 0 40px 80px rgba(0,0,0,0.6);
         }
@@ -233,7 +233,7 @@
         aside { 
             width: var(--sidebar-width); 
             background: var(--bg-sidebar); 
-            border-right:1px solid var(--border); 
+            border-right: 1px solid var(--border); 
             display: flex; 
             flex-direction: column; 
             z-index: var(--z-sidebar); 
@@ -277,7 +277,7 @@
             height: var(--header-height);
             background: rgba(5, 5, 5, 0.8);
             backdrop-filter: blur(12px);
-            border-bottom:1px solid var(--border);
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -294,7 +294,7 @@
         
         .notif-dropdown {
             position: absolute; top: 70px; right: 10px; width: 320px;
-            background: var(--bg-surface); border:1px solid var(--border);
+            background: var(--bg-surface); border: 1px solid var(--border);
             border-radius: 12px; 
             box-shadow: 0 20px 40px rgba(0,0,0,0.6);
             display: none; flex-direction: column; padding: 0;
@@ -419,7 +419,7 @@
         .activity-item:last-child { border: none; }
         .activity-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
         .activity-content h5 { font-size: 0.85rem; font-weight: 600; color: white; margin-bottom: 2px; }
-        .activity-content p { font-size: 0.75rem; color: var(--text-muted); }
+        .activity-content p { font-size: 0.75rem; color: row-gap: var(--text-muted); }
         .activity-time { margin-left: auto; font-size: 0.7rem; color: var(--text-faint); white-space: nowrap; }
 
         /* TABLES */
@@ -507,13 +507,13 @@
         /* The container for white invoice paper */
         #invoice-paper {
             background: #ffffff; /* Pure White */
-            color: #000000; /* Pure Black */
+            color: #000000; /* Pure Black for clarity */
             padding: 40px; /* Padding for screen view */
             border-radius: 4px; /* Only for screen */
             box-shadow: 0 0 20px rgba(0,0,0,0.2);
             font-family: 'Inter', 'Helvetica', 'Arial', sans-serif;
             width: 100%;
-            /* Removed hard max-width for html2pdf compatibility */
+            /* Removed hard max-width for html2pdf compatibility to prevent constraints */
         }
 
         .inv-header { display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 4px solid #000; padding-bottom: 20px; }
@@ -541,7 +541,7 @@
             font-weight: 700; 
             font-size: 0.85rem; 
             text-align: left; 
-            padding: 12px; 
+            padding: 10px 12px;
             /* Explicit Widths for Overlap Fix */
             width: 55%; 
         }
@@ -550,7 +550,7 @@
         .inv-table th:nth-child(3) { width: 20%; text-align: right; }
         
         .inv-table td { 
-            padding: 12px; 
+            padding: 10px 12px; 
             border: 1px solid #ccc; 
             color: #000; 
             vertical-align: top; 
@@ -560,7 +560,7 @@
         .inv-table tr:last-child td { border-bottom: 2px solid #000; }
         
         .inv-total-row { 
-            padding: 15px 12px; 
+            padding: 12px 12px; 
             background: #fafafa; 
             border: 1px solid #ccc;
             /* Ensure total row doesn't split */
@@ -669,8 +669,8 @@
             aside { transform: translateX(-100%); width: 280px; box-shadow: 20px 0 40px rgba(0,0,0,0.5); }
             aside.mobile-open { transform: translateX(0); }
             main { margin-left: 0 !important; width: 100% !important; padding: 1.5rem; padding-top: 5rem; }
-            .stats-grid { grid-template-columns:1fr; }
-            .price-grid { grid-template-columns:1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .price-grid { grid-template-columns: 1fr; }
             .header-brand span { display: none; }
             .notif-dropdown { right: 0; width: 90vw; }
         }
@@ -682,12 +682,12 @@
                 visibility: hidden;
             }
             
-            /* Only show the invoice modal and its children */
+            /* Only show invoice modal and its children */
             #invoiceModalOverlay, #invoiceModalOverlay * {
                 visibility: visible;
             }
 
-            /* Position the invoice overlay to cover the paper */
+            /* Position invoice overlay to cover paper */
             #invoiceModalOverlay {
                 position: absolute;
                 left: 0;
@@ -996,7 +996,7 @@
                     if (!snap.empty) {
                         const lastId = snap.docs[0].data().ticketId; 
                         const parts = lastId.split('-');
-                        if (parts.length > 1) {
+                        if (parts.length >1) {
                             const lastNum = parseInt(parts[1], 10);
                             if (!isNaN(lastNum)) {
                                 nextNum = lastNum + 1;
@@ -1428,7 +1428,7 @@
                                 <span>Tax (0%)</span>
                                 <span>RM 0.00</span>
                             </div>
-                            <div class="inv-total-row" style="display: flex; justify-content: space-between; align-items: center; padding: 20px 10px;">
+                            <div class="inv-total-row" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 10px;">
                                 <span style="font-weight: 700; font-size: 1.2rem;">Total Due</span>
                                 <span class="inv-final-total">${d.total}</span>
                             </div>
@@ -1451,19 +1451,20 @@
             });
         }
 
-        // UPDATED: High Resolution A4 PDF Download
+        // UPDATED: High Resolution A4 PDF Download (FIXED PAGE SIZE)
         function downloadInvoicePDF() {
             const element = document.getElementById('invoice-paper');
             const customerName = element.querySelector('.inv-box p strong').innerText;
             
-            // Configuration for html2pdf (Optimized for A4)
+            // Configuration for html2pdf (Optimized for A4, NO SCROLLING)
             const opt = {
-                margin:       [10, 10, 10, 10], // Top, Left, Bottom, Right in mm (Standard A4 Margins)
+                margin:       [15, 15, 15, 15, 15], // Top, Left, Bottom, Right in mm (Standard A4 Margins)
                 filename:     `Invoice_${customerName.replace(/\s+/g, '_')}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, logging: false }, // Scale 2 for High Res
+                html2canvas:  { scale: 1.5, useCORS: true, logging: false }, // Reduced scale to 1.5 (previously 2.0)
+                pagebreak:     { mode: ['avoid-all', 'css'] }, // 'avoid-all' + 'css' ensures CSS breaks work properly
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak:     { mode: 'avoid-all', before: '.inv-total-row' } // Prevent breaking table
+                enableLinks:    false // Prevents links in PDF from being active
             };
 
             showToast("Generating PDF...", "info");
@@ -1542,7 +1543,7 @@
                     </div>
                     
                     <!-- NEW: Billing Cycle Display -->
-                    <div class="mb-4 p-2" style="background:rgba(59,130,246,0.05); border-radius:6px; border:1px solid rgba(59,130,246,0.1);">
+                    <div class="mb-4 p-2" style="background:rgba(59,130,246,0.05); border-radius:6px; border: 1px solid rgba(59,130, 246, 0.1);">
                         <div class="flex justify-between items-center">
                             <span style="font-size:0.8rem; color:var(--text-muted);">Billing Cycle</span>
                             <span class="font-bold" style="color:var(--primary);">${d.billingCycle || '-'}</span>
@@ -1552,7 +1553,7 @@
                     <div class="mt-4">
                         <label>Client Domain</label>
                         <div style="display:flex; gap:10px;">
-                             <span style="padding:0.6rem; background:var(--bg-input); border:1px solid var(--border); border-radius:6px 0 0 6px 0; color:var(--text-muted);">https://</span>
+                             <span style="padding:0.6rem; background:var(--bg-input); border:1px solid var(--border); border-radius:6px 0 0 0 6px 0; color:var(--text-muted);">https://</span>
                              <input id="o-domain" value="${d.domain || ''}" placeholder="example.com" style="border-radius:0 6px 6px 0;">
                         </div>
                         <small class="text-muted">Leave empty if no domain yet.</small>
@@ -1621,13 +1622,14 @@
                         <td>
                             <button class="btn btn-sm btn-secondary" onclick="editClient('${doc.id}')">Edit</button>
                             <button class="btn btn-sm btn-secondary" onclick="resetPassword('${u.email}')">Reset PW</button>
-                            <button class="btn btn-sm btn-primary" onclick="openAssignVoucherModal('${doc.id}', '${u.name}')">Assign Voucher</button>
-                            ${isAdmin() ? `<button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Client')"><i class="ri-delete-bin-line"></i></button>` : ''}
+                            <button class="btn btn-primary" onclick="openAssignVoucherModal('${doc.id}', '${u.name}')">Assign Voucher</button>
+                            ${isAdmin() ? `<button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Client')"><i class="ri-delete-bin-line"></i></i> Delete</button>` : ''}
                         </td>
                     </tr>`;
                 }).join('');
             });
         }
+
         function editClient(uid) {
             db.collection("users").doc(uid).get().then(doc => {
                 const u = doc.data();
@@ -1686,7 +1688,7 @@
                 }).join('');
             });
         }
-        
+
         async function openAddCrewModal() {
             const newCrewId = await getNextId('crew');
             showModal("Add New Crew", `
@@ -1694,13 +1696,13 @@
                 <div class="mb-4"><label>Full Name</label><input id="c-name"></div>
                 <div class="mb-4"><label>Email Address</label><input type="email" id="c-email"></div>
                 <div class="flex gap-4 mb-4">
-                    <div style="flex:1"><label>Role</label>
+                    <div style="flex:1;"><label>Role</label>
                         <select id="c-role">
                             <option value="crew">Crew</option>
                             <option value="admin">Admin</option>
                         </select>
                     </div>
-                    <div style="flex:1"><label>Job Title</label><input id="c-job"></div>
+                    <div style="flex:1;"><label>Job Title</label><input id="c-job"></div>
                 </div>
                 <div class="mb-4"><label>Temporary Password</label><input type="password" id="c-pass" placeholder="Set password"></div>
             `, `<button class="btn btn-primary" onclick="saveCrew('${newCrewId}')">Create Crew</button>`);
@@ -1727,7 +1729,7 @@
                 });
                 closeModal();
                 showToast("Crew created successfully", "success");
-                logActivity(`Created new crew member: ${name} (${newId})`);
+                logActivity(`Created new crew member: ${name} (${newCrewId})`);
             } catch(e) {
                 showToast(e.message, "error");
             }
@@ -1746,8 +1748,8 @@
                             <option value="admin" ${u.role==='admin'?'selected':''}>Admin</option>
                         </select>
                     </div>
-                `, `<button class="btn btn-primary" onclick="updateCrewData('${uid}')">Save</button>`);
-            });
+                </div>
+            `, `<button class="btn btn-primary" onclick="updateCrewData('${uid}')">Save</button>`);
         }
 
         function updateCrewData(uid) {
@@ -1794,7 +1796,7 @@
                         <td style="white-space:nowrap;">${formatDateTime(d.timestamp)}</td>
                         <td>${d.name}</td><td>${d.type}</td>
                         <td>${d.assignedToName || 'Unassigned'}</td>
-                        <td><span class="badge" style="background:${statusBadge}15; color:${statusBadge}">${d.status}</span></td>
+                        <td><span class="badge" style="background:${statusBadge}15; color:${statusBadge}; border:1px solid ${statusBadge}25">${d.status}</span></td>
                         <td>
                             <button class="btn btn-sm btn-secondary" onclick="viewTicket('${doc.id}')">Manage</button>
                             <button class="btn btn-sm btn-danger" onclick="deleteItem('ticket','${doc.id}')"><i class="ri-delete-bin-line"></i></button>
@@ -1837,25 +1839,31 @@
                     const crewOpts = snap.docs.map(c => `<option value="${c.id}" ${d.assignedTo===c.id?'selected':''}>${c.data().name}</option>`).join('');
                     
                     showModal(`Ticket: ${d.ticketId || id}`, `
-                        <p class="mb-4 p-4" style="background:var(--bg-sidebar); border-radius:8px; border:1px solid var(--border)">${d.message}</p>
-                        <div class="flex gap-4 mb-4">
-                            <div style="flex:1"><label>Status</label>
-                                <select id="tk-status">
-                                    <option value="Open" ${d.status=='Open'?'selected':''}>Open</option>
-                                    <option value="In Progress" ${d.status=='In Progress'?'selected':''}>In Progress</option>
-                                    <option value="Closed" ${d.status=='Closed'?'selected':''}>Closed</option>
-                                </select>
-                            </div>
-                            <div style="flex:1"><label>Assign To Crew</label>
-                                <select id="tk-assign">
-                                    <option value="">Unassigned</option>
-                                    ${crewOpts}
-                                </select>
+                        <p class="mb-4 p-4" style="background:var(--bg-sidebar); border-radius:8px; border: 1px solid var(--border);">
+                            <div class="text-sm text-muted mb-1">Client Info</div>
+                            <strong>${d.name}</strong> (${d.phone})<br>
+                            ${d.userId ? `<small class="text-muted">User ID: ${d.userId}</small>` : ''}</div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="flex gap-4 mb-4">
+                                <div style="flex:1;"><label>Status</label>
+                                    <select id="tk-status">
+                                        <option value="Open" ${d.status=='Open'?'selected':''}>Open</option>
+                                        <option value="In Progress" ${d.status=='In Progress'?'selected':''}>In Progress</option>
+                                        <option value="Closed" ${d.status=='Closed'?'selected':''}>Closed</option>
+                                    </select>
+                                </div>
+                                <div style="flex:1;"><label>Assign To Crew</label>
+                                    <select id="tk-assign">
+                                        <option value="">Unassigned</option>
+                                        ${crewOpts}
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                    `, `<button class="btn btn-primary" onclick="saveTicketDetails('${id}')">Save Changes</button>`);
+                    </div>
+                `, `<button class="btn btn-primary" onclick="saveTicketDetails('${id}')">Save Changes</button>`);
                 });
-            });
         }
         function saveTicketDetails(id) {
             const newStatus = document.getElementById('tk-status').value;
@@ -1866,7 +1874,8 @@
                 status: newStatus,
                 assignedTo: newAssignId || null,
                 assignedToName: newAssignName
-            }).then(() => { closeModal(); showToast("Ticket Updated", "success"); logActivity(`Updated Ticket #${id}`); });
+            }).then(() => { 
+                closeModal(); showToast("Ticket Updated", "success"); logActivity(`Updated Ticket #${id}`); });
         }
 
         // --- 6. VOUCHERS ---
@@ -1937,7 +1946,7 @@
                         <td>${u.name}</td>
                         <td class="font-mono" style="color:var(--primary)">${v.code}</td>
                         <td>
-                            <span class="badge" style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}25">
+                            <span class="badge" style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}25}">
                                 ${vStatus}
                             </span>
                         </td>
@@ -1974,7 +1983,7 @@
                         tbody.innerHTML += `<tr>
                             <td class="font-mono">${v.code}</td>
                             <td>${v.assignedToName || '-'}</td>
-                            <td><span class="badge" style="background:${statusColor}15; color:${statusColor}">${v.status}</span></td>
+                            <td><span class="badge" style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}25}">${v.status}</span></td>
                             <td>${v.movedAt ? formatDateTime(v.movedAt) : '-'}</td>
                             <td>${actionBtn}</td>
                         </tr>`;
@@ -2027,9 +2036,7 @@
                         status: statusReason,
                         movedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
-                    await db.collection("users").doc(uid).update({
-                        personalVoucher: firebase.firestore.FieldValue.delete()
-                    });
+                    await db.collection("users").doc(uid).update({ personalVoucher: firebase.firestore.FieldValue.delete() });
                     console.log(`Moved ${code} to history as ${statusReason}`);
                     movedCount++;
                 }
@@ -2050,6 +2057,7 @@
                         <option value="Active" ${currentStatus==='Active'?'selected':''}>Active</option>
                         <option value="Suspended" ${currentStatus==='Suspended'?'selected':''}>Suspended</option>
                     </select>
+                    </label>
                     <label>Value</label><input type="number" id="e-v-val" value="${v.value}" class="mb-4">
                     <label>Expiry Date</label><input type="date" id="e-v-exp" value="${exp}" class="mb-4">
                 `, `<button class="btn btn-primary" onclick="saveEditVoucher('${uid}')">Save</button>`);
@@ -2128,8 +2136,8 @@
                     ${userSelect}
                     <div class="mb-4"><label>Code</label><input id="v-code" value="${autoCode}"></div>
                     <div class="flex gap-4 mb-4">
-                        <div style="flex:1"><label>Type</label><select id="v-val-type"><option value="fixed">Fixed (RM)</option><option value="percent">Percent (%)</option></select></div>
-                        <div style="flex:1"><label>Value</label><input type="number" id="v-val"></div>
+                        <div style="flex:1;"><label>Type</label><select id="v-val-type"><option value="fixed">Fixed (RM)</option><option value="percent">Percent (%)</option></select></div>
+                        <div style="flex:1;"><label>Value</label><input type="number" id="v-val"></div>
                     </div>
                     <label>Expiry Date</label><input type="date" id="v-exp" class="mb-4">
                 `, `<button class="btn btn-primary" onclick="submitAssignVoucher()">Assign</button>`);
@@ -2139,8 +2147,8 @@
             const uid = document.getElementById('v-user').value;
             const code = document.getElementById('v-code').value.toUpperCase();
             db.collection("users").doc(uid).update({ personalVoucher: {
-                code: code, type: document.getElementById('v-val-type').value, value: parseFloat(document.getElementById('v-val').value), expiryDate: document.getElementById('v-exp').value ? new Date(document.getElementById('v-exp').value) : null, status: 'active', auditLog: [{ action: 'Created', by: userData.email, date: new Date().toISOString() }]
-            }}).then(() => { closeModal(); showToast(`Voucher ${code} Assigned!`, "success"); logActivity(`Assigned voucher ${code}`); });
+                code: code, type: document.getElementById('v-val-type').value: parseFloat(document.getElementById('v-val').value), expiryDate: document.getElementById('v-exp').value ? new Date(document.getElementById('v-exp').value) : null, status: 'active', auditLog: [{ action: 'Created', by: userData.email, date: new Date().toISOString() }]
+            } }).then(() => { closeModal(); showToast(`Voucher ${code} Assigned!`, "success"); logActivity(`Assigned voucher ${code}`); });
         }
 
         function restoreVoucher(code, ownerUid) {
@@ -2151,7 +2159,6 @@
                 db.collection("users").doc(ownerUid).update({ personalVoucher: { ...v, status: 'active' } }).then(() => {
                     db.collection("vouchers_history").doc(code).delete().then(() => { showToast("Voucher Restored", "success"); logActivity(`Restored voucher ${code}`); });
                 });
-            });
         }
 
         // --- 7. CONTENT & PACKAGES (UPDATED) ---
@@ -2188,7 +2195,6 @@
                     <textarea id="content-ai" rows="6">${aiFeatures.join('\n')}</textarea>
                 </div>
             `;
-            });
         }
 
         function saveContentChanges() {
@@ -2335,7 +2341,7 @@
             db.collection("config").doc("site_settings").update({ maintenance_message: document.getElementById('maint-msg').value }).then(() => showToast("Message Saved", "success"));
         }
         function savePrice(key, elemId) {
-            constVal = parseFloat(document.getElementById(elemId).value);
+            const theVal = parseFloat(document.getElementById(elemId).value);
             if(!theVal) return showToast("Invalid price", "error");
             db.collection("config").doc("site_settings").update({ [`prices.${key}`]:theVal }).then(() => showToast("Price Updated", "success"));
         }
@@ -2366,7 +2372,7 @@
                 `, `<button class="btn btn-primary" onclick="saveEditedGateway('${docId}')">Save</button>`);
             });
         }
-        
+
         async function saveEditedGateway(docId) {
             const name = document.getElementById('e-gw-name').value;
             const link = document.getElementById('e-gw-link').value;
@@ -2422,7 +2428,7 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
+                </div>`;
             `;
 
             db.collection("clients_portfolio").orderBy("timestamp", "desc").onSnapshot(snap => {
@@ -2459,7 +2465,7 @@
                             <button class="btn btn-sm ${p.status ? 'btn-danger' : 'btn-success'}" onclick="togglePortfolioStatus('${doc.id}', ${!p.status})">
                                 <i class="${p.status ? 'ri-eye-off-line' : 'ri-eye-line'}"></i>
                             </button>
-                            <button class="btn btn-sm btn-danger" onclick="deletePortfolio('${doc.id}')"><i class="ri-delete-bin-line"></i></button>
+                            <button class="btn btn btn-danger" onclick="deletePortfolio('${doc.id}')"><i class="ri-delete-bin-line"></i></i>
                         </td>
                     </tr>`;
                 }).join('');
@@ -2543,10 +2549,11 @@
                     <div class="flex items-center gap-4">
                         <label class="toggle-switch">
                             <input type="checkbox" id="e-p-status" ${p.status ? 'checked' : ''}>
-                            <span class="slider"></span>
+                                <span class="slider"></span>
                         </label>
                         <span style="font-size:0.9rem; color:var(--text-main);">Visible on Main Site</span>
                     </div>
+                </div>
                 `, `<button class="btn btn-primary" onclick="updatePortfolio('${docId}')">Save Changes</button>`);
             });
         }
@@ -2614,13 +2621,13 @@
         // --- 11. CUSTOMER REQUESTS ---
         function renderRequests() {
             document.getElementById('main').innerHTML = `
-                <div class="flex justify-between items-center mb-4">
-                    <h2 style="font-size:1.25rem; font-weight:700;">Customer Requests</h2>
-                    <input type="text" id="reqSearch" placeholder="Search Client..." style="width:200px;" onkeyup="filterTable('req-tbody', this.value)">
-                </div>
-                <div class="table-container">
-                    <div class="table-responsive">
-                        <table>
+            <div class="flex justify-between items-center mb-4">
+                <h2 style="font-size:1.25rem; font-weight:700;">Customer Requests</h2>
+                <input type="text" id="reqSearch" placeholder="Search Client..." style="width:200px;" onkeyup="filterTable('req-tbody', this.value)">
+            </div>
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table>
                             <thead>
                                 <tr>
                                     <th>Date</th>
@@ -2679,7 +2686,7 @@
                         <td>
                             <button class="btn btn-sm btn-secondary" onclick="viewRequestDetails('${doc.id}')">View</button>
                             <button class="btn btn-sm btn-success" onclick="updateRequestStatus('${doc.id}', 'Completed')">Done</button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteItem('request','${doc.id}')"><i class="ri-delete-bin-line"></i></button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteItem('request','${doc.id}')"><i class="ri-delete-bin-line"></i></i></button>
                         </td>
                     </tr>`;
                 }).join('');
@@ -2697,42 +2704,43 @@
                     detailsHTML = `
                         <div class="mb-4">
                             <label>Description</label>
-                            <textarea readonly rows="4">${d.details || 'No description provided.'}</textarea>
+                                <textarea readonly rows="4">${d.details || 'No description provided.'}</textarea>
                         </div>
                         <div class="mb-4">
                             <label>Attachments</label>
-                            <div class="flex items-center gap-2 text-sm">
-                                <i class="${d.hasFile ? 'ri-checkbox-circle-fill text-success' : 'ri-close-circle-fill text-muted'}"></i>
-                                ${d.hasFile ? 'User attached a file via website form.' : 'No file attached.'}
+                                <div class="flex items-center gap-2 text-sm">
+                                    <i class="${d.hasFile ? 'ri-checkbox-circle-fill text-success' : 'ri-close-circle-fill text-muted'}"></i>
+                                    ${d.hasFile ? 'User attached a file via website form.' : 'No file attached.'}
+                                </div>
                             </div>
                         </div>
-                    `;
-                } else if (type === 'upgrade') {
+                `; } else if (type === 'upgrade') {
                     detailsHTML = `
                         <div class="flex gap-4 mb-4">
-                            <div style="flex:1"><label>Current Plan</label><input value="${d.currentPlan || '-'}" readonly></div>
-                            <div style="flex:1"><label>New Plan</label><input value="${d.newPlan || '-'}" readonly></div>
+                            <div style="flex:1;"><label>Current Plan</label><input id="current-plan-input" value="${d.currentPlan || '-'}" readonly></div>
+                            <div style="flex:1;"><label>New Plan</label><input id="new-plan-input" value="${d.newPlan || '-'}" readonly></div>
                         </div>
                         <div class="mb-4"><label>Additional Notes</label><textarea readonly rows="3">${d.details || '-'}</textarea></div>
                     `;
                 } else if (type === 'renew') {
                     detailsHTML = `
                         <div class="flex gap-4 mb-4">
-                            <div style="flex:1"><label>Plan to Renew</label><input value="${d.plan || '-'}" readonly></div>
-                            <div style="flex:1"><label>Duration</label><input value="${d.duration || '-'}" readonly></div>
+                            <div style="flex:1;"><label>Plan to Renew</label><input id="renew-plan-input" value="${d.plan || '-'}" readonly></div>
+                            <div style="flex:1;"><label>Duration</label><input id="renew-duration-input" value="${d.duration || '-'}" readonly></div>
                         </div>
+                        <div class="mb-4"><label>Additional Notes</label><textarea readonly rows="3">${d.details || '-'}</textarea></div>
                     `;
-                } else if (type === 'remove') {
+                `; } else if (type === 'remove') {
                     detailsHTML = `
                         <div class="mb-4"><label>Items to Remove</label><textarea readonly rows="3">${d.details || '-'}</textarea></div>
                     `;
-                }
+                `; }
 
                 showModal(`Request Details (${type.toUpperCase()})`, `
-                    <div class="mb-4 p-4" style="background:var(--bg-sidebar); border-radius:8px; border:1px solid var(--border)">
+                    <div class="mb-4 p-4" style="background:var(--bg-sidebar); border-radius:8px; border:1px solid var(--border);">
                         <div class="text-sm text-muted mb-1">Client Info</div>
                         <strong>${d.name}</strong> (${d.phone})<br>
-                        ${d.userId ? `<small class="text-muted">User ID: ${d.userId}</small>` : ''}
+                        ${d.userId ? `<small class="text-muted">User ID: ${d.userId}</small>` : ''}</div>
                     </div>
                     ${detailsHTML}
                     
@@ -2741,10 +2749,10 @@
                         <select id="req-status-select">
                             <option value="Pending" ${d.status==='Pending'?'selected':''}>Pending</option>
                             <option value="Completed" ${d.status==='Completed'?'selected':''}>Completed</option>
+                            <option value="Cancelled" ${d.status==='Cancelled'?'selected':''}>Cancelled</option>
                         </select>
                     </div>
                 `, `<button class="btn btn-primary" onclick="updateRequestStatus('${id}', null, true)">Save Status</button>`);
-            });
         }
 
         function updateRequestStatus(id, newStatus = null, fromModal = false) {
@@ -2756,8 +2764,6 @@
                 if(fromModal) closeModal();
                 showToast("Request Status Updated", "success");
                 logActivity(`Updated request status to ${statusToSet}`);
-            }).catch(err => {
-                showToast("Error updating: " + err.message, "error");
             });
         }
 
@@ -2778,7 +2784,6 @@
                     <h2 style="font-size:1.25rem; font-weight:700;">Public Promo Codes</h2>
                     <button class="btn btn-primary" onclick="addPublicPromo()"><i class="ri-add-line"></i> Add Code</button>
                 </div>
-                
                 <div class="table-container">
                     <div class="table-header">
                         <h3>Active Codes (config/promo_codes)</h3>
@@ -2872,4 +2877,3 @@
 
     </script>
 </body>
-</html>
