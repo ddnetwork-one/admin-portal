@@ -10,13 +10,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 
-    <!-- html2pdf Library for PDF Download -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
     <style>
         :root {
@@ -110,7 +107,7 @@
         .btn {
             padding: 0.6rem 1.2rem; 
             border-radius: 6px; 
-            border: 1px solid transparent; 
+            border:1px solid transparent; 
             cursor: pointer; 
             font-weight: 500; 
             font-size: 0.85rem; 
@@ -136,25 +133,25 @@
         .btn-primary { 
             background: var(--primary); 
             color: white; 
-            border: 1px solid var(--primary); 
+            border:1px solid var(--primary); 
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); 
         }
         .btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
 
-        .btn-success { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .btn-success { background: rgba(16, 185, 129, 0.1); color: var(--success); border:1px solid rgba(16, 185, 129, 0.2); }
         .btn-success:hover { background: rgba(16, 185, 129, 0.2); border-color: var(--success); }
 
-        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border:1px solid rgba(239, 68, 68, 0.2); }
         .btn-danger:hover { background: rgba(239, 68, 68, 0.2); border-color: var(--danger); }
         
-        .btn-danger-solid { background: var(--danger); color: white; border: 1px solid var(--danger); }
+        .btn-danger-solid { background: var(--danger); color: white; border:1px solid var(--danger); }
         .btn-danger-solid:hover { background: #dc2626; }
 
-        .btn-info { background: rgba(14, 165, 233, 0.1); color: var(--info); border: 1px solid rgba(14, 165, 233, 0.2); }
-        .btn-info:hover { background: rgba(14, 165, 433, 0.2); border-color: var(--info); }
+        .btn-info { background: rgba(14, 165, 233, 0.1); color: var(--info); border:1px solid rgba(14, 165, 233, 0.2); }
+        .btn-info:hover { background: rgba(14, 165, 233, 0.2); border-color: var(--info); }
 
         .btn-secondary { background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-main); }
-        .btn-secondary:hover { border-color: calc(var(--text-muted)); background: var(--bg-surface-hover); }
+        .btn-secondary:hover { border-color: var(--text-muted); background: var(--bg-surface-hover); }
         
         .btn-sm { padding: 0.35rem 0.8rem; font-size: 0.75rem; border-radius: 4px; }
         
@@ -177,7 +174,7 @@
             width:100%; 
             padding: 0.65rem 0.85rem; 
             background: var(--bg-input); 
-            border: 1px solid var(--border); 
+            border:1px solid var(--border); 
             border-radius: 6px; 
             color: white; 
             font-family: inherit; 
@@ -205,7 +202,7 @@
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            padding: 1rem;
+            padding:1rem;
         }
         .auth-card { 
             width: 100%; max-width: 400px; 
@@ -213,7 +210,7 @@
             background: rgba(18, 18, 22, 0.8); 
             backdrop-filter: blur(20px);
             border-radius: 16px; 
-            border: 1px solid var(--border); 
+            border:1px solid var(--border); 
             text-align: center; 
             box-shadow: 0 40px 80px rgba(0,0,0,0.6);
         }
@@ -233,7 +230,7 @@
         aside { 
             width: var(--sidebar-width); 
             background: var(--bg-sidebar); 
-            border-right: 1px solid var(--border); 
+            border-right:1px solid var(--border); 
             display: flex; 
             flex-direction: column; 
             z-index: var(--z-sidebar); 
@@ -277,7 +274,7 @@
             height: var(--header-height);
             background: rgba(5, 5, 5, 0.8);
             backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
+            border-bottom:1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -294,7 +291,7 @@
         
         .notif-dropdown {
             position: absolute; top: 70px; right: 10px; width: 320px;
-            background: var(--bg-surface); border: 1px solid var(--border);
+            background: var(--bg-surface); border:1px solid var(--border);
             border-radius: 12px; 
             box-shadow: 0 20px 40px rgba(0,0,0,0.6);
             display: none; flex-direction: column; padding: 0;
@@ -419,7 +416,7 @@
         .activity-item:last-child { border: none; }
         .activity-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
         .activity-content h5 { font-size: 0.85rem; font-weight: 600; color: white; margin-bottom: 2px; }
-        .activity-content p { font-size: 0.75rem; color: row-gap: var(--text-muted); }
+        .activity-content p { font-size: 0.75rem; color: var(--text-muted); }
         .activity-time { margin-left: auto; font-size: 0.7rem; color: var(--text-faint); white-space: nowrap; }
 
         /* TABLES */
@@ -459,7 +456,7 @@
         tr:last-child td { border-bottom: none; }
         tr:hover td { background: rgba(255,255,255,0.02); }
 
-        /* MODAL */
+        /* --- MAIN MODAL --- */
         .modal-overlay { 
             position: fixed; inset: 0; 
             background: rgba(0,0,0,0.85); 
@@ -493,83 +490,128 @@
             align-items: center; 
             background: rgba(255,255,255,0.02); 
             border-radius: 16px 16px 0 0; 
+            flex-shrink: 0;
         }
         .modal-title { font-size: 1.1rem; font-weight: 700; color: white; }
         .modal-body { padding: 1.5rem; overflow-y: auto; }
-        .modal-footer { padding: 1.2rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; border-radius: 0 0 16px 16px; background: rgba(0,0,0,0.2); }
+        .modal-footer { padding: 1.2rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; border-radius: 0 0 16px 16px; background: rgba(0,0,0,0.2); flex-shrink: 0; }
 
-        /* --- IMPROVED INVOICE STYLES (A4 OPTIMIZED, FIXED LAYOUT) --- */
+        /* --- UPDATED INVOICE MODAL STYLES --- */
         #invoiceModalOverlay {
-            z-index: 2000;
-            background: rgba(0,0,0,0.9);
+            z-index: 3000;
+            background: rgba(0, 0, 0, 0.8); /* Darker background for focus */
+            padding: 0;
         }
         
-        /* The container for white invoice paper */
-        #invoice-paper {
-            background: #ffffff; /* Pure White */
-            color: #000000; /* Pure Black for clarity */
-            padding: 40px; /* Padding for screen view */
-            border-radius: 4px; /* Only for screen */
-            box-shadow: 0 0 20px rgba(0,0,0,0.2);
-            font-family: 'Inter', 'Helvetica', 'Arial', sans-serif;
+        /* Container for the Invoice Paper */
+        .invoice-modal-wrapper {
             width: 100%;
-            /* Removed hard max-width for html2pdf compatibility to prevent constraints */
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
         }
 
-        .inv-header { display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 4px solid #000; padding-bottom: 20px; }
-        .inv-title { font-size: 2.5rem; font-weight: 800; color: #000; margin: 0; letter-spacing: -2px; text-transform: uppercase; }
-        .inv-meta { text-align: right; font-size: 0.9rem; color: #333; line-height: 1.6; }
-        .inv-meta strong { display: block; font-size: 1.1rem; color: #000; margin-bottom: 5px; }
-        
+        .invoice-paper {
+            background: white;
+            color: #1f2937;
+            width: 210mm; /* A4 Width */
+            min-height: 297mm; /* A4 Height */
+            padding: 15mm;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow-y: auto; /* Scroll inside the paper if content is long */
+            margin: 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Invoice Internal Layout */
+        .inv-header { display: flex; justify-content: space-between; margin-bottom: 40px; }
+        .inv-logo-area h1 { color: #0f172a; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
+        .inv-logo-area p { color: #64748b; font-size: 13px; }
+        .inv-title-area { text-align: right; }
+        .inv-title-area h2 { font-size: 32px; color: #e2e8f0; /* Light grey for large title background effect if desired, or just dark text */ color: #1e293b; font-weight: 700; margin: 0; }
+        .inv-meta { margin-top: 10px; font-size: 13px; color: #475569; }
+        .inv-meta strong { color: #1e293b; }
+
         .inv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
-        .inv-box h4 { margin: 0 0 10px 0; font-size: 0.85rem; text-transform: uppercase; color: #666; font-weight: 700; letter-spacing: 1px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .inv-box p { margin: 0 0 8px 0; color: #111; font-size: 0.95rem; font-weight: 500; }
-        .inv-box small { color: #555; font-weight: 400; }
+        .inv-section-title { font-size: 12px; text-transform: uppercase; color: #94a3b8; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .inv-box h3 { font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 4px; }
+        .inv-box p { color: #334155; font-size: 13px; margin-bottom: 2px; }
 
-        /* Fixed Layout Table to prevent Overlap */
-        .inv-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-bottom: 20px; 
-            table-layout: fixed; /* Critical for alignment */
-        }
-        .inv-table th { 
-            background: #f0f0f0; 
-            color: #000; 
-            border: 1px solid #000; 
-            border-bottom: 2px solid #000; 
-            font-weight: 700; 
-            font-size: 0.85rem; 
-            text-align: left; 
-            padding: 10px 12px;
-            /* Explicit Widths for Overlap Fix */
-            width: 55%; 
-        }
-        /* Specific widths for columns */
-        .inv-table th:nth-child(2) { width: 25%; }
-        .inv-table th:nth-child(3) { width: 20%; text-align: right; }
+        .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        .inv-table th { text-align: left; padding: 12px 8px; background: #f1f5f9; color: #475569; font-size: 12px; text-transform: uppercase; font-weight: 600; }
+        .inv-table td { padding: 16px 8px; border-bottom: 1px solid #e2e8f0; color: #334155; vertical-align: top; }
+        .inv-table .col-right { text-align: right; }
+        .inv-table .col-center { text-align: center; }
         
-        .inv-table td { 
-            padding: 10px 12px; 
-            border: 1px solid #ccc; 
-            color: #000; 
-            vertical-align: top; 
-            font-size: 0.9rem;
-            word-break: break-word; /* Prevent overlap */
-        }
-        .inv-table tr:last-child td { border-bottom: 2px solid #000; }
-        
-        .inv-total-row { 
-            padding: 12px 12px; 
-            background: #fafafa; 
-            border: 1px solid #ccc;
-            /* Ensure total row doesn't split */
-            page-break-inside: avoid;
-        }
-        .inv-final-total { font-size: 1.8rem; font-weight: 900; color: #000; }
+        .inv-total-section { display: flex; justify-content: flex-end; margin-bottom: 40px; }
+        .inv-total-box { width: 250px; }
+        .inv-total-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; color: #475569; }
+        .inv-total-row.final { border-bottom: none; border-top: 2px solid #e2e8f0; padding-top: 16px; margin-top: 8px; font-weight: 700; color: #0f172a; font-size: 18px; }
 
-        .inv-footer { margin-top: 60px; padding-top: 20px; border-top: 2px solid #eee; text-align: center; color: #666; font-size: 0.8rem; page-break-inside: avoid; }
-        .inv-footer p { margin-bottom: 8px; }
+        .inv-bank-details { background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+        .inv-bank-title { font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .inv-bank-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 13px; color: #334155; }
+        .inv-bank-item strong { display: block; color: #64748b; font-size: 11px; margin-bottom: 2px; }
+
+        .inv-footer { text-align: center; color: #94a3b8; font-size: 12px; margin-top: auto; padding-top: 20px; border-top: 1px dashed #e2e8f0; }
+
+        /* Invoice Modal Controls (Not Printed) */
+        .invoice-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 3001;
+        }
+
+        /* --- PRINT STYLES FOR INVOICE (UPDATED) --- */
+        @media print {
+            /* Hide everything except the invoice paper */
+            body * {
+                visibility: hidden;
+            }
+            
+            /* Hide Modals Overlays that block */
+            #invoiceModalOverlay, .modal-overlay {
+                position: static;
+                background: white;
+                display: block;
+            }
+
+            /* Make the invoice paper visible and positioned correctly */
+            .invoice-paper, .invoice-paper * {
+                visibility: visible;
+            }
+            
+            .invoice-paper {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 0; /* Let page margins handle it or keep padding */
+                box-shadow: none;
+                border: none;
+            }
+
+            /* Hide controls */
+            .invoice-controls, .btn-icon, aside, header, .toast-container, .sidebar-overlay {
+                display: none !important;
+            }
+
+            /* Set page margins */
+            @page {
+                size: A4;
+                margin: 15mm;
+            }
+        }
 
         /* TOAST */
         .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: var(--z-toast); display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
@@ -669,66 +711,20 @@
             aside { transform: translateX(-100%); width: 280px; box-shadow: 20px 0 40px rgba(0,0,0,0.5); }
             aside.mobile-open { transform: translateX(0); }
             main { margin-left: 0 !important; width: 100% !important; padding: 1.5rem; padding-top: 5rem; }
-            .stats-grid { grid-template-columns: 1fr; }
-            .price-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns:1fr; }
+            .price-grid { grid-template-columns:1fr; }
             .header-brand span { display: none; }
             .notif-dropdown { right: 0; width: 90vw; }
-        }
-
-        /* PRINT STYLES FOR INVOICE */
-        @media print {
-            /* Hide everything on page by default */
-            body * {
-                visibility: hidden;
-            }
             
-            /* Only show invoice modal and its children */
-            #invoiceModalOverlay, #invoiceModalOverlay * {
-                visibility: visible;
-            }
-
-            /* Position invoice overlay to cover paper */
-            #invoiceModalOverlay {
-                position: absolute;
-                left: 0;
-                top: 0;
+            /* Invoice Responsive */
+            .invoice-paper {
                 width: 100%;
-                background: white;
-                z-index: 99999;
+                min-height: auto;
+                margin: 10px;
+                padding: 15px;
             }
-
-            /* Style the specific invoice container */
-            .modal {
-                box-shadow: none;
-                max-width: 100%;
-                width: 100%;
-                border: none;
-                margin: 0;
-                padding: 0;
-            }
-            
-            #invoice-paper {
-                box-shadow: none;
-                border-radius: 0;
-                margin: 0;
-                padding: 20px; /* Reduced print padding to fit better */
-                color: black;
-                background: white;
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-            }
-
-            /* Hide buttons in print */
-            .modal-header, .modal-footer, .btn-icon {
-                display: none !important;
-            }
-            
-            /* Reset text colors for print */
-            th, td, p, h1, h2, h3, h4, h5, small {
-                color: black !important;
-            }
+            .inv-grid { grid-template-columns: 1fr; gap: 20px; }
+            .inv-bank-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -856,27 +852,22 @@
         </div>
     </div>
 
-    <!-- INVOICE MODAL (Specific) -->
+    <!-- INVOICE MODAL (Updated A4 Format) -->
     <div class="modal-overlay" id="invoiceModalOverlay">
-        <div class="modal" style="max-width: 900px; background: transparent; box-shadow: none;">
-            <!-- Close Button (Absolute positioned for clear access) -->
-            <button onclick="closeInvoiceModal()" style="position: absolute; top: -40px; right: 0; background: rgba(0,0,0,0.5); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; z-index: 10;">
-                <i class="ri-close-line"></i> Close Preview
-            </button>
-            
-            <!-- The Invoice Paper -->
-            <div id="invoice-paper">
-                <!-- Content injected via JS -->
+        <div class="invoice-modal-wrapper">
+            <!-- Controls (Print & Close) -->
+            <div class="invoice-controls">
+                <button class="btn btn-secondary" onclick="window.print()" style="background: white; color: black; border-color: #ccc;">
+                    <i class="ri-printer-line"></i> Print / Download PDF
+                </button>
+                <button class="btn btn-danger-solid" onclick="closeInvoiceModal()" style="border-radius: 50%; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                    <i class="ri-close-line" style="font-size: 1.2rem;"></i>
+                </button>
             </div>
 
-            <!-- Footer Actions for Screen -->
-            <div style="margin-top: 20px; display: flex; justify-content: center; gap: 15px;">
-                <button class="btn btn-primary" onclick="downloadInvoicePDF()" style="background: var(--success); border-color: var(--success); padding: 12px 24px; font-weight: 600;">
-                    <i class="ri-download-line"></i> Download PDF
-                </button>
-                <button class="btn btn-secondary" onclick="window.print()" style="padding: 12px 24px; font-weight: 600;">
-                    <i class="ri-printer-line"></i> Print
-                </button>
+            <!-- A4 Paper -->
+            <div class="invoice-paper" id="invoice-content">
+                <!-- Content Injected via JS -->
             </div>
         </div>
     </div>
@@ -1341,8 +1332,8 @@
                         <td>
                             <div style="display:flex; gap:5px; flex-wrap:wrap;">
                                 <button class="btn btn-sm btn-secondary" onclick="viewOrder('${doc.id}')">Manage</button>
-                                <button class="btn btn-sm btn-info" title="Generate Invoice" onclick="generateInvoice('${doc.id}')"><i class="ri-file-list-2-line"></i></button>
-                                <button class="btn btn-sm btn-success" title="Send WhatsApp Remainder" onclick="sendPaymentReminder('${doc.id}')"><i class="ri-whatsapp-line"></i></button>
+                                <button class="btn btn-sm btn-info" title="Generate Invoice" onclick="generateInvoice('${doc.id}')"><i class="ri-file-list-2-line"></i> PDF</button>
+                                <button class="btn btn-sm btn-success" title="Send WhatsApp Remainder" onclick="sendPaymentReminder('${doc.id}')"><i class="ri-whatsapp-line"></i> WA</button>
                                 <button class="btn btn-sm btn-danger" onclick="deleteOrder('${doc.id}')"><i class="ri-delete-bin-line"></i></button>
                             </div>
                         </td>
@@ -1351,178 +1342,190 @@
             });
         }
 
-        // FEATURE: Better Invoice Generate with PDF Download (UPDATED A4, LAYOUT)
-        function generateInvoice(id) {
-            db.collection("orders").doc(id).get().then(doc => {
-                if(!doc.exists) return;
-                const d = doc.data();
-                const date = formatDateTime(d.timestamp);
-                
-                // Clean logo URL for print
-                const logoUrl = "https://raw.githubusercontent.com/ddnetwork-ent/ddnetwork/refs/heads/main/DDN%20Logo%20NoBG.png";
-                
+        // --- UPDATED INVOICE GENERATOR (A4, PROFESSIONAL) ---
+        async function generateInvoice(orderId) {
+            try {
+                const orderDoc = await db.collection("orders").doc(orderId).get();
+                if(!orderDoc.exists) return showToast("Order not found", "error");
+                const d = orderDoc.data();
+
+                // Fetch Payment Methods for Footer
+                let paymentMethodsHTML = '<p>No payment methods configured in config.</p>';
+                try {
+                    const pmSnap = await db.collection("payment_methods").where("active", "==", true).limit(2).get();
+                    if(!pmSnap.empty) {
+                        paymentMethodsHTML = `<div class="inv-bank-grid">`;
+                        pmSnap.forEach(pm => {
+                            const data = pm.data();
+                            paymentMethodsHTML += `
+                                <div class="inv-bank-item">
+                                    <strong>${data.name}</strong>
+                                    <a href="${data.link}" target="_blank" style="color:var(--primary); text-decoration:none;">${data.name} Link &rarr;</a>
+                                </div>`;
+                        });
+                        paymentMethodsHTML += `</div>`;
+                    }
+                } catch(e) { console.error("Error fetching payments", e); }
+
+                const dateStr = formatDateTime(d.timestamp);
+                const orderRef = orderId.substring(0,8).toUpperCase();
+                const total = parseFloat(d.total.replace('RM ', '')).toFixed(2);
+
+                // Invoice Template
                 const invoiceHTML = `
                     <div class="inv-header">
-                        <div>
-                            <img src="${logoUrl}" alt="DDNetwork Logo" style="height: 60px; margin-bottom: 15px; display:block;">
-                            <h1 class="inv-title">INVOICE</h1>
+                        <div class="inv-logo-area">
+                            <h1>INVOICE</h1>
+                            <p><strong>DDNetwork One</strong><br>PG0572133-K</p>
                         </div>
-                        <div class="inv-meta">
-                            <strong>DDNetwork One</strong>
-                            <small>Reg No: PG0572133-K</small>
-                            <a href="mailto:sales@ddnet.my" style="color: #000; text-decoration:underline;">sales@ddnet.my</a>
+                        <div class="inv-title-area">
+                            <h2>#${orderRef}</h2>
+                            <div class="inv-meta">
+                                <div>Date Issued: <strong>${dateStr}</strong></div>
+                                <div>Status: <strong style="color:${d.status==='Paid'?'#10b981':'#f59e0b'}">${d.status}</strong></div>
+                            </div>
                         </div>
                     </div>
-                    
+
                     <div class="inv-grid">
-                        <div class="inv-box">
-                            <h4>Bill To:</h4>
-                            <p><strong>${d.customerName}</strong></p>
-                            ${d.customerCompany ? `<p>${d.customerCompany}</p>` : ''}
-                            <p>${d.customerEmail}</p>
-                            <p>${d.customerPhone || '-'}</p>
+                        <div>
+                            <div class="inv-section-title">Bill To</div>
+                            <div class="inv-box">
+                                <h3>${d.customerName}</h3>
+                                <p>${d.customerEmail}</p>
+                                <p>${d.customerPhone || '-'}</p>
+                                ${d.customerCompany ? `<p>${d.customerCompany}</p>` : ''}
+                            </div>
                         </div>
-                        <div class="inv-box" style="text-align: right;">
-                            <h4>Invoice Details:</h4>
-                            <p>Order ID: <span class="font-mono">${id.substr(0,8).toUpperCase()}</span></p>
-                            <p>Date Issued: ${date}</p>
-                            <p>Status: <strong style="color: #000;">${d.status}</strong></p>
-                            <p>Billing Cycle: ${d.billingCycle || 'One-time'}</p>
+                        <div>
+                            <div class="inv-section-title">Pay To</div>
+                            <div class="inv-box">
+                                <h3>DDNetwork One</h3>
+                                <p>Kuala Lumpur, Malaysia</p>
+                                <p><strong>Email:</strong> sales@ddnet.my</p>
+                            </div>
                         </div>
                     </div>
 
                     <table class="inv-table">
                         <thead>
                             <tr>
-                                <th style="width: 55%;">Description</th>
-                                <th style="width: 25%;">Notes</th>
-                                <th style="width: 20%; text-align: right;">Amount</th>
+                                <th style="width: 50%">Description</th>
+                                <th class="col-center">Billing</th>
+                                <th class="col-right">Amount</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td>
                                     <strong>${d.package}</strong><br>
-                                    <small>Web Development & Services</small>
+                                    <span style="color:#64748b; font-size:12px;">
+                                        ${d.domain ? `Domain: ${d.domain}` : 'Domain pending'}
+                                    </span>
                                 </td>
-                                <td>
-                                    ${d.domain ? `Domain: ${d.domain}` : 'No Domain'}
+                                <td class="col-center">
+                                    <span style="font-size:13px; background:#f1f5f9; padding:2px 6px; border-radius:4px;">
+                                        ${d.billingCycle || 'One-Time'}
+                                    </span>
                                 </td>
-                                <td style="text-align: right;">${d.total}</td>
+                                <td class="col-right">RM ${total}</td>
                             </tr>
                             ${d.voucherCode ? `
                             <tr>
-                                <td colspan="2" style="color: #000; text-align: right;"><strong>Discount Applied (${d.voucherCode})</strong></td>
-                                <td style="text-align: right; color: #000;">-</td>
+                                <td><strong>Discount</strong> <span style="color:#10b981; font-size:12px;">(${d.voucherCode})</span></td>
+                                <td></td>
+                                <td class="col-right" style="color:#10b981;">- RM 0.00</td>
                             </tr>` : ''}
                         </tbody>
                     </table>
-                    
-                    <div style="display: flex; justify-content: flex-end;">
-                        <div style="width: 40%;">
-                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #000; margin-bottom: 10px;">
+
+                    <div class="inv-total-section">
+                        <div class="inv-total-box">
+                            <div class="inv-total-row">
                                 <span>Subtotal</span>
-                                <span>${d.total}</span>
+                                <span>RM ${total}</span>
                             </div>
-                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #000; margin-bottom: 10px;">
+                            <div class="inv-total-row">
                                 <span>Tax (0%)</span>
                                 <span>RM 0.00</span>
                             </div>
-                            <div class="inv-total-row" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 10px;">
-                                <span style="font-weight: 700; font-size: 1.2rem;">Total Due</span>
-                                <span class="inv-final-total">${d.total}</span>
+                            <div class="inv-total-row final">
+                                <span>Total Due</span>
+                                <span>RM ${total}</span>
                             </div>
                         </div>
                     </div>
 
+                    <div class="inv-bank-details">
+                        <div class="inv-bank-title"><i class="ri-bank-card-line" style="color:var(--primary)"></i> Payment Methods</div>
+                        ${paymentMethodsHTML}
+                        <p style="margin-top:10px; font-size:12px; color:#64748b;">Please include Invoice #${orderRef} in your payment reference.</p>
+                    </div>
+
                     <div class="inv-footer">
-                        <p><strong>Payment Instructions:</strong> Please proceed payment using payment link sent via WhatsApp or Email.</p>
-                        <p>Bank transfers may take 1-3 business days to reflect.</p>
-                        <br>
-                        <small>Thank you for choosing DDNetwork One.</small>
+                        <p>Thank you for your business!</p>
+                        <p>Generated by DDNetwork Admin Portal</p>
                     </div>
                 `;
 
-                document.getElementById('invoice-paper').innerHTML = invoiceHTML;
+                document.getElementById('invoice-content').innerHTML = invoiceHTML;
                 document.getElementById('invoiceModalOverlay').classList.add('open');
-            }).catch(err => {
-                console.error(err);
-                showToast("Error loading order", "error");
-            });
-        }
 
-        // UPDATED: High Resolution A4 PDF Download (FIXED PAGE SIZE)
-        function downloadInvoicePDF() {
-            const element = document.getElementById('invoice-paper');
-            const customerName = element.querySelector('.inv-box p strong').innerText;
-            
-            // Configuration for html2pdf (Optimized for A4, NO SCROLLING)
-            const opt = {
-                margin:       [15, 15, 15, 15, 15], // Top, Left, Bottom, Right in mm (Standard A4 Margins)
-                filename:     `Invoice_${customerName.replace(/\s+/g, '_')}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 1.5, useCORS: true, logging: false }, // Reduced scale to 1.5 (previously 2.0)
-                pagebreak:     { mode: ['avoid-all', 'css'] }, // 'avoid-all' + 'css' ensures CSS breaks work properly
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                enableLinks:    false // Prevents links in PDF from being active
-            };
-
-            showToast("Generating PDF...", "info");
-            
-            // Generate and save
-            html2pdf().set(opt).from(element).save().then(() => {
-                showToast("PDF Downloaded Successfully!", "success");
-            }).catch(err => {
+            } catch (err) {
                 console.error(err);
-                showToast("Failed to generate PDF", "error");
-            });
+                showToast("Error generating invoice", "error");
+            }
         }
 
         function closeInvoiceModal() {
             document.getElementById('invoiceModalOverlay').classList.remove('open');
         }
 
-        // FEATURE: Robust WhatsApp Reminder
-        function sendPaymentReminder(id) {
-            db.collection("orders").doc(id).get().then(doc => {
+        // --- UPDATED PAYMENT REMINDER ---
+        async function sendPaymentReminder(id) {
+            try {
+                const doc = await db.collection("orders").doc(id).get();
                 if(!doc.exists) return;
                 const d = doc.data();
                 
-                // --- FIX: Robust Phone Sanitization ---
-                let phone = d.customerPhone || "";
-                
-                if(!phone) {
-                    showToast("No phone number saved for this client.", "error");
-                    return;
-                }
+                // Fetch active payment link to include
+                let payLink = "https://ddnet.my"; // Default fallback
+                try {
+                    const pmSnap = await db.collection("payment_methods").where("active", "==", true).limit(1).get();
+                    if(!pmSnap.empty) {
+                        payLink = pmSnap.docs[0].data().link;
+                    }
+                } catch(e) {}
 
-                // Remove all non-numeric characters
-                phone = phone.replace(/[^0-9]/g, '');
+                const orderRef = id.substring(0,6).toUpperCase();
                 
-                // Logic: If starts with '0', replace with '60' (Malaysia)
-                if(phone.startsWith('0')) {
-                    phone = '60' + phone.substring(1);
-                } 
-                // Logic: If it doesn't start with country code but is long enough, assume 60
-                else if(!phone.startsWith('60') && phone.length > 9) {
-                    phone = '60' + phone;
-                }
+                const msg = `👋 Hi ${d.customerName},
 
-                if(phone.length < 10) {
-                    showToast("Invalid phone number format.", "error");
-                    return;
-                }
+This is a friendly reminder regarding your order with DDNetwork One.
+
+📄 *Invoice:* #${orderRef}
+📦 *Package:* ${d.package}
+💰 *Total Amount:* ${d.total}
+
+Please proceed with payment at your earliest convenience to avoid service delays.
+
+💳 *Payment Link:* ${payLink}
+
+If you have already made the payment, please ignore this message. Feel free to reply if you have any questions!
+
+Thank you! 🚀`;
                 
-                const msg = `Hi ${d.customerName},\n\n*Friendly Reminder from DDNetwork One.*\n\nWe noticed your payment for Order #${id.substr(0,6).toUpperCase()} (${d.package}) is pending.\n\nTotal: ${d.total}\n\nPlease click payment link sent previously or reply to this message for a new link.\n\nThank you!`;
-                
-                const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
-                
-                window.open(url, '_blank');
+                // Clean phone number
+                let cleanPhone = d.customerPhone ? d.customerPhone.replace(/^0/, '60') : '60123456789';
+                if(!cleanPhone.startsWith('+')) cleanPhone = '+' + cleanPhone;
+
+                window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
                 showToast("Opening WhatsApp...", "success");
-            }).catch(err => {
+                logActivity(`Sent payment reminder for Order #${orderRef}`);
+            } catch(err) {
                 console.error(err);
                 showToast("Error sending reminder", "error");
-            });
+            }
         }
 
         // UPDATED: Manage Order Modal includes Billing Cycle display
@@ -1543,7 +1546,7 @@
                     </div>
                     
                     <!-- NEW: Billing Cycle Display -->
-                    <div class="mb-4 p-2" style="background:rgba(59,130,246,0.05); border-radius:6px; border: 1px solid rgba(59,130, 246, 0.1);">
+                    <div class="mb-4 p-2" style="background:rgba(59,130,246,0.05); border-radius:6px; border:1px solid rgba(59,130,246,0.1);">
                         <div class="flex justify-between items-center">
                             <span style="font-size:0.8rem; color:var(--text-muted);">Billing Cycle</span>
                             <span class="font-bold" style="color:var(--primary);">${d.billingCycle || '-'}</span>
@@ -1553,7 +1556,7 @@
                     <div class="mt-4">
                         <label>Client Domain</label>
                         <div style="display:flex; gap:10px;">
-                             <span style="padding:0.6rem; background:var(--bg-input); border:1px solid var(--border); border-radius:6px 0 0 0 6px 0; color:var(--text-muted);">https://</span>
+                             <span style="padding:0.6rem; background:var(--bg-input); border:1px solid var(--border); border-radius:6px 0 0 6px 0; color:var(--text-muted);">https://</span>
                              <input id="o-domain" value="${d.domain || ''}" placeholder="example.com" style="border-radius:0 6px 6px 0;">
                         </div>
                         <small class="text-muted">Leave empty if no domain yet.</small>
@@ -1622,14 +1625,13 @@
                         <td>
                             <button class="btn btn-sm btn-secondary" onclick="editClient('${doc.id}')">Edit</button>
                             <button class="btn btn-sm btn-secondary" onclick="resetPassword('${u.email}')">Reset PW</button>
-                            <button class="btn btn-primary" onclick="openAssignVoucherModal('${doc.id}', '${u.name}')">Assign Voucher</button>
-                            ${isAdmin() ? `<button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Client')"><i class="ri-delete-bin-line"></i></i> Delete</button>` : ''}
+                            <button class="btn btn-sm btn-primary" onclick="openAssignVoucherModal('${doc.id}', '${u.name}')">Assign Voucher</button>
+                            ${isAdmin() ? `<button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Client')"><i class="ri-delete-bin-line"></i></button>` : ''}
                         </td>
                     </tr>`;
                 }).join('');
             });
         }
-
         function editClient(uid) {
             db.collection("users").doc(uid).get().then(doc => {
                 const u = doc.data();
@@ -1688,7 +1690,7 @@
                 }).join('');
             });
         }
-
+        
         async function openAddCrewModal() {
             const newCrewId = await getNextId('crew');
             showModal("Add New Crew", `
@@ -1696,13 +1698,13 @@
                 <div class="mb-4"><label>Full Name</label><input id="c-name"></div>
                 <div class="mb-4"><label>Email Address</label><input type="email" id="c-email"></div>
                 <div class="flex gap-4 mb-4">
-                    <div style="flex:1;"><label>Role</label>
+                    <div style="flex:1"><label>Role</label>
                         <select id="c-role">
                             <option value="crew">Crew</option>
                             <option value="admin">Admin</option>
                         </select>
                     </div>
-                    <div style="flex:1;"><label>Job Title</label><input id="c-job"></div>
+                    <div style="flex:1"><label>Job Title</label><input id="c-job"></div>
                 </div>
                 <div class="mb-4"><label>Temporary Password</label><input type="password" id="c-pass" placeholder="Set password"></div>
             `, `<button class="btn btn-primary" onclick="saveCrew('${newCrewId}')">Create Crew</button>`);
@@ -1729,7 +1731,7 @@
                 });
                 closeModal();
                 showToast("Crew created successfully", "success");
-                logActivity(`Created new crew member: ${name} (${newCrewId})`);
+                logActivity(`Created new crew member: ${name} (${newId})`);
             } catch(e) {
                 showToast(e.message, "error");
             }
@@ -1748,8 +1750,8 @@
                             <option value="admin" ${u.role==='admin'?'selected':''}>Admin</option>
                         </select>
                     </div>
-                </div>
-            `, `<button class="btn btn-primary" onclick="updateCrewData('${uid}')">Save</button>`);
+                `, `<button class="btn btn-primary" onclick="updateCrewData('${uid}')">Save</button>`);
+            });
         }
 
         function updateCrewData(uid) {
@@ -1796,7 +1798,7 @@
                         <td style="white-space:nowrap;">${formatDateTime(d.timestamp)}</td>
                         <td>${d.name}</td><td>${d.type}</td>
                         <td>${d.assignedToName || 'Unassigned'}</td>
-                        <td><span class="badge" style="background:${statusBadge}15; color:${statusBadge}; border:1px solid ${statusBadge}25">${d.status}</span></td>
+                        <td><span class="badge" style="background:${statusBadge}15; color:${statusBadge}">${d.status}</span></td>
                         <td>
                             <button class="btn btn-sm btn-secondary" onclick="viewTicket('${doc.id}')">Manage</button>
                             <button class="btn btn-sm btn-danger" onclick="deleteItem('ticket','${doc.id}')"><i class="ri-delete-bin-line"></i></button>
@@ -1839,31 +1841,25 @@
                     const crewOpts = snap.docs.map(c => `<option value="${c.id}" ${d.assignedTo===c.id?'selected':''}>${c.data().name}</option>`).join('');
                     
                     showModal(`Ticket: ${d.ticketId || id}`, `
-                        <p class="mb-4 p-4" style="background:var(--bg-sidebar); border-radius:8px; border: 1px solid var(--border);">
-                            <div class="text-sm text-muted mb-1">Client Info</div>
-                            <strong>${d.name}</strong> (${d.phone})<br>
-                            ${d.userId ? `<small class="text-muted">User ID: ${d.userId}</small>` : ''}</div>
-                        </div>
-                        <div class="mb-4">
-                            <div class="flex gap-4 mb-4">
-                                <div style="flex:1;"><label>Status</label>
-                                    <select id="tk-status">
-                                        <option value="Open" ${d.status=='Open'?'selected':''}>Open</option>
-                                        <option value="In Progress" ${d.status=='In Progress'?'selected':''}>In Progress</option>
-                                        <option value="Closed" ${d.status=='Closed'?'selected':''}>Closed</option>
-                                    </select>
-                                </div>
-                                <div style="flex:1;"><label>Assign To Crew</label>
-                                    <select id="tk-assign">
-                                        <option value="">Unassigned</option>
-                                        ${crewOpts}
-                                    </select>
-                                </div>
+                        <p class="mb-4 p-4" style="background:var(--bg-sidebar); border-radius:8px; border:1px solid var(--border)">${d.message}</p>
+                        <div class="flex gap-4 mb-4">
+                            <div style="flex:1"><label>Status</label>
+                                <select id="tk-status">
+                                    <option value="Open" ${d.status=='Open'?'selected':''}>Open</option>
+                                    <option value="In Progress" ${d.status=='In Progress'?'selected':''}>In Progress</option>
+                                    <option value="Closed" ${d.status=='Closed'?'selected':''}>Closed</option>
+                                </select>
+                            </div>
+                            <div style="flex:1"><label>Assign To Crew</label>
+                                <select id="tk-assign">
+                                    <option value="">Unassigned</option>
+                                    ${crewOpts}
+                                </select>
                             </div>
                         </div>
-                    </div>
-                `, `<button class="btn btn-primary" onclick="saveTicketDetails('${id}')">Save Changes</button>`);
+                    `, `<button class="btn btn-primary" onclick="saveTicketDetails('${id}')">Save Changes</button>`);
                 });
+            });
         }
         function saveTicketDetails(id) {
             const newStatus = document.getElementById('tk-status').value;
@@ -1874,8 +1870,7 @@
                 status: newStatus,
                 assignedTo: newAssignId || null,
                 assignedToName: newAssignName
-            }).then(() => { 
-                closeModal(); showToast("Ticket Updated", "success"); logActivity(`Updated Ticket #${id}`); });
+            }).then(() => { closeModal(); showToast("Ticket Updated", "success"); logActivity(`Updated Ticket #${id}`); });
         }
 
         // --- 6. VOUCHERS ---
@@ -1946,7 +1941,7 @@
                         <td>${u.name}</td>
                         <td class="font-mono" style="color:var(--primary)">${v.code}</td>
                         <td>
-                            <span class="badge" style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}25}">
+                            <span class="badge" style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}25">
                                 ${vStatus}
                             </span>
                         </td>
@@ -1983,7 +1978,7 @@
                         tbody.innerHTML += `<tr>
                             <td class="font-mono">${v.code}</td>
                             <td>${v.assignedToName || '-'}</td>
-                            <td><span class="badge" style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}25}">${v.status}</span></td>
+                            <td><span class="badge" style="background:${statusColor}15; color:${statusColor}">${v.status}</span></td>
                             <td>${v.movedAt ? formatDateTime(v.movedAt) : '-'}</td>
                             <td>${actionBtn}</td>
                         </tr>`;
@@ -2036,7 +2031,9 @@
                         status: statusReason,
                         movedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
-                    await db.collection("users").doc(uid).update({ personalVoucher: firebase.firestore.FieldValue.delete() });
+                    await db.collection("users").doc(uid).update({
+                        personalVoucher: firebase.firestore.FieldValue.delete()
+                    });
                     console.log(`Moved ${code} to history as ${statusReason}`);
                     movedCount++;
                 }
@@ -2057,7 +2054,6 @@
                         <option value="Active" ${currentStatus==='Active'?'selected':''}>Active</option>
                         <option value="Suspended" ${currentStatus==='Suspended'?'selected':''}>Suspended</option>
                     </select>
-                    </label>
                     <label>Value</label><input type="number" id="e-v-val" value="${v.value}" class="mb-4">
                     <label>Expiry Date</label><input type="date" id="e-v-exp" value="${exp}" class="mb-4">
                 `, `<button class="btn btn-primary" onclick="saveEditVoucher('${uid}')">Save</button>`);
@@ -2136,8 +2132,8 @@
                     ${userSelect}
                     <div class="mb-4"><label>Code</label><input id="v-code" value="${autoCode}"></div>
                     <div class="flex gap-4 mb-4">
-                        <div style="flex:1;"><label>Type</label><select id="v-val-type"><option value="fixed">Fixed (RM)</option><option value="percent">Percent (%)</option></select></div>
-                        <div style="flex:1;"><label>Value</label><input type="number" id="v-val"></div>
+                        <div style="flex:1"><label>Type</label><select id="v-val-type"><option value="fixed">Fixed (RM)</option><option value="percent">Percent (%)</option></select></div>
+                        <div style="flex:1"><label>Value</label><input type="number" id="v-val"></div>
                     </div>
                     <label>Expiry Date</label><input type="date" id="v-exp" class="mb-4">
                 `, `<button class="btn btn-primary" onclick="submitAssignVoucher()">Assign</button>`);
@@ -2147,8 +2143,8 @@
             const uid = document.getElementById('v-user').value;
             const code = document.getElementById('v-code').value.toUpperCase();
             db.collection("users").doc(uid).update({ personalVoucher: {
-                code: code, type: document.getElementById('v-val-type').value: parseFloat(document.getElementById('v-val').value), expiryDate: document.getElementById('v-exp').value ? new Date(document.getElementById('v-exp').value) : null, status: 'active', auditLog: [{ action: 'Created', by: userData.email, date: new Date().toISOString() }]
-            } }).then(() => { closeModal(); showToast(`Voucher ${code} Assigned!`, "success"); logActivity(`Assigned voucher ${code}`); });
+                code: code, type: document.getElementById('v-val-type').value, value: parseFloat(document.getElementById('v-val').value), expiryDate: document.getElementById('v-exp').value ? new Date(document.getElementById('v-exp').value) : null, status: 'active', auditLog: [{ action: 'Created', by: userData.email, date: new Date().toISOString() }]
+            }}).then(() => { closeModal(); showToast(`Voucher ${code} Assigned!`, "success"); logActivity(`Assigned voucher ${code}`); });
         }
 
         function restoreVoucher(code, ownerUid) {
@@ -2159,6 +2155,7 @@
                 db.collection("users").doc(ownerUid).update({ personalVoucher: { ...v, status: 'active' } }).then(() => {
                     db.collection("vouchers_history").doc(code).delete().then(() => { showToast("Voucher Restored", "success"); logActivity(`Restored voucher ${code}`); });
                 });
+            });
         }
 
         // --- 7. CONTENT & PACKAGES (UPDATED) ---
@@ -2195,6 +2192,7 @@
                     <textarea id="content-ai" rows="6">${aiFeatures.join('\n')}</textarea>
                 </div>
             `;
+            });
         }
 
         function saveContentChanges() {
@@ -2372,7 +2370,7 @@
                 `, `<button class="btn btn-primary" onclick="saveEditedGateway('${docId}')">Save</button>`);
             });
         }
-
+        
         async function saveEditedGateway(docId) {
             const name = document.getElementById('e-gw-name').value;
             const link = document.getElementById('e-gw-link').value;
@@ -2428,7 +2426,7 @@
                             </tbody>
                         </table>
                     </div>
-                </div>`;
+                </div>
             `;
 
             db.collection("clients_portfolio").orderBy("timestamp", "desc").onSnapshot(snap => {
@@ -2465,7 +2463,7 @@
                             <button class="btn btn-sm ${p.status ? 'btn-danger' : 'btn-success'}" onclick="togglePortfolioStatus('${doc.id}', ${!p.status})">
                                 <i class="${p.status ? 'ri-eye-off-line' : 'ri-eye-line'}"></i>
                             </button>
-                            <button class="btn btn btn-danger" onclick="deletePortfolio('${doc.id}')"><i class="ri-delete-bin-line"></i></i>
+                            <button class="btn btn-sm btn-danger" onclick="deletePortfolio('${doc.id}')"><i class="ri-delete-bin-line"></i></button>
                         </td>
                     </tr>`;
                 }).join('');
@@ -2549,11 +2547,10 @@
                     <div class="flex items-center gap-4">
                         <label class="toggle-switch">
                             <input type="checkbox" id="e-p-status" ${p.status ? 'checked' : ''}>
-                                <span class="slider"></span>
+                            <span class="slider"></span>
                         </label>
                         <span style="font-size:0.9rem; color:var(--text-main);">Visible on Main Site</span>
                     </div>
-                </div>
                 `, `<button class="btn btn-primary" onclick="updatePortfolio('${docId}')">Save Changes</button>`);
             });
         }
@@ -2621,13 +2618,13 @@
         // --- 11. CUSTOMER REQUESTS ---
         function renderRequests() {
             document.getElementById('main').innerHTML = `
-            <div class="flex justify-between items-center mb-4">
-                <h2 style="font-size:1.25rem; font-weight:700;">Customer Requests</h2>
-                <input type="text" id="reqSearch" placeholder="Search Client..." style="width:200px;" onkeyup="filterTable('req-tbody', this.value)">
-            </div>
-            <div class="table-container">
-                <div class="table-responsive">
-                    <table>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 style="font-size:1.25rem; font-weight:700;">Customer Requests</h2>
+                    <input type="text" id="reqSearch" placeholder="Search Client..." style="width:200px;" onkeyup="filterTable('req-tbody', this.value)">
+                </div>
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table>
                             <thead>
                                 <tr>
                                     <th>Date</th>
@@ -2686,7 +2683,7 @@
                         <td>
                             <button class="btn btn-sm btn-secondary" onclick="viewRequestDetails('${doc.id}')">View</button>
                             <button class="btn btn-sm btn-success" onclick="updateRequestStatus('${doc.id}', 'Completed')">Done</button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteItem('request','${doc.id}')"><i class="ri-delete-bin-line"></i></i></button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteItem('request','${doc.id}')"><i class="ri-delete-bin-line"></i></button>
                         </td>
                     </tr>`;
                 }).join('');
@@ -2704,43 +2701,42 @@
                     detailsHTML = `
                         <div class="mb-4">
                             <label>Description</label>
-                                <textarea readonly rows="4">${d.details || 'No description provided.'}</textarea>
+                            <textarea readonly rows="4">${d.details || 'No description provided.'}</textarea>
                         </div>
                         <div class="mb-4">
                             <label>Attachments</label>
-                                <div class="flex items-center gap-2 text-sm">
-                                    <i class="${d.hasFile ? 'ri-checkbox-circle-fill text-success' : 'ri-close-circle-fill text-muted'}"></i>
-                                    ${d.hasFile ? 'User attached a file via website form.' : 'No file attached.'}
-                                </div>
+                            <div class="flex items-center gap-2 text-sm">
+                                <i class="${d.hasFile ? 'ri-checkbox-circle-fill text-success' : 'ri-close-circle-fill text-muted'}"></i>
+                                ${d.hasFile ? 'User attached a file via website form.' : 'No file attached.'}
                             </div>
                         </div>
-                `; } else if (type === 'upgrade') {
+                    `;
+                } else if (type === 'upgrade') {
                     detailsHTML = `
                         <div class="flex gap-4 mb-4">
-                            <div style="flex:1;"><label>Current Plan</label><input id="current-plan-input" value="${d.currentPlan || '-'}" readonly></div>
-                            <div style="flex:1;"><label>New Plan</label><input id="new-plan-input" value="${d.newPlan || '-'}" readonly></div>
+                            <div style="flex:1"><label>Current Plan</label><input value="${d.currentPlan || '-'}" readonly></div>
+                            <div style="flex:1"><label>New Plan</label><input value="${d.newPlan || '-'}" readonly></div>
                         </div>
                         <div class="mb-4"><label>Additional Notes</label><textarea readonly rows="3">${d.details || '-'}</textarea></div>
                     `;
                 } else if (type === 'renew') {
                     detailsHTML = `
                         <div class="flex gap-4 mb-4">
-                            <div style="flex:1;"><label>Plan to Renew</label><input id="renew-plan-input" value="${d.plan || '-'}" readonly></div>
-                            <div style="flex:1;"><label>Duration</label><input id="renew-duration-input" value="${d.duration || '-'}" readonly></div>
+                            <div style="flex:1"><label>Plan to Renew</label><input value="${d.plan || '-'}" readonly></div>
+                            <div style="flex:1"><label>Duration</label><input value="${d.duration || '-'}" readonly></div>
                         </div>
-                        <div class="mb-4"><label>Additional Notes</label><textarea readonly rows="3">${d.details || '-'}</textarea></div>
                     `;
-                `; } else if (type === 'remove') {
+                } else if (type === 'remove') {
                     detailsHTML = `
                         <div class="mb-4"><label>Items to Remove</label><textarea readonly rows="3">${d.details || '-'}</textarea></div>
                     `;
-                `; }
+                }
 
                 showModal(`Request Details (${type.toUpperCase()})`, `
-                    <div class="mb-4 p-4" style="background:var(--bg-sidebar); border-radius:8px; border:1px solid var(--border);">
+                    <div class="mb-4 p-4" style="background:var(--bg-sidebar); border-radius:8px; border:1px solid var(--border)">
                         <div class="text-sm text-muted mb-1">Client Info</div>
                         <strong>${d.name}</strong> (${d.phone})<br>
-                        ${d.userId ? `<small class="text-muted">User ID: ${d.userId}</small>` : ''}</div>
+                        ${d.userId ? `<small class="text-muted">User ID: ${d.userId}</small>` : ''}
                     </div>
                     ${detailsHTML}
                     
@@ -2749,10 +2745,10 @@
                         <select id="req-status-select">
                             <option value="Pending" ${d.status==='Pending'?'selected':''}>Pending</option>
                             <option value="Completed" ${d.status==='Completed'?'selected':''}>Completed</option>
-                            <option value="Cancelled" ${d.status==='Cancelled'?'selected':''}>Cancelled</option>
                         </select>
                     </div>
                 `, `<button class="btn btn-primary" onclick="updateRequestStatus('${id}', null, true)">Save Status</button>`);
+            });
         }
 
         function updateRequestStatus(id, newStatus = null, fromModal = false) {
@@ -2764,6 +2760,8 @@
                 if(fromModal) closeModal();
                 showToast("Request Status Updated", "success");
                 logActivity(`Updated request status to ${statusToSet}`);
+            }).catch(err => {
+                showToast("Error updating: " + err.message, "error");
             });
         }
 
@@ -2784,6 +2782,7 @@
                     <h2 style="font-size:1.25rem; font-weight:700;">Public Promo Codes</h2>
                     <button class="btn btn-primary" onclick="addPublicPromo()"><i class="ri-add-line"></i> Add Code</button>
                 </div>
+                
                 <div class="table-container">
                     <div class="table-header">
                         <h3>Active Codes (config/promo_codes)</h3>
@@ -2877,3 +2876,4 @@
 
     </script>
 </body>
+</html>
