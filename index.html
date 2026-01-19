@@ -496,7 +496,7 @@
         .modal-body { padding: 1.5rem; overflow-y: auto; }
         .modal-footer { padding: 1.2rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; border-radius: 0 0 16px 16px; background: rgba(0,0,0,0.2); flex-shrink: 0; }
 
-        /* --- INVOICE MODAL STYLES (UPDATED FOR PRINTING) --- */
+        /* --- INVOICE MODAL STYLES --- */
         #invoiceModalOverlay {
             z-index: 3000;
             background: rgba(0, 0, 0, 0.8); 
@@ -599,61 +599,61 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
 
-        /* --- FIX FOR DOWNLOAD PDF (CAN'T SEE ANYTHING) --- */
+        /* --- FINAL FIX: PRINT STYLES --- */
         @media print {
-            /* 1. Hide the entire app interface */
-            body > *:not(#invoiceModalOverlay), 
-            #dashboard, 
-            header, 
-            aside, 
-            .toast-container, 
-            .modal-overlay:not(#invoiceModalOverlay) {
+            /* 1. Reset Body to White/Black */
+            body {
+                background-color: white !important;
+                color: black !important;
+                height: auto;
+                width: 100%;
+                overflow: visible;
+                display: block;
+            }
+
+            /* 2. Hide EVERYTHING except the Invoice Modal */
+            /* This targets every direct child of body and hides them unless it is the invoice overlay */
+            body > *:not(#invoiceModalOverlay) {
                 display: none !important;
             }
 
-            /* 2. Fix Body & Overlay for Print */
-            body {
-                background: white !important;
-                height: auto;
-                overflow: visible;
-            }
-
+            /* 3. Setup Invoice Modal as the root printable element */
             #invoiceModalOverlay {
-                position: static; /* Take out of fixed context for printing */
-                background: white !important; /* Remove dark overlay background */
+                position: static !important;
+                background-color: white !important;
                 height: auto;
                 width: 100%;
-                display: block !important;
                 z-index: 999999;
+                overflow: visible;
+                display: block !important;
             }
 
-            /* 3. Fix Invoice Paper */
             .invoice-modal-wrapper {
                 display: block;
                 height: auto;
             }
 
+            /* 4. Invoice Paper Specifics */
             .invoice-paper {
-                position: relative;
-                left: 0;
-                top: 0;
+                position: static;
                 margin: 0;
+                padding: 0; /* Let @page handle margins */
                 width: 100%;
                 box-shadow: none;
                 border: none;
-                padding: 0; /* Let @page handle margins */
-                color: black !important; /* Ensure text is black */
+                color: black !important;
+                background: white !important;
             }
 
-            /* 4. Hide Controls in Print */
+            /* 5. Hide Controls */
             .invoice-controls {
                 display: none !important;
             }
 
-            /* 5. Page Settings */
+            /* 6. Page Setup */
             @page {
                 size: A4;
-                margin: 15mm;
+                margin: 0; /* Zero margins to ensure invoice fills page */
             }
         }
 
@@ -897,12 +897,12 @@
         </div>
     </div>
 
-    <!-- INVOICE MODAL (Download Only) -->
+    <!-- INVOICE MODAL -->
     <div class="modal-overlay" id="invoiceModalOverlay">
         <div class="invoice-modal-wrapper">
-            <!-- Only Download Button -->
+            <!-- Controls -->
             <div class="invoice-controls">
-                <button class="btn btn-primary" onclick="window.print()">
+                <button class="btn btn-primary" onclick="downloadCurrentInvoice()">
                     <i class="ri-file-download-line"></i> Download PDF
                 </button>
                 <button class="btn btn-danger-solid" onclick="closeInvoiceModal()" style="border-radius: 50%; width: 36px; height: 36px; padding: 0;">
@@ -931,6 +931,7 @@
             appId: "1:699127560990:web:50cfd61ff620bc85fb670f"
         };
         let db, auth, currentUser, userData = null;
+        let currentOrderDataForPrint = null; // Store current order data to access in print function
         
         try { firebase.initializeApp(firebaseConfig); db = firebase.firestore(); auth = firebase.auth(); } catch(e) { console.log("Firebase init error", e); }
 
@@ -1314,7 +1315,7 @@
             });
         }
 
-        // --- 2. ORDERS (UPDATED INVOICE & REMAINDER) ---
+        // --- 2. ORDERS (UPDATED INVOICE) ---
         function renderOrders() {
             document.getElementById('main').innerHTML = `
                 <div class="table-container">
@@ -1386,12 +1387,42 @@
             });
         }
 
-        // --- UPDATED INVOICE GENERATOR (NEAT TABLE) ---
+        // --- PRINT FUNCTION TO FIX TITLE & VIEW ---
+        function downloadCurrentInvoice() {
+            if (!currentOrderDataForPrint) {
+                showToast("No invoice loaded", "error");
+                return;
+            }
+
+            const originalTitle = document.title;
+            const invoiceId = currentOrderDataForPrint.orderRef;
+
+            // 1. Change Title (Fixes "Admin Portal..." in PDF header)
+            document.title = `Invoice #${invoiceId} - DDNetwork One`;
+
+            // 2. Print
+            window.print();
+
+            // 3. Restore Title after 1 sec (gives browser time to load print dialog)
+            setTimeout(() => {
+                document.title = originalTitle;
+            }, 1000);
+        }
+
+        // --- UPDATED INVOICE GENERATOR ---
         async function generateInvoice(orderId) {
             try {
                 const orderDoc = await db.collection("orders").doc(orderId).get();
                 if(!orderDoc.exists) return showToast("Order not found", "error");
                 const d = orderDoc.data();
+
+                // Store data for print function
+                currentOrderDataForPrint = {
+                    orderRef: orderId.substring(0,8).toUpperCase(),
+                    customerName: d.customerName,
+                    package: d.package,
+                    total: d.total
+                };
 
                 let paymentMethodsHTML = '<p>No payment methods configured in config.</p>';
                 try {
@@ -1521,6 +1552,7 @@
 
         function closeInvoiceModal() {
             document.getElementById('invoiceModalOverlay').classList.remove('open');
+            currentOrderDataForPrint = null;
         }
 
         // --- UPDATED PAYMENT REMINDER ---
