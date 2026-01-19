@@ -499,8 +499,9 @@
         /* --- INVOICE MODAL STYLES --- */
         #invoiceModalOverlay {
             z-index: 3000;
-            background: rgba(0, 0, 0, 0.8); 
+            background: rgba(0, 0, 0, 0.9); 
             padding: 0;
+            overflow-y: hidden; /* Main modal handles scroll via wrapper */
         }
         
         .invoice-modal-wrapper {
@@ -508,24 +509,32 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            /* FIX: Changed to flex-start to allow scrolling from top */
+            align-items: flex-start; 
             justify-content: center;
             position: relative;
+            overflow-y: auto; /* Allow scrolling the invoice paper */
+            padding-top: 20px;
+            padding-bottom: 40px;
         }
 
         .invoice-paper {
             background: white;
             color: #1f2937;
-            width: 210mm; /* A4 Width */
-            min-height: 297mm; /* A4 Height */
+            /* FIX: Scaled down to 85% to fit better on screens */
+            width: 210mm; 
+            min-height: 297mm; 
             padding: 15mm;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            position: relative;
-            overflow-y: auto; 
-            margin: 20px;
+            margin: 0 auto;
             font-family: 'Inter', sans-serif;
             font-size: 14px;
             line-height: 1.5;
+            
+            /* SCALING LOGIC */
+            transform: scale(0.85); /* Shrinks view to 85% */
+            transform-origin: top center;
+            margin-bottom: -15%; /* Pull up bottom content to minimize empty space caused by scale */
         }
 
         /* Invoice Internal Layout */
@@ -549,7 +558,7 @@
             margin-bottom: 30px;
             border-radius: 4px;
             overflow: hidden;
-            table-layout: fixed; /* FIX: Forces column widths to be respected */
+            table-layout: fixed; 
         }
         
         .inv-table th { 
@@ -562,7 +571,7 @@
             font-weight: 600; 
             border-bottom: 2px solid #e2e8f0;
             letter-spacing: 0.5px;
-            white-space: normal; /* FIX: Allow wrapping in headers */
+            white-space: normal;
             vertical-align: middle;
         }
         
@@ -572,25 +581,15 @@
             color: #334155; 
             vertical-align: top; 
             line-height: 1.6;
-            white-space: normal; /* FIX: Allow text wrapping in description */
+            white-space: normal;
             word-wrap: break-word;
         }
 
-        /* FIX: Explicit Column Widths to prevent columns disappearing */
-        .inv-table th:nth-child(1), .inv-table td:nth-child(1) { 
-            width: 55%; 
-            text-align: left; 
-        }
-        .inv-table th:nth-child(2), .inv-table td:nth-child(2) { 
-            width: 15%; 
-            text-align: center; 
-        }
-        .inv-table th:nth-child(3), .inv-table td:nth-child(3) { 
-            width: 30%; 
-            text-align: right; 
-        }
+        /* FIX: Explicit Column Widths */
+        .inv-table th:nth-child(1), .inv-table td:nth-child(1) { width: 55%; text-align: left; }
+        .inv-table th:nth-child(2), .inv-table td:nth-child(2) { width: 15%; text-align: center; }
+        .inv-table th:nth-child(3), .inv-table td:nth-child(3) { width: 30%; text-align: right; }
         
-        /* Right alignment helper for table */
         .text-right { text-align: right !important; }
         .text-center { text-align: center !important; }
         
@@ -608,17 +607,18 @@
 
         /* Invoice Modal Controls */
         .invoice-controls {
-            position: absolute;
+            position: fixed;
             top: 20px;
             right: 20px;
             display: flex;
             gap: 10px;
             z-index: 3001;
-            background: rgba(15, 23, 42, 0.8);
+            background: rgba(15, 23, 42, 0.9);
             padding: 8px;
             border-radius: 12px;
             backdrop-filter: blur(4px);
             border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
         /* --- FINAL FIX: PRINT STYLES --- */
@@ -634,7 +634,6 @@
             }
 
             /* 2. Hide EVERYTHING except the Invoice Modal */
-            /* This targets every direct child of body and hides them unless it is the invoice overlay */
             body > *:not(#invoiceModalOverlay) {
                 display: none !important;
             }
@@ -648,11 +647,14 @@
                 z-index: 999999;
                 overflow: visible;
                 display: block !important;
+                padding: 0;
             }
 
             .invoice-modal-wrapper {
                 display: block;
                 height: auto;
+                overflow: visible;
+                padding: 0;
             }
 
             /* 4. Invoice Paper Specifics */
@@ -665,6 +667,11 @@
                 border: none;
                 color: black !important;
                 background: white !important;
+                /* CRITICAL: Remove scaling for full quality print */
+                transform: none !important; 
+                transform-origin: initial !important;
+                margin-bottom: 0 !important;
+                min-height: auto !important;
                 print-color-adjust: exact;
                 -webkit-print-color-adjust: exact;
             }
@@ -786,16 +793,14 @@
             
             /* Invoice Responsive */
             .invoice-paper {
-                width: 100%;
-                min-height: auto;
-                margin: 10px;
-                padding: 15px;
+                /* Increase scale slightly on mobile to match width better, or keep scaled */
+                transform: scale(0.6); 
+                margin-bottom: -40%;
             }
             .inv-grid { grid-template-columns: 1fr; gap: 20px; }
             .inv-bank-grid { grid-template-columns: 1fr; }
             .inv-table th, .inv-table td { padding: 10px; font-size: 12px; }
             
-            /* Responsive Table Overrides */
             .inv-table th:nth-child(1), .inv-table td:nth-child(1) { width: 50%; }
             .inv-table th:nth-child(2), .inv-table td:nth-child(2) { width: 20%; }
             .inv-table th:nth-child(3), .inv-table td:nth-child(3) { width: 30%; }
