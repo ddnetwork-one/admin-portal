@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Admin Portal v11.1 (ddn)</title>
+    <title>Admin Portal v11.2(ddn)</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -496,24 +496,22 @@
         .modal-body { padding: 1.5rem; overflow-y: auto; }
         .modal-footer { padding: 1.2rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; border-radius: 0 0 16px 16px; background: rgba(0,0,0,0.2); flex-shrink: 0; }
 
-        /* --- INVOICE MODAL STYLES (UPDATED FOR CENTERING & VIEW) --- */
+        /* --- INVOICE MODAL STYLES (FIXED CENTERING & MOBILE FRIENDLY) --- */
         #invoiceModalOverlay {
             z-index: 3000;
-            background: rgba(0, 0, 0, 0.92); 
+            background: rgba(0, 0, 0, 0.95); /* Darker for contrast */
             padding: 0;
         }
         
         .invoice-modal-wrapper {
             width: 100%;
             height: 100%;
-            /* FIX: Use Flexbox to perfectly center the invoice */
-            display: flex;
-            justify-content: center; /* Horizontal Center */
-            align-items: center;     /* Vertical Center */
-            position: relative;
-            /* Allow scrolling if screen is too small for scaled invoice */
-            overflow-y: auto;
-            padding: 40px; /* Add breathing room so paper doesn't touch edges */
+            /* FIX: Grid Centering ensures perfect alignment without negative margins */
+            display: grid;
+            place-items: center; /* Centers vertically and horizontally */
+            justify-items: center;
+            overflow-y: auto; /* Allow scrolling if height overflows viewport */
+            padding: 20px; /* Breathing room */
         }
 
         .invoice-paper {
@@ -524,11 +522,11 @@
             padding: 15mm;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             
-            /* SCALING LOGIC: Scale down to 90% for better viewing on standard screens */
-            transform: scale(0.9); 
-            transform-origin: center center; /* Scale from the center of the paper */
+            /* SCALING LOGIC */
+            transform: scale(0.92); /* Default Desktop Scale (Larger text) */
+            transform-origin: top center; /* Anchor scaling to top-center */
             
-            margin: 0; /* Remove negative margins */
+            margin: 0; /* Removed negative margins to fix "too much at left" */
             font-family: 'Inter', sans-serif;
             font-size: 14px;
             line-height: 1.5;
@@ -560,7 +558,7 @@
         
         .inv-table th { 
             text-align: left; 
-            padding: 14px 16px; /* Increased padding for better view */
+            padding: 14px 16px; /* Increased padding */
             background: #f8fafc; 
             color: #475569; 
             font-size: 12px; 
@@ -618,6 +616,37 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
+        /* --- RESPONSIVENESS & MOBILE INVOICE OPTIMIZATION --- */
+        @media(max-width: 1024px) {
+            aside { transform: translateX(-100%); width: 280px; box-shadow: 20px 0 40px rgba(0,0,0,0.5); }
+            aside.mobile-open { transform: translateX(0); }
+            main { margin-left: 0 !important; width: 100% !important; padding: 1.5rem; padding-top: 5rem; }
+            .stats-grid { grid-template-columns:1fr; }
+            .price-grid { grid-template-columns:1fr; }
+            .header-brand span { display: none; }
+            .notif-dropdown { right: 0; width: 90vw; }
+            
+            /* Invoice Responsive Fixes */
+            .invoice-paper {
+                /* 0.75 Scale provides a good balance of readability vs screen fit on phones */
+                transform: scale(0.75); 
+            }
+            .inv-grid { grid-template-columns: 1fr; gap: 20px; }
+            .inv-bank-grid { grid-template-columns: 1fr; }
+            .inv-table th, .inv-table td { padding: 10px; font-size: 12px; }
+            
+            .inv-table th:nth-child(1), .inv-table td:nth-child(1) { width: 50%; }
+            .inv-table th:nth-child(2), .inv-table td:nth-child(2) { width: 20%; }
+            .inv-table th:nth-child(3), .inv-table td:nth-child(3) { width: 30%; }
+        }
+        
+        /* Tablet Optimization */
+        @media(min-width: 1025px) and (max-width: 1440px) {
+            .invoice-paper {
+                transform: scale(0.85);
+            }
+        }
+
         /* --- FINAL FIX: PRINT STYLES --- */
         @media print {
             /* 1. Reset Body to White/Black */
@@ -651,13 +680,12 @@
                 display: block;
                 height: auto;
                 overflow: visible;
-                padding: 0;
             }
 
             /* 4. Invoice Paper Specifics */
             .invoice-paper {
                 position: static;
-                margin: 0 auto; /* Centers horizontally in the PDF page */
+                margin: 0 auto; /* Centers horizontally in PDF page */
                 padding: 0; /* Let @page handle margins */
                 width: 100%; /* Fill A4 width */
                 box-shadow: none;
@@ -749,7 +777,7 @@
         input:checked + .slider:before { transform: translateX(20px); }
         
         .price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
-        .gateway-card { background: var(--bg-input); padding:1rem; border-radius: 8px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 0.5rem; }
+        .gateway-card { background: var(--bg-input); padding: 1rem; border-radius: 8px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 0.5rem; }
 
         /* Loading State */
         .loading-spinner {
@@ -765,41 +793,6 @@
         
         .page-loader {
             display: flex; justify-content: center; align-items: center; height: 300px; width: 100%;
-        }
-
-        /* --- RESPONSIVENESS TWEAKS --- */
-        @media(min-width: 1025px) {
-            aside { transform: translateX(0) !important; width: var(--sidebar-width); }
-            aside.collapsed { transform: translateX(0) !important; width: var(--sidebar-width-collapsed); }
-            
-            main { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); padding: 2rem; }
-            
-            aside.collapsed + main { margin-left: var(--sidebar-width-collapsed); width: calc(100% - var(--sidebar-width-collapsed)); }
-            
-            .sidebar-overlay { display: none !important; }
-        }
-
-        @media(max-width: 1024px) {
-            aside { transform: translateX(-100%); width: 280px; box-shadow: 20px 0 40px rgba(0,0,0,0.5); }
-            aside.mobile-open { transform: translateX(0); }
-            main { margin-left: 0 !important; width: 100% !important; padding: 1.5rem; padding-top: 5rem; }
-            .stats-grid { grid-template-columns:1fr; }
-            .price-grid { grid-template-columns:1fr; }
-            .header-brand span { display: none; }
-            .notif-dropdown { right: 0; width: 90vw; }
-            
-            /* Invoice Responsive */
-            .invoice-paper {
-                /* On small screens, reduce scale further so it fits nicely */
-                transform: scale(0.6); 
-            }
-            .inv-grid { grid-template-columns: 1fr; gap: 20px; }
-            .inv-bank-grid { grid-template-columns: 1fr; }
-            .inv-table th, .inv-table td { padding: 10px; font-size: 12px; }
-            
-            .inv-table th:nth-child(1), .inv-table td:nth-child(1) { width: 50%; }
-            .inv-table th:nth-child(2), .inv-table td:nth-child(2) { width: 20%; }
-            .inv-table th:nth-child(3), .inv-table td:nth-child(3) { width: 30%; }
         }
     </style>
 </head>
@@ -2551,7 +2544,7 @@ Thank you! 🚀`;
                         <td>${statusBadge}</td>
                         <td>
                             <button class="btn btn-sm btn-secondary" onclick="editPortfolio('${doc.id}')"><i class="ri-pencil-line"></i></button>
-                            <button class="btn btn-sm ${p.status ? 'btn-danger' : 'btn-success'}" onclick="togglePortfolioStatus('${doc.id}', ${!p.status})">
+                            <button class="btn ${p.status ? 'btn-danger' : 'btn-success'}" onclick="togglePortfolioStatus('${doc.id}', ${!p.status})">
                                 <i class="${p.status ? 'ri-eye-off-line' : 'ri-eye-line'}"></i>
                             </button>
                             <button class="btn btn-sm btn-danger" onclick="deletePortfolio('${doc.id}')"><i class="ri-delete-bin-line"></i></button>
