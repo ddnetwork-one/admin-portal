@@ -499,11 +499,10 @@
         /* --- UPDATED INVOICE MODAL STYLES --- */
         #invoiceModalOverlay {
             z-index: 3000;
-            background: rgba(0, 0, 0, 0.8); /* Darker background for focus */
+            background: rgba(0, 0, 0, 0.8); 
             padding: 0;
         }
         
-        /* Container for the Invoice Paper */
         .invoice-modal-wrapper {
             width: 100%;
             height: 100%;
@@ -522,7 +521,7 @@
             padding: 15mm;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             position: relative;
-            overflow-y: auto; /* Scroll inside the paper if content is long */
+            overflow-y: auto; 
             margin: 20px;
             font-family: 'Inter', sans-serif;
             font-size: 14px;
@@ -534,7 +533,7 @@
         .inv-logo-area h1 { color: #0f172a; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
         .inv-logo-area p { color: #64748b; font-size: 13px; }
         .inv-title-area { text-align: right; }
-        .inv-title-area h2 { font-size: 32px; color: #e2e8f0; /* Light grey for large title background effect if desired, or just dark text */ color: #1e293b; font-weight: 700; margin: 0; }
+        .inv-title-area h2 { font-size: 32px; color: #e2e8f0; color: #1e293b; font-weight: 700; margin: 0; }
         .inv-meta { margin-top: 10px; font-size: 13px; color: #475569; }
         .inv-meta strong { color: #1e293b; }
 
@@ -543,11 +542,35 @@
         .inv-box h3 { font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 4px; }
         .inv-box p { color: #334155; font-size: 13px; margin-bottom: 2px; }
 
-        .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-        .inv-table th { text-align: left; padding: 12px 8px; background: #f1f5f9; color: #475569; font-size: 12px; text-transform: uppercase; font-weight: 600; }
-        .inv-table td { padding: 16px 8px; border-bottom: 1px solid #e2e8f0; color: #334155; vertical-align: top; }
-        .inv-table .col-right { text-align: right; }
-        .inv-table .col-center { text-align: center; }
+        /* --- UPDATED NEAT TABLE STYLES --- */
+        .inv-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-bottom: 30px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .inv-table th { 
+            text-align: left; 
+            padding: 12px 16px; 
+            background: #f8fafc; /* Clean light gray header */
+            color: #475569; 
+            font-size: 12px; 
+            text-transform: uppercase; 
+            font-weight: 600; 
+            border-bottom: 2px solid #e2e8f0;
+            letter-spacing: 0.5px;
+        }
+        .inv-table td { 
+            padding: 16px; /* Generous padding for neatness */
+            border-bottom: 1px solid #f1f5f9; 
+            color: #334155; 
+            vertical-align: top; 
+            line-height: 1.6;
+        }
+        /* Right alignment helper for table */
+        .text-right { text-align: right !important; }
+        .text-center { text-align: center !important; }
         
         .inv-total-section { display: flex; justify-content: flex-end; margin-bottom: 40px; }
         .inv-total-box { width: 250px; }
@@ -561,7 +584,7 @@
 
         .inv-footer { text-align: center; color: #94a3b8; font-size: 12px; margin-top: auto; padding-top: 20px; border-top: 1px dashed #e2e8f0; }
 
-        /* Invoice Modal Controls (Not Printed) */
+        /* Invoice Modal Controls */
         .invoice-controls {
             position: absolute;
             top: 20px;
@@ -569,44 +592,28 @@
             display: flex;
             gap: 10px;
             z-index: 3001;
+            background: rgba(15, 23, 42, 0.8);
+            padding: 8px;
+            border-radius: 12px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        /* --- PRINT STYLES FOR INVOICE (UPDATED) --- */
+        /* --- PRINT STYLES --- */
         @media print {
-            /* Hide everything except the invoice paper */
-            body * {
-                visibility: hidden;
-            }
-            
-            /* Hide Modals Overlays that block */
-            #invoiceModalOverlay, .modal-overlay {
-                position: static;
-                background: white;
-                display: block;
-            }
-
-            /* Make the invoice paper visible and positioned correctly */
-            .invoice-paper, .invoice-paper * {
-                visibility: visible;
-            }
-            
+            body * { visibility: hidden; }
+            #invoiceModalOverlay, .modal-overlay { position: static; background: white; display: block; }
+            .invoice-paper, .invoice-paper * { visibility: visible; }
             .invoice-paper {
                 position: absolute;
-                left: 0;
-                top: 0;
+                left: 0; top: 0;
                 width: 100%;
-                margin: 0;
-                padding: 0; /* Let page margins handle it or keep padding */
-                box-shadow: none;
-                border: none;
+                margin: 0; padding: 0;
+                box-shadow: none; border: none;
             }
-
-            /* Hide controls */
             .invoice-controls, .btn-icon, aside, header, .toast-container, .sidebar-overlay {
                 display: none !important;
             }
-
-            /* Set page margins */
             @page {
                 size: A4;
                 margin: 15mm;
@@ -725,6 +732,7 @@
             }
             .inv-grid { grid-template-columns: 1fr; gap: 20px; }
             .inv-bank-grid { grid-template-columns: 1fr; }
+            .inv-table th, .inv-table td { padding: 10px; font-size: 12px; }
         }
     </style>
 </head>
@@ -852,16 +860,19 @@
         </div>
     </div>
 
-    <!-- INVOICE MODAL (Updated A4 Format) -->
+    <!-- INVOICE MODAL (Updated Controls & Table) -->
     <div class="modal-overlay" id="invoiceModalOverlay">
         <div class="invoice-modal-wrapper">
-            <!-- Controls (Print & Close) -->
+            <!-- Separate Controls -->
             <div class="invoice-controls">
-                <button class="btn btn-secondary" onclick="window.print()" style="background: white; color: black; border-color: #ccc;">
-                    <i class="ri-printer-line"></i> Print / Download PDF
+                <button class="btn btn-primary" onclick="window.print()">
+                    <i class="ri-file-download-line"></i> Download PDF
                 </button>
-                <button class="btn btn-danger-solid" onclick="closeInvoiceModal()" style="border-radius: 50%; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;">
-                    <i class="ri-close-line" style="font-size: 1.2rem;"></i>
+                <button class="btn btn-secondary" onclick="window.print()">
+                    <i class="ri-printer-line"></i> Print
+                </button>
+                <button class="btn btn-danger-solid" onclick="closeInvoiceModal()" style="border-radius: 50%; width: 36px; height: 36px; padding: 0; margin-left: 10px;">
+                    <i class="ri-close-line" style="font-size: 1.1rem;"></i>
                 </button>
             </div>
 
@@ -910,7 +921,6 @@
                 showToast("Database initialized!", "success");
             }
 
-            // Initialize Dedicated Payment Methods Collection
             const pmSnapshot = await db.collection("payment_methods").limit(1).get();
             if (pmSnapshot.empty) {
                 console.log("Payment methods collection empty, adding defaults...");
@@ -1270,7 +1280,7 @@
             });
         }
 
-        // --- 2. ORDERS (UPDATED: INVOICE & REMAINDER) ---
+        // --- 2. ORDERS (UPDATED INVOICE & REMAINDER) ---
         function renderOrders() {
             document.getElementById('main').innerHTML = `
                 <div class="table-container">
@@ -1342,14 +1352,13 @@
             });
         }
 
-        // --- UPDATED INVOICE GENERATOR (A4, PROFESSIONAL) ---
+        // --- UPDATED INVOICE GENERATOR (NEAT TABLE) ---
         async function generateInvoice(orderId) {
             try {
                 const orderDoc = await db.collection("orders").doc(orderId).get();
                 if(!orderDoc.exists) return showToast("Order not found", "error");
                 const d = orderDoc.data();
 
-                // Fetch Payment Methods for Footer
                 let paymentMethodsHTML = '<p>No payment methods configured in config.</p>';
                 try {
                     const pmSnap = await db.collection("payment_methods").where("active", "==", true).limit(2).get();
@@ -1411,8 +1420,8 @@
                         <thead>
                             <tr>
                                 <th style="width: 50%">Description</th>
-                                <th class="col-center">Billing</th>
-                                <th class="col-right">Amount</th>
+                                <th class="text-center">Billing</th>
+                                <th class="text-right">Amount</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1423,18 +1432,18 @@
                                         ${d.domain ? `Domain: ${d.domain}` : 'Domain pending'}
                                     </span>
                                 </td>
-                                <td class="col-center">
+                                <td class="text-center">
                                     <span style="font-size:13px; background:#f1f5f9; padding:2px 6px; border-radius:4px;">
                                         ${d.billingCycle || 'One-Time'}
                                     </span>
                                 </td>
-                                <td class="col-right">RM ${total}</td>
+                                <td class="text-right">RM ${total}</td>
                             </tr>
                             ${d.voucherCode ? `
                             <tr>
                                 <td><strong>Discount</strong> <span style="color:#10b981; font-size:12px;">(${d.voucherCode})</span></td>
                                 <td></td>
-                                <td class="col-right" style="color:#10b981;">- RM 0.00</td>
+                                <td class="text-right" style="color:#10b981;">- RM 0.00</td>
                             </tr>` : ''}
                         </tbody>
                     </table>
@@ -1488,8 +1497,7 @@
                 if(!doc.exists) return;
                 const d = doc.data();
                 
-                // Fetch active payment link to include
-                let payLink = "https://ddnet.my"; // Default fallback
+                let payLink = "https://ddnet.my"; 
                 try {
                     const pmSnap = await db.collection("payment_methods").where("active", "==", true).limit(1).get();
                     if(!pmSnap.empty) {
@@ -1515,7 +1523,6 @@ If you have already made the payment, please ignore this message. Feel free to r
 
 Thank you! 🚀`;
                 
-                // Clean phone number
                 let cleanPhone = d.customerPhone ? d.customerPhone.replace(/^0/, '60') : '60123456789';
                 if(!cleanPhone.startsWith('+')) cleanPhone = '+' + cleanPhone;
 
@@ -1528,7 +1535,6 @@ Thank you! 🚀`;
             }
         }
 
-        // UPDATED: Manage Order Modal includes Billing Cycle display
         function viewOrder(id) {
             db.collection("orders").doc(id).get().then(doc => {
                 const d = doc.data();
@@ -1545,7 +1551,6 @@ Thank you! 🚀`;
                         <div><label class="text-muted text-sm">Total</label><input id="o-total" value="${d.total}"></div>
                     </div>
                     
-                    <!-- NEW: Billing Cycle Display -->
                     <div class="mb-4 p-2" style="background:rgba(59,130,246,0.05); border-radius:6px; border:1px solid rgba(59,130,246,0.1);">
                         <div class="flex justify-between items-center">
                             <span style="font-size:0.8rem; color:var(--text-muted);">Billing Cycle</span>
@@ -1578,7 +1583,7 @@ Thank you! 🚀`;
                 customerEmail: document.getElementById('o-email').value,
                 customerPhone: document.getElementById('o-phone').value,
                 total: document.getElementById('o-total').value,
-                domain: document.getElementById('o-domain').value.replace(/^https?:\/\//, ''), // Basic sanitization
+                domain: document.getElementById('o-domain').value.replace(/^https?:\/\//, ''), 
                 status: document.getElementById('upd-status').value
             }).then(() => { 
                 closeModal(); showToast("Order Updated Successfully", "success"); logActivity(`Updated Order #${id.substr(0,6)}`);
@@ -1924,7 +1929,6 @@ Thank you! 🚀`;
             document.getElementById('active-vouchers-container').classList.remove('hidden');
             document.getElementById('history-vouchers-container').classList.remove('hidden');
 
-            // Render Active
             db.collection("users").where("personalVoucher", "!=", null).onSnapshot(snap => {
                 const tbody = document.getElementById('vouch-active');
                 if(!tbody) return;
@@ -1956,7 +1960,6 @@ Thank you! 🚀`;
                 });
             });
 
-            // Render History
             const updateHistoryListener = (filterVal) => {
                 db.collection("vouchers_history").orderBy("movedAt", "desc").limit(50).onSnapshot(snap => {
                     const tbody = document.getElementById('vouch-history');
@@ -2166,7 +2169,6 @@ Thank you! 🚀`;
                 const siteData = doc.exists ? doc.data() : {};
                 const packages = siteData.packageDetails || {};
                 
-                // Safely get features or default to empty array
                 const frontendFeatures = (packages.frontend && packages.frontend.features) 
                     ? packages.frontend.features 
                     : ["Up to 5 Pages", "Animations", "Contact Forms", "WhatsApp Integration"];
@@ -2199,7 +2201,6 @@ Thank you! 🚀`;
             const frontendLines = document.getElementById('content-frontend').value.split('\n').filter(l => l.trim() !== '');
             const aiLines = document.getElementById('content-ai').value.split('\n').filter(l => l.trim() !== '');
 
-            // Show loading state on button temporarily
             const btnText = document.querySelector('button[onclick="saveContentChanges()"] span');
             const originalBtnHTML = document.querySelector('button[onclick="saveContentChanges()"]').innerHTML;
             document.querySelector('button[onclick="saveContentChanges()"]').innerHTML = `<div class="loading-spinner" style="width:16px; height:16px; border-width:2px;"></div> Saving...`;
@@ -2216,14 +2217,12 @@ Thank you! 🚀`;
                 }).then(() => {
                     showToast("Content updated successfully!", "success");
                     logActivity("Updated website content features");
-                    // Restore button
                     const main = document.getElementById('main');
                     const btn = main.querySelector('button[onclick="saveContentChanges()"]');
                     if(btn) btn.innerHTML = `<i class="ri-save-line"></i> Save Changes`;
                 });
             }).catch(err => {
                 showToast("Error updating: " + err.message, "error");
-                 // Restore button
                  const btn = document.querySelector('button[onclick="saveContentChanges()"]');
                  if(btn) btn.innerHTML = `<i class="ri-save-line"></i> Save Changes`;
             });
@@ -2235,7 +2234,6 @@ Thank you! 🚀`;
             document.getElementById('main').innerHTML = `
                 <h2 style="font-size:1.25rem; font-weight:700; margin-bottom:1.5rem;">System Configuration</h2>
                 
-                <!-- Maintenance -->
                 <div class="config-section">
                     <div class="config-header flex justify-between">
                         <span>Maintenance Mode</span>
@@ -2252,7 +2250,6 @@ Thank you! 🚀`;
                     </div>
                 </div>
 
-                <!-- Dynamic Pricing -->
                 <div class="config-section">
                     <div class="config-header">Dynamic Pricing Override</div>
                     <p class="text-muted text-sm mb-4">Base prices for different modules (Syncs with Main Site).</p>
@@ -2281,7 +2278,6 @@ Thank you! 🚀`;
                     </div>
                 </div>
 
-                <!-- Payment Gateways -->
                 <div class="config-section">
                     <div class="config-header flex justify-between">
                         <span>Payment Gateways</span>
