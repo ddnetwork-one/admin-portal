@@ -496,7 +496,7 @@
         .modal-body { padding: 1.5rem; overflow-y: auto; }
         .modal-footer { padding: 1.2rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; border-radius: 0 0 16px 16px; background: rgba(0,0,0,0.2); flex-shrink: 0; }
 
-        /* --- UPDATED INVOICE MODAL STYLES --- */
+        /* --- INVOICE MODAL STYLES (UPDATED FOR PRINTING) --- */
         #invoiceModalOverlay {
             z-index: 3000;
             background: rgba(0, 0, 0, 0.8); 
@@ -542,7 +542,7 @@
         .inv-box h3 { font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 4px; }
         .inv-box p { color: #334155; font-size: 13px; margin-bottom: 2px; }
 
-        /* --- UPDATED NEAT TABLE STYLES --- */
+        /* --- NEAT TABLE STYLES --- */
         .inv-table { 
             width: 100%; 
             border-collapse: collapse; 
@@ -599,21 +599,58 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
 
-        /* --- PRINT STYLES --- */
+        /* --- FIX FOR DOWNLOAD PDF (CAN'T SEE ANYTHING) --- */
         @media print {
-            body * { visibility: hidden; }
-            #invoiceModalOverlay, .modal-overlay { position: static; background: white; display: block; }
-            .invoice-paper, .invoice-paper * { visibility: visible; }
-            .invoice-paper {
-                position: absolute;
-                left: 0; top: 0;
-                width: 100%;
-                margin: 0; padding: 0;
-                box-shadow: none; border: none;
-            }
-            .invoice-controls, .btn-icon, aside, header, .toast-container, .sidebar-overlay {
+            /* 1. Hide the entire app interface */
+            body > *:not(#invoiceModalOverlay), 
+            #dashboard, 
+            header, 
+            aside, 
+            .toast-container, 
+            .modal-overlay:not(#invoiceModalOverlay) {
                 display: none !important;
             }
+
+            /* 2. Fix Body & Overlay for Print */
+            body {
+                background: white !important;
+                height: auto;
+                overflow: visible;
+            }
+
+            #invoiceModalOverlay {
+                position: static; /* Take out of fixed context for printing */
+                background: white !important; /* Remove dark overlay background */
+                height: auto;
+                width: 100%;
+                display: block !important;
+                z-index: 999999;
+            }
+
+            /* 3. Fix Invoice Paper */
+            .invoice-modal-wrapper {
+                display: block;
+                height: auto;
+            }
+
+            .invoice-paper {
+                position: relative;
+                left: 0;
+                top: 0;
+                margin: 0;
+                width: 100%;
+                box-shadow: none;
+                border: none;
+                padding: 0; /* Let @page handle margins */
+                color: black !important; /* Ensure text is black */
+            }
+
+            /* 4. Hide Controls in Print */
+            .invoice-controls {
+                display: none !important;
+            }
+
+            /* 5. Page Settings */
             @page {
                 size: A4;
                 margin: 15mm;
@@ -860,18 +897,15 @@
         </div>
     </div>
 
-    <!-- INVOICE MODAL (Updated Controls & Table) -->
+    <!-- INVOICE MODAL (Download Only) -->
     <div class="modal-overlay" id="invoiceModalOverlay">
         <div class="invoice-modal-wrapper">
-            <!-- Separate Controls -->
+            <!-- Only Download Button -->
             <div class="invoice-controls">
                 <button class="btn btn-primary" onclick="window.print()">
                     <i class="ri-file-download-line"></i> Download PDF
                 </button>
-                <button class="btn btn-secondary" onclick="window.print()">
-                    <i class="ri-printer-line"></i> Print
-                </button>
-                <button class="btn btn-danger-solid" onclick="closeInvoiceModal()" style="border-radius: 50%; width: 36px; height: 36px; padding: 0; margin-left: 10px;">
+                <button class="btn btn-danger-solid" onclick="closeInvoiceModal()" style="border-radius: 50%; width: 36px; height: 36px; padding: 0;">
                     <i class="ri-close-line" style="font-size: 1.1rem;"></i>
                 </button>
             </div>
@@ -1380,7 +1414,6 @@
                 const orderRef = orderId.substring(0,8).toUpperCase();
                 const total = parseFloat(d.total.replace('RM ', '')).toFixed(2);
 
-                // Invoice Template
                 const invoiceHTML = `
                     <div class="inv-header">
                         <div class="inv-logo-area">
@@ -1519,7 +1552,7 @@ Please proceed with payment at your earliest convenience to avoid service delays
 
 💳 *Payment Link:* ${payLink}
 
-If you have already made the payment, please ignore this message. Feel free to reply if you have any questions!
+If you have already made payment, please ignore this message. Feel free to reply if you have any questions!
 
 Thank you! 🚀`;
                 
