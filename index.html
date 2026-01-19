@@ -498,7 +498,7 @@
         .modal-body { padding: 1.5rem; overflow-y: auto; }
         .modal-footer { padding: 1.2rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; border-radius: 0 0 16px 16px; background: rgba(0,0,0,0.2); }
 
-        /* --- IMPROVED INVOICE STYLES (A4 OPTIMIZED) --- */
+        /* --- IMPROVED INVOICE STYLES (A4 OPTIMIZED, FIXED LAYOUT) --- */
         #invoiceModalOverlay {
             z-index: 2000;
             background: rgba(0,0,0,0.9);
@@ -507,19 +507,16 @@
         /* The container for white invoice paper */
         #invoice-paper {
             background: #ffffff; /* Pure White */
-            color: #000000; /* Pure Black for clarity */
-            padding: 60px; /* More padding for clarity */
-            border-radius: 0; /* No radius for print */
+            color: #000000; /* Pure Black */
+            padding: 40px; /* Padding for screen view */
+            border-radius: 4px; /* Only for screen */
             box-shadow: 0 0 20px rgba(0,0,0,0.2);
             font-family: 'Inter', 'Helvetica', 'Arial', sans-serif;
             width: 100%;
-            max-width: 210mm; /* Exact A4 width */
-            min-height: 297mm; /* Exact A4 height */
-            margin: 0 auto;
-            box-sizing: border-box;
+            /* Removed hard max-width for html2pdf compatibility */
         }
 
-        .inv-header { display: flex; justify-content: space-between; margin-bottom: 40px; border-bottom: 4px solid #000; padding-bottom: 20px; }
+        .inv-header { display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 4px solid #000; padding-bottom: 20px; }
         .inv-title { font-size: 2.5rem; font-weight: 800; color: #000; margin: 0; letter-spacing: -2px; text-transform: uppercase; }
         .inv-meta { text-align: right; font-size: 0.9rem; color: #333; line-height: 1.6; }
         .inv-meta strong { display: block; font-size: 1.1rem; color: #000; margin-bottom: 5px; }
@@ -529,14 +526,49 @@
         .inv-box p { margin: 0 0 8px 0; color: #111; font-size: 0.95rem; font-weight: 500; }
         .inv-box small { color: #555; font-weight: 400; }
 
-        .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .inv-table th { background: #f0f0f0; color: #000; border: 1px solid #000; border-bottom: 2px solid #000; font-weight: 700; font-size: 0.85rem; text-align: left; padding: 12px; }
-        .inv-table td { padding: 14px 12px; border: 1px solid #ccc; color: #000; vertical-align: top; font-size: 0.9rem; }
+        /* Fixed Layout Table to prevent Overlap */
+        .inv-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-bottom: 20px; 
+            table-layout: fixed; /* Critical for alignment */
+        }
+        .inv-table th { 
+            background: #f0f0f0; 
+            color: #000; 
+            border: 1px solid #000; 
+            border-bottom: 2px solid #000; 
+            font-weight: 700; 
+            font-size: 0.85rem; 
+            text-align: left; 
+            padding: 12px; 
+            /* Explicit Widths for Overlap Fix */
+            width: 55%; 
+        }
+        /* Specific widths for columns */
+        .inv-table th:nth-child(2) { width: 25%; }
+        .inv-table th:nth-child(3) { width: 20%; text-align: right; }
+        
+        .inv-table td { 
+            padding: 12px; 
+            border: 1px solid #ccc; 
+            color: #000; 
+            vertical-align: top; 
+            font-size: 0.9rem;
+            word-break: break-word; /* Prevent overlap */
+        }
         .inv-table tr:last-child td { border-bottom: 2px solid #000; }
-        .inv-total-row td { padding: 15px 12px; background: #fafafa; border: 1px solid #ccc; }
+        
+        .inv-total-row { 
+            padding: 15px 12px; 
+            background: #fafafa; 
+            border: 1px solid #ccc;
+            /* Ensure total row doesn't split */
+            page-break-inside: avoid;
+        }
         .inv-final-total { font-size: 1.8rem; font-weight: 900; color: #000; }
 
-        .inv-footer { margin-top: 60px; padding-top: 20px; border-top: 2px solid #eee; text-align: center; color: #666; font-size: 0.8rem; }
+        .inv-footer { margin-top: 60px; padding-top: 20px; border-top: 2px solid #eee; text-align: center; color: #666; font-size: 0.8rem; page-break-inside: avoid; }
         .inv-footer p { margin-bottom: 8px; }
 
         /* TOAST */
@@ -679,7 +711,7 @@
                 box-shadow: none;
                 border-radius: 0;
                 margin: 0;
-                padding: 50px; /* Ensure padding in print */
+                padding: 20px; /* Reduced print padding to fit better */
                 color: black;
                 background: white;
                 position: absolute;
@@ -826,7 +858,7 @@
 
     <!-- INVOICE MODAL (Specific) -->
     <div class="modal-overlay" id="invoiceModalOverlay">
-        <div class="modal" style="max-width: 850px; background: transparent; box-shadow: none;">
+        <div class="modal" style="max-width: 900px; background: transparent; box-shadow: none;">
             <!-- Close Button (Absolute positioned for clear access) -->
             <button onclick="closeInvoiceModal()" style="position: absolute; top: -40px; right: 0; background: rgba(0,0,0,0.5); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; z-index: 10;">
                 <i class="ri-close-line"></i> Close Preview
@@ -964,7 +996,7 @@
                     if (!snap.empty) {
                         const lastId = snap.docs[0].data().ticketId; 
                         const parts = lastId.split('-');
-                        if (parts.length >1) {
+                        if (parts.length > 1) {
                             const lastNum = parseInt(parts[1], 10);
                             if (!isNaN(lastNum)) {
                                 nextNum = lastNum + 1;
@@ -1319,7 +1351,7 @@
             });
         }
 
-        // FEATURE: Better Invoice Generate with PDF Download (UPDATED A4)
+        // FEATURE: Better Invoice Generate with PDF Download (UPDATED A4, LAYOUT)
         function generateInvoice(id) {
             db.collection("orders").doc(id).get().then(doc => {
                 if(!doc.exists) return;
@@ -1362,8 +1394,8 @@
                     <table class="inv-table">
                         <thead>
                             <tr>
-                                <th style="width: 60%;">Description</th>
-                                <th style="width: 20%;">Notes</th>
+                                <th style="width: 55%;">Description</th>
+                                <th style="width: 25%;">Notes</th>
                                 <th style="width: 20%; text-align: right;">Amount</th>
                             </tr>
                         </thead>
@@ -1426,11 +1458,12 @@
             
             // Configuration for html2pdf (Optimized for A4)
             const opt = {
-                margin:       [15, 15, 15, 15], // Top, Left, Bottom, Right in mm (Standard A4 Margins)
+                margin:       [10, 10, 10, 10], // Top, Left, Bottom, Right in mm (Standard A4 Margins)
                 filename:     `Invoice_${customerName.replace(/\s+/g, '_')}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true, logging: false }, // Scale 2 for High Res
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:     { mode: 'avoid-all', before: '.inv-total-row' } // Prevent breaking table
             };
 
             showToast("Generating PDF...", "info");
