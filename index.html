@@ -862,6 +862,11 @@
     <script>
         // --- CONSTANTS & CONFIG ---
         
+        // WARNING: Brevo API Key. 
+        // NOTE: In a production environment, do not expose API keys in client-side code.
+        // Use this for internal tools only, or set up a backend proxy.
+        const BREVO_API_KEY = "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";
+
         // Updated Job Titles & Rates based on Prompt
         const JOB_TITLES = [
             "Founder & Managing Director", // Super Admin, 5%
@@ -1346,9 +1351,6 @@
                     if(d.status === 'Paid') statusColor = 'var(--primary)';
                     if(d.status === 'Cancelled') statusColor = 'var(--danger)';
                     
-                    // Crew can see Manage/PDF/WA. Admin can see Delete.
-                    // Internal Crew CAN Edit Orders based on Prompt ("Orders - All employees")
-                    
                     return `<tr>
                         <td style="white-space:nowrap;">${formatDateTime(d.timestamp)}</td>
                         <td><strong>${d.customerName}</strong></td>
@@ -1359,6 +1361,7 @@
                             <div style="display:flex; gap:5px; flex-wrap:wrap;">
                                 <button class="btn btn-sm btn-secondary" onclick="viewOrder('${doc.id}')">Manage</button>
                                 <button class="btn btn-sm btn-info" title="Generate Invoice" onclick="generateInvoice('${doc.id}')"><i class="ri-file-list-2-line"></i> PDF</button>
+                                <button class="btn btn-sm btn-info" title="Send Email" onclick="sendOrderEmail('${doc.id}')"><i class="ri-mail-send-line"></i> Email</button>
                                 <button class="btn btn-sm btn-success" title="Send WhatsApp Remainder" onclick="sendPaymentReminder('${doc.id}')"><i class="ri-whatsapp-line"></i> WA</button>
                                 ${isSuperAdmin() ? `<button class="btn btn-sm btn-danger" onclick="deleteOrder('${doc.id}')"><i class="ri-delete-bin-line"></i></button>` : ''}
                             </div>
@@ -1366,6 +1369,105 @@
                     </tr>`;
                 }).join('');
             });
+        }
+
+        // --- NEW: SEND EMAIL FUNCTION ---
+        async function sendOrderEmail(orderId) {
+            if(checkAccessAndDeny('orders')) return;
+
+            const btn = document.querySelector(`button[onclick="sendOrderEmail('${orderId}')"]`);
+            const originalIcon = btn.innerHTML;
+            btn.innerHTML = `<div class="loading-spinner" style="width:14px; height:14px; border-width:2px;"></div>`;
+            btn.disabled = true;
+
+            try {
+                const orderDoc = await db.collection("orders").doc(orderId).get();
+                if(!orderDoc.exists) {
+                    showToast("Order not found", "error");
+                    btn.innerHTML = originalIcon;
+                    btn.disabled = false;
+                    return;
+                }
+                const d = orderDoc.data();
+                const orderRef = orderId.substring(0,6).toUpperCase();
+
+                // Get Payment Link
+                let payLink = "https://ddnet.my"; 
+                try {
+                    const pmSnap = await db.collection("payment_methods").where("active", "==", true).limit(1).get();
+                    if(!pmSnap.empty) payLink = pmSnap.docs[0].data().link;
+                } catch(e) {}
+
+                // Construct HTML Email
+                const emailHtml = `
+                    <div style="font-family: 'Inter', sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
+                        <div style="background: #0f172a; padding: 20px; text-align: center;">
+                            <h1 style="color: white; margin: 0; font-size: 24px;">DDNetwork</h1>
+                            <p style="color: #94a3b8; margin: 5px 0 0;">Payment Reminder</p>
+                        </div>
+                        <div style="padding: 30px; background: #f8fafc; border: 1px solid #e2e8f0;">
+                            <p style="font-size: 16px;">Hi ${d.customerName},</p>
+                            <p style="color: #64748b; line-height: 1.6;">
+                                This is a friendly reminder regarding your order <strong>#${orderRef}</strong> with DDNetwork One.
+                                It looks like the payment is still pending.
+                            </p>
+                            <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
+                                    <span style="font-weight: 600; color: #64748b;">Order ID</span>
+                                    <span style="color: #0f172a; font-family: monospace;">#${orderRef}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                    <span style="font-weight: 600; color: #64748b;">Package</span>
+                                    <span style="color: #0f172a;">${d.package}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                    <span style="font-weight: 600; color: #64748b;">Amount Due</span>
+                                    <span style="color: #16a34a; font-weight: bold;">${d.total}</span>
+                                </div>
+                            </div>
+                            <div style="text-align: center; margin-top: 30px;">
+                                <a href="${payLink}" style="background: #3b82f6; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; display: inline-block;">Complete Payment</a>
+                            </div>
+                        </div>
+                        <div style="padding: 20px; text-align: center; font-size: 12px; color: #94a3b8;">
+                            <p>Need help? Just reply to this email.</p>
+                            <p>&copy; ${new Date().getFullYear()} DDNetwork One. All rights reserved.</p>
+                        </div>
+                    </div>
+                `;
+
+                // Brevo API Call
+                const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+                    method: "POST",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "api-key": BREVO_API_KEY
+                    },
+                    body: JSON.stringify({
+                        sender: { name: "DDNetwork Team", email: "sales@ddnet.my" },
+                        to: [{ email: d.customerEmail, name: d.customerName }],
+                        subject: `Payment Reminder: Order #${orderRef}`,
+                        htmlContent: emailHtml
+                    })
+                });
+
+                if(response.ok) {
+                    showToast("Email sent successfully via Brevo", "success");
+                    logActivity(`Sent email reminder for Order #${orderRef} to ${d.customerEmail}`);
+                } else {
+                    const errorData = await response.json();
+                    console.error("Brevo Error:", errorData);
+                    showToast("Failed to send email. Check Console.", "error");
+                }
+
+            } catch (err) {
+                console.error("Email Error:", err);
+                showToast("An error occurred while sending email.", "error");
+            } finally {
+                btn.innerHTML = originalIcon;
+                btn.disabled = false;
+            }
         }
 
         function downloadCurrentInvoice() {
@@ -1433,7 +1535,7 @@
                             <div class="inv-section-title">Pay To</div>
                             <div class="inv-box">
                                 <h3>DDNetwork One</h3>
-                                <p>Kuala Lumpur, Malaysia</p>
+                                <p>Kedah, Malaysia</p>
                                 <p><strong>Email:</strong> sales@ddnet.my</p>
                             </div>
                         </div>
@@ -1491,7 +1593,7 @@
         }
 
         async function sendPaymentReminder(id) {
-            if(checkAccessAndDeny('orders')) return; // Write check
+            if(checkAccessAndDeny('orders')) return;
 
             try {
                 const doc = await db.collection("orders").doc(id).get();
@@ -1536,7 +1638,7 @@ Thank you for choosing DDNetwork.
 
         async function viewOrder(id) {
             // Crew can view and edit order details? Prompt: "Orders - All employees". 
-            // Internal Crew has Write Access to Orders.
+            // Internal Crew CAN Edit Orders based on Prompt ("Orders - All employees")
             
             if(checkAccessAndDeny('orders')) return;
 
