@@ -226,7 +226,7 @@
         }
         .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
 
-        /* SIDEBAR (Updated with Collapse Logic) */
+        /* SIDEBAR */
         aside { 
             width: var(--sidebar-width); 
             background: var(--bg-sidebar); 
@@ -361,7 +361,7 @@
         }
         .nav-item i { font-size: 1.15rem; }
 
-        /* MAIN CONTENT (Transition for Sidebar) */
+        /* MAIN CONTENT */
         main { 
             flex: 1; 
             overflow-y: auto; 
@@ -419,7 +419,7 @@
         .activity-content p { font-size: 0.75rem; color: var(--text-muted); }
         .activity-time { margin-left: auto; font-size: 0.7rem; color: var(--text-faint); white-space: nowrap; }
 
-        /* TABLES (General Dashboard) */
+        /* TABLES */
         .table-container { 
             background: var(--bg-surface); 
             border-radius: 12px; 
@@ -455,6 +455,35 @@
         td { padding: 1rem 1.2rem; border-bottom: 1px solid var(--border); color: var(--text-main); font-size: 0.85rem; vertical-align: middle; transition: 0.1s; }
         tr:last-child td { border-bottom: none; }
         tr:hover td { background: rgba(255,255,255,0.02); }
+
+        /* --- ACCESS DENIED PAGE --- */
+        .access-denied-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--text-muted);
+            padding: 2rem;
+        }
+        .access-denied-icon {
+            font-size: 4rem;
+            color: var(--danger);
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+        .access-denied-title {
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        .access-denied-desc {
+            font-size: 1rem;
+            max-width: 400px;
+            line-height: 1.5;
+            margin-bottom: 2rem;
+        }
 
         /* --- MAIN MODAL --- */
         .modal-overlay { 
@@ -496,10 +525,10 @@
         .modal-body { padding: 1.5rem; overflow-y: auto; }
         .modal-footer { padding: 1.2rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; border-radius: 0 0 16px 16px; background: rgba(0,0,0,0.2); flex-shrink: 0; }
 
-        /* --- INVOICE MODAL STYLES (FIXED CENTERING & MOBILE FRIENDLY) --- */
+        /* --- INVOICE MODAL STYLES --- */
         #invoiceModalOverlay {
             z-index: 3000;
-            background: rgba(0, 0, 0, 0.95); /* Darker for contrast */
+            background: rgba(0, 0, 0, 0.95); 
             padding: 0;
         }
         
@@ -507,22 +536,22 @@
             width: 100%;
             height: 100%;
             display: grid;
-            place-items: center;
+            place-items: center; 
             justify-items: center;
-            overflow-y: auto;
-            padding: 20px;
+            overflow-y: auto; 
+            padding: 20px; 
         }
 
         .invoice-paper {
             background: white;
             color: #1f2937;
-            width: 210mm; /* A4 Width */
-            min-height: 297mm; /* A4 Height */
+            width: 210mm; 
+            min-height: 297mm; 
             padding: 15mm;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            transform: scale(0.92); /* Default Desktop Scale */
-            transform-origin: top center;
-            margin: 0;
+            transform: scale(0.92); 
+            transform-origin: top center; 
+            margin: 0; 
             font-family: 'Inter', sans-serif;
             font-size: 14px;
             line-height: 1.5;
@@ -544,7 +573,7 @@
         .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; border-radius: 4px; overflow: hidden; table-layout: fixed; }
         .inv-table th { text-align: left; padding: 14px 16px; background: #f8fafc; color: #475569; font-size: 12px; text-transform: uppercase; font-weight: 600; border-bottom: 2px solid #e2e8f0; letter-spacing: 0.5px; white-space: normal; vertical-align: middle; }
         .inv-table td { padding: 16px; border-bottom: 1px solid #f1f5f9; color: #334155; vertical-align: top; line-height: 1.6; white-space: normal; word-wrap: break-word; }
-
+        
         .inv-table th:nth-child(1), .inv-table td:nth-child(1) { width: 55%; text-align: left; }
         .inv-table th:nth-child(2), .inv-table td:nth-child(2) { width: 15%; text-align: center; }
         .inv-table th:nth-child(3), .inv-table td:nth-child(3) { width: 30%; text-align: right; }
@@ -565,36 +594,39 @@
         .inv-footer { text-align: center; color: #94a3b8; font-size: 12px; margin-top: auto; padding-top: 20px; border-top: 1px dashed #e2e8f0; }
 
         .invoice-controls {
-            position: fixed; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 3001;
-            background: rgba(15, 23, 42, 0.9); padding: 8px; border-radius: 12px;
-            backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            position: fixed; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 3001; background: rgba(15, 23, 42, 0.9); padding: 8px; border-radius: 12px; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
-        /* Access Denied Page */
-        .access-denied-container {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            height: 60vh; text-align: center;
-        }
-        .access-denied-icon { font-size: 4rem; color: var(--danger); margin-bottom: 1rem; }
-        .access-denied-title { font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem; }
-        .access-denied-desc { color: var(--text-muted); max-width: 400px; margin: 0 auto 2rem; line-height: 1.5; }
-
-        /* RESPONSIVE */
+        /* RESPONSIVENESS */
         @media(max-width: 1024px) {
             aside { transform: translateX(-100%); width: 280px; box-shadow: 20px 0 40px rgba(0,0,0,0.5); }
             aside.mobile-open { transform: translateX(0); }
             main { margin-left: 0 !important; width: 100% !important; padding: 1.5rem; padding-top: 5rem; }
             .stats-grid { grid-template-columns:1fr; }
+            .price-grid { grid-template-columns:1fr; }
+            .header-brand span { display: none; }
+            .notif-dropdown { right: 0; width: 90vw; }
+            
             .invoice-paper { transform: scale(0.75); }
             .inv-grid { grid-template-columns: 1fr; gap: 20px; }
+            .inv-bank-grid { grid-template-columns: 1fr; }
+            .inv-table th, .inv-table td { padding: 10px; font-size: 12px; }
+            
+            .inv-table th:nth-child(1), .inv-table td:nth-child(1) { width: 50%; }
+            .inv-table th:nth-child(2), .inv-table td:nth-child(2) { width: 20%; }
+            .inv-table th:nth-child(3), .inv-table td:nth-child(3) { width: 30%; }
+        }
+        
+        @media(min-width: 1025px) and (max-width: 1440px) {
+            .invoice-paper { transform: scale(0.85); }
         }
 
         @media print {
+            body { background-color: white !important; color: black !important; height: auto; width: 100%; overflow: visible; display: block; }
             body > *:not(#invoiceModalOverlay) { display: none !important; }
-            #invoiceModalOverlay { position: static !important; background: white !important; height: auto; width: 100%; z-index: 999999; display: block !important; padding: 0 !important; }
+            #invoiceModalOverlay { position: static !important; background-color: white !important; height: auto; width: 100%; z-index: 999999; overflow: visible; display: block !important; padding: 0 !important; }
             .invoice-modal-wrapper { display: block; height: auto; overflow: visible; }
-            .invoice-paper { position: static; margin: 0 auto; padding: 0; width: 100%; box-shadow: none; border: none; color: black !important; background: white !important; transform: none !important; transform-origin: initial !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+            .invoice-paper { position: static; margin: 0 auto; padding: 0; width: 100%; box-shadow: none; border: none; color: black !important; background: white !important; transform: none !important; transform-origin: initial !important; margin-bottom: 0 !important; min-height: auto !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
             .invoice-controls { display: none !important; }
             @page { size: A4; margin: 0; }
         }
@@ -602,9 +634,17 @@
         /* TOAST */
         .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: var(--z-toast); display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast { 
-            background: var(--bg-surface); color: white; padding:1rem 1.25rem; border-radius: 10px; border: 1px solid var(--border); 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6); display: flex; align-items: center; gap: 12px; 
-            transform: translateX(120%); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            background: var(--bg-surface); 
+            color: white; 
+            padding:1rem 1.25rem; 
+            border-radius: 10px; 
+            border: 1px solid var(--border); 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6); 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            transform: translateX(120%); 
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             min-width: 300px; pointer-events: auto;
         }
         .toast.show { transform: translateX(0); }
@@ -613,19 +653,20 @@
 
         /* Badges */
         .badge { padding: 3px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; display: inline-block; letter-spacing: 0.3px; }
-        .badge-super-admin { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
-        .badge-admin { background: rgba(59, 130, 246, 0.15); color: var(--primary); border: 1px solid rgba(59, 130, 246, 0.2); }
-        .badge-crew { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
+        .badge-admin { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
+        .badge-crew { background: rgba(59, 130, 246, 0.15); color: var(--primary); border: 1px solid rgba(59, 130, 246, 0.2); }
+        .badge-user { background: rgba(255,255,255,0.1); color: white; }
+        .badge-voucher { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
         
+        /* Request Badges */
         .badge-content { background: rgba(14, 165, 233, 0.15); color: var(--info); border: 1px solid rgba(14, 165, 233, 0.2); }
         .badge-upgrade { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
         .badge-renew { background: rgba(139, 92, 246, 0.15); color: var(--ticket); border: 1px solid rgba(139, 92, 246, 0.2); }
         .badge-remove { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
 
-        /* CONFIG */
+        /* CONFIG TAB SPECIFICS */
         .config-section { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
         .config-header { font-size: 0.95rem; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); color: var(--text-main); display: flex; justify-content: space-between; align-items: center; }
-        
         .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .toggle-switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--bg-input); transition: .4s; border-radius: 34px; border: 1px solid var(--border); }
@@ -636,15 +677,10 @@
         .price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
         .gateway-card { background: var(--bg-input); padding: 1rem; border-radius: 8px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 0.5rem; }
 
+        /* Loading State */
         .loading-spinner { border: 3px solid rgba(255,255,255,0.1); border-left-color: var(--primary); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 0 auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .page-loader { display: flex; justify-content: center; align-items: center; height: 300px; width: 100%; }
-
-        /* Multi-select chips */
-        .chip-container { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; }
-        .chip { background: var(--primary); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; display: flex; align-items: center; gap: 6px; }
-        .chip i { cursor: pointer; }
-        .chip:hover { background: var(--primary-hover); }
     </style>
 </head>
 <body>
@@ -678,8 +714,8 @@
             <div class="header-actions">
                 <button class="btn-icon spin" onclick="location.reload()" title="Force Refresh"><i class="ri-refresh-line"></i></button>
                 
-                <!-- Notifications (Admin Only) -->
-                <button class="btn-icon" id="notif-btn" onclick="toggleNotifications()" style="display:none;">
+                <!-- Notifications -->
+                <button class="btn-icon" id="notif-btn" onclick="toggleNotifications()">
                     <i class="ri-notification-3-line" style="font-size: 1.3rem;"></i>
                     <span class="notification-dot" id="notifDot"></span>
                     <div class="notif-dropdown" id="notifDropdown">
@@ -704,49 +740,57 @@
             </div>
             
             <div class="nav-scroll">
+                <!-- OVERVIEW (Visible to All) -->
                 <div class="nav-item active" onclick="navigateTo('/')">
                     <i class="ri-dashboard-line"></i> <span class="nav-text">Overview</span>
                 </div>
                 
-                <div class="nav-section-title"><span class="nav-text">Operations</span></div>
-                <div class="nav-item" id="nav-orders" onclick="navigateTo('/orders')">
+                <!-- OPERATIONS (Super Admin & Admin Only) -->
+                <div class="nav-section-title nav-group-admin nav-group-super"><span class="nav-text">Operations</span></div>
+                <div class="nav-item nav-group-admin nav-group-super" onclick="navigateTo('/orders')">
                     <i class="ri-shopping-bag-3-line"></i> <span class="nav-text">Orders</span>
                 </div>
-                <div class="nav-item" id="nav-clients" onclick="navigateTo('/clients')">
+                <div class="nav-item nav-group-admin nav-group-super" onclick="navigateTo('/clients')">
                     <i class="ri-user-line"></i> <span class="nav-text">Clients</span>
                 </div>
-                <div class="nav-item" id="nav-requests" onclick="navigateTo('/requests')">
+                <div class="nav-item nav-group-admin nav-group-super" onclick="navigateTo('/requests')">
                     <i class="ri-database-2-line"></i> <span class="nav-text">Customer Requests</span>
                 </div>
-                <div class="nav-item" id="nav-crew" onclick="navigateTo('/crew')">
-                    <i class="ri-team-line"></i> <span class="nav-text">Internal Crew</span>
-                </div>
-                <div class="nav-item" id="nav-support" onclick="navigateTo('/support')">
+                <div class="nav-item nav-group-admin nav-group-super" onclick="navigateTo('/support')">
                     <i class="ri-customer-service-2-line"></i> <span class="nav-text">Support Tickets</span>
                 </div>
-                <div class="nav-item" id="nav-vouchers" onclick="navigateTo('/vouchers')">
+                <div class="nav-item nav-group-admin nav-group-super" onclick="navigateTo('/vouchers')">
                     <i class="ri-ticket-2-line"></i> <span class="nav-text">Vouchers</span>
                 </div>
                 
-                <div class="nav-section-title"><span class="nav-text">Finance</span></div>
-                <div class="nav-item" id="nav-commissions" onclick="navigateTo('/commissions')">
-                    <i class="ri-money-dollar-circle-line"></i> <span class="nav-text">Commissions</span>
-                </div>
-
-                <div class="nav-section-title"><span class="nav-text">Management</span></div>
-                <div class="nav-item" id="nav-portfolio" onclick="navigateTo('/portfolio')">
+                <!-- MANAGEMENT (Super Admin & Admin Only) -->
+                <div class="nav-section-title nav-group-admin nav-group-super"><span class="nav-text">Management</span></div>
+                <div class="nav-item nav-group-admin nav-group-super" onclick="navigateTo('/portfolio')">
                     <i class="ri-gallery-line"></i> <span class="nav-text">Portfolio</span>
                 </div>
-                <div class="nav-item" id="nav-content" onclick="navigateTo('/content')">
+                <div class="nav-item nav-group-admin nav-group-super" onclick="navigateTo('/content')">
                     <i class="ri-layout-masonry-line"></i> <span class="nav-text">Content & Pkg</span>
                 </div>
-                <div class="nav-item" id="nav-public-promos" onclick="navigateTo('/public-promos')">
+                <div class="nav-item nav-group-admin nav-group-super" onclick="navigateTo('/public-promos')">
                     <i class="ri-coupon-3-line"></i> <span class="nav-text">Public Promos</span>
                 </div>
-                <div class="nav-item" id="nav-config" onclick="navigateTo('/config')">
+                
+                <!-- SUPER ADMIN ONLY SECTIONS -->
+                <div class="nav-section-title nav-group-super"><span class="nav-text">System</span></div>
+                <div class="nav-item nav-group-super" onclick="navigateTo('/crew')">
+                    <i class="ri-team-line"></i> <span class="nav-text">Internal Crew</span>
+                </div>
+                <div class="nav-item nav-group-super" onclick="navigateTo('/config')">
                     <i class="ri-settings-4-line"></i> <span class="nav-text">System Config</span>
                 </div>
                 
+                <!-- FINANCE (Visible to All Crew) -->
+                <div class="nav-section-title"><span class="nav-text">Finance</span></div>
+                <div class="nav-item" onclick="navigateTo('/commissions')">
+                    <i class="ri-money-dollar-circle-line"></i> <span class="nav-text">Commissions</span>
+                </div>
+                
+                <!-- PERSONAL (Visible to All) -->
                 <div class="nav-section-title"><span class="nav-text">Personal</span></div>
                 <div class="nav-item" onclick="navigateTo('/my-profile')">
                     <i class="ri-user-settings-line"></i> <span class="nav-text">My Profile</span>
@@ -794,57 +838,34 @@
 
     <!-- JAVASCRIPT -->
     <script>
-        // --- 1. CONSTANTS & CONFIGURATION ---
+        // --- CONSTANTS & CONFIG ---
         
+        // Updated Job Titles and Mapping
         const JOB_TITLES = [
-            // SUPER ADMIN
+            // Super Admin
             "Founder & Managing Director",
-            
-            // ADMIN
+            // Admin Group
             "Project & Client Manager",
             "Account / Operations / Marketing Manager",
-            
-            // CREW - Sales
+            // Sales & Growth (Internal Crew)
             "Business Development Executive",
             "Sales Executive",
-            
-            // CREW - CS
+            // Customer Success (Internal Crew)
             "Client Success Coordinator",
             "Client Experience Executive",
-            
-            // CREW - Technical
+            // Technical (Internal Crew)
             "Technical Specialist",
             "Web Developer",
             "Full Stack Developer",
             "Automation & AI Specialist",
-            
-            // CREW - Support
+            // Support (Internal Crew)
             "Support Operations Executive"
         ];
 
-        // Role Mapping based on Job Title
-        const ROLE_MAPPING = {
-            "Founder & Managing Director": "super-admin",
-            
-            "Project & Client Manager": "admin",
-            "Account / Operations / Marketing Manager": "admin",
-            
-            "Business Development Executive": "crew",
-            "Sales Executive": "crew",
-            "Client Success Coordinator": "crew",
-            "Client Experience Executive": "crew",
-            "Technical Specialist": "crew",
-            "Web Developer": "crew",
-            "Full Stack Developer": "crew",
-            "Automation & AI Specialist": "crew",
-            "Support Operations Executive": "crew"
-        };
-
-        // Default Commission Rates (Decimal format 0.05 = 5%)
         const DEFAULT_COMMISSION_RATES = {
             "Founder & Managing Director": 0.05,
             
-            // Admin: 3-5%
+            // Management: 3-5% (Used midpoint for default)
             "Project & Client Manager": 0.04,
             "Account / Operations / Marketing Manager": 0.04,
             
@@ -862,19 +883,15 @@
             "Full Stack Developer": 0.05,
             "Automation & AI Specialist": 0.05,
 
-            // Support: 0% (usually base salary, but can be modified)
-            "Support Operations Executive": 0.0
+            // Support: 2-3%
+            "Support Operations Executive": 0.025
         };
 
         function getDefaultRate(title) {
             return DEFAULT_COMMISSION_RATES[title] || 0.0;
         }
 
-        function getRoleGroup(jobTitle) {
-            return ROLE_MAPPING[jobTitle] || "crew";
-        }
-
-        // --- 2. FIREBASE SETUP ---
+        // --- FIREBASE SETUP ---
         const firebaseConfig = {
             apiKey: "AIzaSyAwf31b-wpYQwPbd-3DxnqGVRw8g3xq938",
             authDomain: "ddnetwork-database.firebaseapp.com",
@@ -884,16 +901,14 @@
             appId: "1:699127560990:web:50cfd61ff620bc85fb670f"
         };
         let db, auth, currentUser, userData = null;
-        let userRoleGroup = "crew"; // 'super-admin', 'admin', 'crew'
         let currentOrderDataForPrint = null;
         
         try { firebase.initializeApp(firebaseConfig); db = firebase.firestore(); auth = firebase.auth(); } catch(e) { console.log("Firebase init error", e); }
 
-        // --- 3. INITIALIZATION ---
+        // --- AUTO CREATE CONFIG ---
         async function initializeDatabase() {
             const configRef = db.collection("config").doc("site_settings");
             const doc = await configRef.get();
-            
             if (!doc.exists) {
                 console.log("Config not found, creating default...");
                 await configRef.set({
@@ -909,7 +924,6 @@
                 });
                 showToast("Database initialized!", "success");
             }
-
             const pmSnapshot = await db.collection("payment_methods").limit(1).get();
             if (pmSnapshot.empty) {
                 const defaults = [
@@ -968,8 +982,7 @@
                      }
                      return String(nextId).padStart(3, '0');
                  } catch(e) { return "001"; }
-            } 
-            else if (type === 'ticket') {
+            } else if (type === 'ticket') {
                 try {
                     const snap = await db.collection("tickets").orderBy("ticketId", "desc").limit(1).get();
                     let nextNum = 1;
@@ -983,12 +996,15 @@
                     }
                     const paddedNum = String(nextNum).padStart(4, '0');
                     return `#Ticket-${paddedNum}`;
-                } catch (e) { return "#Ticket-0001"; }
+                } catch (e) {
+                    console.error("Error generating ticket ID", e);
+                    return "#Ticket-0001";
+                }
             }
             return null;
         }
 
-        // --- 4. AUTHENTICATION ---
+        // --- AUTH ---
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const input = document.getElementById('loginInput').value.trim();
@@ -1003,114 +1019,95 @@
             auth.signInWithEmailAndPassword(emailToUse, pass).catch(err => showToast(err.message, "error"));
         });
 
-        // Main Auth State Listener - Handles Reload/Login logic
-        auth.onAuthStateChanged(async (user) => {
+        // AUTH STATE LISTENER (Prevents Login Screen on Refresh)
+        auth.onAuthStateChanged((user) => {
             if(user) {
-                // User is logged in (Session persisted or just logged in)
-                try {
-                    const doc = await db.collection("users").doc(user.uid).get();
+                db.collection("users").doc(user.uid).get().then(doc => {
                     if(doc.exists) {
-                        const data = doc.data();
-                        
-                        // Check if user has a valid role defined
-                        if(data.role === 'user') {
-                            // Standard website users shouldn't access admin panel usually, 
-                            // but per requirements, we allow 'crew' and 'admin'. 
-                            // If 'user' role tries to login, deny.
-                            auth.signOut();
-                            return showToast("Access Denied. Staff access only.", "error");
-                        }
-
                         currentUser = user;
-                        userData = data;
+                        userData = doc.data();
                         
-                        // Determine Role Group based on Job Title mapping
-                        // If 'role' field in DB is missing, calculate it. Otherwise use it.
-                        userRoleGroup = getRoleGroup(data.jobTitle);
-
-                        // Hide Auth Screen
+                        // UI Update
                         document.getElementById('auth-screen').classList.add('hidden');
                         document.getElementById('dashboard').classList.remove('hidden');
                         
-                        // Populate Sidebar Profile
                         document.getElementById('side-name').innerText = userData.name || 'User';
                         document.getElementById('side-job').innerText = userData.jobTitle || userData.role;
                         document.getElementById('side-avatar').innerText = (userData.name || 'A').charAt(0).toUpperCase();
                         document.getElementById('header-avatar').innerText = (userData.name || 'A').charAt(0).toUpperCase();
 
-                        // Manage Sidebar Visibility based on Role
-                        manageSidebarVisibility();
+                        // --- ACCESS CONTROL LOGIC ---
+                        const role = userData.role || 'crew';
+                        
+                        // Hide all restricted groups first
+                        document.querySelectorAll('.nav-group-super, .nav-group-admin').forEach(el => el.classList.add('hidden'));
 
-                        // Start Listeners
-                        initRouter();
-                        initializeDatabase(); 
-
-                        if(userRoleGroup === 'super-admin') {
+                        if (role === 'super_admin') {
+                            // Show everything
+                            document.querySelectorAll('.nav-group-super, .nav-group-admin').forEach(el => el.classList.remove('hidden'));
+                            document.getElementById('notif-btn').style.display = 'flex'; 
                             listenForNotifications(); 
+                        } else if (role === 'admin') {
+                            // Show Admin groups, hide Super Admin groups
+                            document.querySelectorAll('.nav-group-admin').forEach(el => el.classList.remove('hidden'));
+                            document.getElementById('notif-btn').style.display = 'flex'; 
+                            listenForNotifications();
+                        } else {
+                            // Internal Crew: Only see Overview, Commissions, My Profile
+                            // (Restricted sections already hidden by CSS class logic)
+                            document.getElementById('notif-btn').style.display = 'none';
                         }
 
+                        initRouter();
+                        initializeDatabase(); 
                     } else {
-                        // Auth user exists but no Firestore record (Shouldn't happen often, but handle it)
-                        // Might be a newly created user not yet synced
-                        showToast("Profile data loading...", "info");
-                        // We don't sign out here immediately, wait for potential retry or handle create
+                        showToast("Access Denied. User record not found.", "error");
+                        auth.signOut();
                     }
-                } catch (error) {
-                    console.error(error);
-                    showToast("Error loading user data", "error");
-                    // auth.signOut();
-                }
+                });
             } else {
-                // No user logged in
-                document.getElementById('auth-screen').classList.remove('hidden');
+                // No User
                 document.getElementById('dashboard').classList.add('hidden');
+                document.getElementById('auth-screen').classList.remove('hidden');
             }
         });
 
         function handleLogout() { auth.signOut().then(() => location.reload()); }
 
-        // --- 5. SIDEBAR & PERMISSIONS ---
-        function manageSidebarVisibility() {
-            // Helper to hide/show
-            const setVis = (id, visible) => {
-                const el = document.getElementById(id);
-                if(el) el.style.display = visible ? 'flex' : 'none';
-            };
-
-            // Default: Commissions visible to all
-            setVis('nav-commissions', true);
-            setVis('nav-config', false);
-            setVis('nav-public-promos', false);
-            setVis('nav-vouchers', false);
-            setVis('nav-crew', false);
-
-            // Notifications
-            const notifBtn = document.getElementById('notif-btn');
-            if(notifBtn) notifBtn.style.display = 'none';
-
-            if (userRoleGroup === 'super-admin') {
-                // Full Access
-                setVis('nav-config', true);
-                setVis('nav-public-promos', true);
-                setVis('nav-vouchers', true);
-                setVis('nav-crew', true);
-                if(notifBtn) notifBtn.style.display = 'flex';
-
-            } else if (userRoleGroup === 'admin') {
-                // Admin Access (Limited)
-                setVis('nav-vouchers', true); // Optional per prompt
-                // Config & Public Promos hidden
-                // Internal Crew visible but limited later
-                setVis('nav-crew', true); 
-
-            } else if (userRoleGroup === 'crew') {
-                // Crew Access (Limited)
-                // Config, Public Promos, Vouchers hidden
-                // Crew Management hidden
+        // --- NOTIFICATIONS ---
+        function toggleNotifications() {
+            const el = document.getElementById('notifDropdown');
+            el.classList.toggle('show');
+        }
+        document.addEventListener('click', (e) => {
+            const dd = document.getElementById('notifDropdown');
+            const btn = document.getElementById('notif-btn');
+            if (!dd.contains(e.target) && !btn.contains(e.target)) {
+                dd.classList.remove('show');
             }
+        });
+
+        function listenForNotifications() {
+            db.collection("activity_logs").orderBy("timestamp", "desc").limit(10).onSnapshot(snap => {
+                const container = document.getElementById('notifDropdown');
+                if(snap.empty) {
+                    container.innerHTML = '<div class="p-4 text-center" style="color:var(--text-muted)">No recent activity</div>';
+                    document.getElementById('notifDot').style.display = 'none';
+                    return;
+                }
+                document.getElementById('notifDot').style.display = 'block';
+                container.innerHTML = snap.docs.map(doc => {
+                    const d = doc.data();
+                    return `<div class="notif-item">
+                        <strong>${d.actorName || d.actor}</strong>
+                        <div>${d.message}</div>
+                        <span class="notif-time">${formatDateTime(d.timestamp)}</span>
+                    </div>`;
+                }).join('');
+            });
         }
 
-        // --- 6. ROUTER & ACCESS CONTROL ---
+        // --- ROUTING SYSTEM ---
         const routes = {
             '/': renderOverview,
             '/orders': renderOrders,
@@ -1128,12 +1125,25 @@
         };
 
         function navigateTo(path) {
-            // Check Access Before Routing
-            if (!checkPageAccess(path)) {
-                window.history.pushState({ path: path }, "", path); // Update URL anyway to reflect attempt
-                loadRoute(path); // Will trigger Access Denied inside render function
-                return;
+            // Permission Check before Navigation
+            const role = userData.role;
+            
+            // Super Admin: ALL ACCESS
+            // Admin: NO 'crew', NO 'config'
+            // Crew: ONLY '/', 'commissions', 'my-profile'
+            
+            if (role === 'crew') {
+                if (!['/', '/commissions', '/my-profile'].includes(path)) {
+                    renderAccessDenied();
+                    return;
+                }
+            } else if (role === 'admin') {
+                if (['/crew', '/config'].includes(path)) {
+                    renderAccessDenied();
+                    return;
+                }
             }
+
             window.history.pushState({ path: path }, "", path);
             loadRoute(path);
         }
@@ -1157,49 +1167,19 @@
         function initRouter() {
             const path = window.location.pathname;
             const basePath = path.replace(/\/[^/]+\.html$/, '') || '/';
-            if (routes[basePath]) loadRoute(basePath);
-            else navigateTo('/');
+            if (routes[basePath]) {
+                loadRoute(basePath);
+            } else {
+                navigateTo('/');
+            }
         }
 
         window.onpopstate = (event) => {
-            if (event.state && event.state.path) loadRoute(event.state.path);
+            if (event.state && event.state.path) {
+                loadRoute(event.state.path);
+            }
         };
 
-        function checkPageAccess(path) {
-            // Super Admin has access to everything
-            if (userRoleGroup === 'super-admin') return true;
-
-            // Admin restrictions
-            if (userRoleGroup === 'admin') {
-                const forbidden = ['/config', '/public-promos'];
-                if (forbidden.includes(path)) return false;
-            }
-
-            // Crew restrictions
-            if (userRoleGroup === 'crew') {
-                const forbidden = ['/config', '/public-promos', '/vouchers', '/crew', '/portfolio', '/content'];
-                if (forbidden.includes(path)) return false;
-            }
-
-            return true;
-        }
-
-        function renderAccessDenied() {
-            const main = document.getElementById('main');
-            main.innerHTML = `
-                <div class="access-denied-container">
-                    <i class="ri-lock-2-line access-denied-icon"></i>
-                    <div class="access-denied-title">Access Denied</div>
-                    <div class="access-denied-desc">
-                        You do not have permission to view this section. <br>
-                        Please contact IT or Danial Danish if you believe this is an error.
-                    </div>
-                    <button class="btn btn-primary" onclick="navigateTo('/my-profile')">Back to Profile</button>
-                </div>
-            `;
-        }
-
-        // --- UI UTILS ---
         function toggleSidebar() { 
             const sb = document.getElementById('sidebar');
             const ov = document.getElementById('sidebarOverlay');
@@ -1211,36 +1191,10 @@
             }
         }
 
-        function toggleNotifications() {
-            document.getElementById('notifDropdown').classList.toggle('show');
-        }
-        document.addEventListener('click', (e) => {
-            const dd = document.getElementById('notifDropdown');
-            const btn = document.getElementById('notif-btn');
-            if (!dd.contains(e.target) && !btn.contains(e.target)) dd.classList.remove('show');
-        });
-
-        function listenForNotifications() {
-            db.collection("activity_logs").orderBy("timestamp", "desc").limit(10).onSnapshot(snap => {
-                const container = document.getElementById('notifDropdown');
-                if(snap.empty) {
-                    container.innerHTML = '<div class="p-4 text-center" style="color:var(--text-muted)">No recent activity</div>';
-                    document.getElementById('notifDot').style.display = 'none';
-                    return;
-                }
-                document.getElementById('notifDot').style.display = 'block';
-                container.innerHTML = snap.docs.map(doc => {
-                    const d = doc.data();
-                    return `<div class="notif-item">
-                        <strong>${d.actorName || d.actor}</strong>
-                        <div>${d.message}</div>
-                        <span class="notif-time">${formatDateTime(d.timestamp)}</span>
-                    </div>`;
-                }).join('');
-            });
-        }
-
-        function isAdmin() { return userRoleGroup === 'super-admin'; } // Legacy helper
+        // --- UTILS ---
+        function isAdmin() { return userData && (userData.role === 'admin' || userData.role === 'super_admin'); }
+        function isSuperAdmin() { return userData && userData.role === 'super_admin'; }
+        
         function showModal(title, body, footer='') {
             document.getElementById('modalTitle').innerText = title;
             document.getElementById('modalBody').innerHTML = body;
@@ -1258,28 +1212,44 @@
         }
 
         async function deleteUser(uid, name, type) {
-            if(userRoleGroup !== 'super-admin') return showToast("Access Denied", "error");
-            if(!confirm(`Permanently delete ${name}?`)) return;
+            if(!isSuperAdmin()) return showToast("Access Denied", "error");
+            if(!confirm(`Are you sure you want to PERMANENTLY DELETE ${name}? This action cannot be undone.`)) return;
             try {
                 await db.collection("users").doc(uid).delete();
                 logActivity(`Deleted user: ${name} (${type})`);
-                showToast("User deleted", "success");
+                showToast("User deleted successfully", "success");
             } catch (error) {
-                showToast("Error deleting", "error");
+                console.error("Delete error:", error);
+                showToast("Error deleting user: " + error.message, "error");
             }
         }
 
-        // --- 7. PAGES ---
+        function renderAccessDenied() {
+            document.getElementById('main').innerHTML = `
+                <div class="access-denied-container">
+                    <i class="ri-lock-2-line access-denied-icon"></i>
+                    <h1 class="access-denied-title">Access Denied</h1>
+                    <p class="access-denied-desc">
+                        You do not have permission to view this section.
+                    </p>
+                    <button class="btn btn-primary" onclick="navigateTo('/')">Return to Dashboard</button>
+                    <div style="margin-top: 2rem; color: var(--text-faint); font-size: 0.9rem;">
+                        Please Contact IT or Danial Danish if you believe this is an error.
+                    </div>
+                </div>
+            `;
+        }
 
+        // ---1. OVERVIEW ---
         function renderOverview() {
             const main = document.getElementById('main');
             main.innerHTML = `
                 <div class="flex justify-between items-center mb-4" style="flex-wrap: wrap; gap:10px;">
                     <h2 style="font-size:1.5rem; font-weight:700; letter-spacing:-0.5px;">Dashboard Overview</h2>
-                    ${userRoleGroup === 'super-admin' ? `<button class="btn btn-secondary btn-sm"><i class="ri-download-cloud-2-line"></i> Export Report</button>` : ''}
+                    <button class="btn btn-secondary btn-sm" onclick="window.print()"><i class="ri-download-cloud-2-line"></i> Export Report</button>
                 </div>
                 <div class="stats-grid" id="stats-grid">
-                    <div class="page-loader"><div class="loading-spinner"></div></div>
+                    <div class="page-loader" style="height:100px;"><div class="loading-spinner"></div></div>
                 </div>
                 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
@@ -1289,7 +1259,7 @@
                             <button class="btn btn-secondary" onclick="navigateTo('/orders')"><i class="ri-shopping-bag-line"></i> New Order</button>
                             <button class="btn btn-secondary" onclick="navigateTo('/support')"><i class="ri-ticket-line"></i> Check Tickets</button>
                             <button class="btn btn-secondary" onclick="navigateTo('/requests')"><i class="ri-database-2-line"></i> Requests</button>
-                            ${userRoleGroup === 'super-admin' ? `<button class="btn btn-secondary" onclick="navigateTo('/crew')"><i class="ri-user-add-line"></i> Add Crew</button>` : ''}
+                            ${isSuperAdmin() ? `<button class="btn btn-secondary" onclick="navigateTo('/crew')"><i class="ri-user-add-line"></i> Add Crew</button>` : ''}
                         </div>
                     </div>
                     <div class="list-group">
@@ -1352,48 +1322,65 @@
             });
         }
 
-        // --- ORDERS (Updated with Multi-Rep Logic) ---
+        // --- 2. ORDERS ---
         function renderOrders() {
             document.getElementById('main').innerHTML = `
                 <div class="table-container">
                     <div class="table-header">
                         <h3>Order Management</h3>
-                        <input type="text" id="orderSearch" placeholder="Search..." style="width:250px;" onkeyup="filterTable('orders-tbody', this.value)">
+                        <input type="text" id="orderSearch" placeholder="Search ID, Name, Domain..." style="width:250px;" onkeyup="filterTable('orders-tbody', this.value)">
                     </div>
                     <div class="table-responsive">
-                        <table><thead><tr><th>Date</th><th>Client</th><th>Package</th><th>Total</th><th>Sales Reps</th><th>Status</th><th>Actions</th></tr></thead><tbody id="orders-tbody">
-                        <tr><td colspan="7" class="text-center"><div class="loading-spinner"></div></td></tr>
-                        </tbody></table>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Client</th>
+                                    <th>Package</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-tbody">
+                                <tr><td colspan="6" class="text-center"><div class="loading-spinner"></div></td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>`;
             
             db.collection("orders").orderBy("timestamp", "desc").onSnapshot(snap => {
                 const tbody = document.getElementById('orders-tbody');
                 if(!tbody) return;
-                if(snap.empty) { tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No orders found</td></tr>'; return; }
+                if(snap.empty) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No orders found</td></tr>';
+                    return;
+                }
 
                 tbody.innerHTML = snap.docs.map(doc => {
                     const d = doc.data();
-                    const statusColor = d.status === 'Completed' ? 'var(--success)' : (d.status === 'Paid' ? 'var(--primary)' : (d.status === 'Cancelled' ? 'var(--danger)' : '#71717a'));
-                    
-                    let repDisplay = 'Unassigned';
-                    if(d.salesRepNames && d.salesRepNames.length > 0) {
-                        repDisplay = d.salesRepNames.join(', ');
+                    const domainDisplay = d.domain ? `<span class="font-mono" style="color:var(--primary)">${d.domain}</span>` : `<span style="color:var(--text-faint)">N/A</span>`;
+                    let voucherBadge = '<span style="color:var(--text-faint)">None</span>';
+                    if (d.voucherCode) {
+                        voucherBadge = `<span class="badge badge-voucher"><i class="ri-coupon-line"></i> ${d.voucherCode}</span>`;
                     }
-
+                    let statusColor = '#71717a';
+                    if(d.status === 'Completed') statusColor = 'var(--success)';
+                    if(d.status === 'Paid') statusColor = 'var(--primary)';
+                    if(d.status === 'Cancelled') statusColor = 'var(--danger)';
+                    
                     return `<tr>
                         <td style="white-space:nowrap;">${formatDateTime(d.timestamp)}</td>
                         <td><strong>${d.customerName}</strong></td>
                         <td>${d.package}</td>
                         <td>${d.total}</td>
-                        <td style="font-size:0.8rem; color:var(--text-muted); max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${repDisplay}</td>
                         <td><span class="badge" style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}25">${d.status}</span></td>
                         <td>
-                            <div style="display:flex; gap:5px;">
+                            <div style="display:flex; gap:5px; flex-wrap:wrap;">
                                 <button class="btn btn-sm btn-secondary" onclick="viewOrder('${doc.id}')">Manage</button>
-                                <button class="btn btn-sm btn-info" onclick="generateInvoice('${doc.id}')"><i class="ri-file-list-2-line"></i></button>
-                                <button class="btn btn-sm btn-success" onclick="sendPaymentReminder('${doc.id}')"><i class="ri-whatsapp-line"></i></button>
-                                ${isAdmin() ? `<button class="btn btn-sm btn-danger" onclick="deleteOrder('${doc.id}')"><i class="ri-delete-bin-line"></i></button>` : ''}
+                                <button class="btn btn-sm btn-info" title="Generate Invoice" onclick="generateInvoice('${doc.id}')"><i class="ri-file-list-2-line"></i> PDF</button>
+                                <button class="btn btn-sm btn-success" title="Send WhatsApp Remainder" onclick="sendPaymentReminder('${doc.id}')"><i class="ri-whatsapp-line"></i> WA</button>
+                                ${isSuperAdmin() ? `<button class="btn btn-sm btn-danger" onclick="deleteOrder('${doc.id}')"><i class="ri-delete-bin-line"></i></button>` : ''}
                             </div>
                         </td>
                     </tr>`;
@@ -1404,9 +1391,10 @@
         function downloadCurrentInvoice() {
             if (!currentOrderDataForPrint) return showToast("No invoice loaded", "error");
             const originalTitle = document.title;
-            document.title = `Invoice #${currentOrderDataForPrint.orderRef} - DDNetwork One`;
+            const invoiceId = currentOrderDataForPrint.orderRef;
+            document.title = `Invoice #${invoiceId} - DDNetwork One`;
             window.print();
-            setTimeout(() => document.title = originalTitle, 1000);
+            setTimeout(() => { document.title = originalTitle; }, 1000);
         }
 
         async function generateInvoice(orderId) {
@@ -1414,15 +1402,9 @@
                 const orderDoc = await db.collection("orders").doc(orderId).get();
                 if(!orderDoc.exists) return showToast("Order not found", "error");
                 const d = orderDoc.data();
+                currentOrderDataForPrint = { orderRef: orderId.substring(0,8).toUpperCase(), customerName: d.customerName, package: d.package, total: d.total };
 
-                currentOrderDataForPrint = {
-                    orderRef: orderId.substring(0,8).toUpperCase(),
-                    customerName: d.customerName,
-                    package: d.package,
-                    total: d.total
-                };
-
-                let paymentMethodsHTML = '<p>No payment methods configured.</p>';
+                let paymentMethodsHTML = '<p>No payment methods configured in config.</p>';
                 try {
                     const pmSnap = await db.collection("payment_methods").where("active", "==", true).limit(2).get();
                     if(!pmSnap.empty) {
@@ -1432,12 +1414,12 @@
                             paymentMethodsHTML += `
                                 <div class="inv-bank-item">
                                     <strong>${data.name}</strong>
-                                    <a href="${data.link}" target="_blank">${data.name} Link &rarr;</a>
+                                    <a href="${data.link}" target="_blank" style="color:var(--primary); text-decoration:none;">${data.name} Link &rarr;</a>
                                 </div>`;
                         });
                         paymentMethodsHTML += `</div>`;
                     }
-                } catch(e) { console.error(e); }
+                } catch(e) { console.error("Error fetching payments", e); }
 
                 const dateStr = formatDateTime(d.timestamp);
                 const orderRef = orderId.substring(0,8).toUpperCase();
@@ -1445,7 +1427,10 @@
 
                 const invoiceHTML = `
                     <div class="inv-header">
-                        <div class="inv-logo-area"><h1>INVOICE</h1><p><strong>DDNetwork One</strong><br>PG0572133-K</p></div>
+                        <div class="inv-logo-area">
+                            <h1>INVOICE</h1>
+                            <p><strong>DDNetwork One</strong><br>PG0572133-K</p>
+                        </div>
                         <div class="inv-title-area">
                             <h2>#${orderRef}</h2>
                             <div class="inv-meta">
@@ -1455,34 +1440,67 @@
                         </div>
                     </div>
                     <div class="inv-grid">
-                        <div><div class="inv-section-title">Bill To</div><div class="inv-box"><h3>${d.customerName}</h3><p>${d.customerEmail}</p><p>${d.customerPhone || '-'}</p></div></div>
-                        <div><div class="inv-section-title">Pay To</div><div class="inv-box"><h3>DDNetwork One</h3><p>Kuala Lumpur, Malaysia</p></div></div>
+                        <div>
+                            <div class="inv-section-title">Bill To</div>
+                            <div class="inv-box">
+                                <h3>${d.customerName}</h3>
+                                <p>${d.customerEmail}</p>
+                                <p>${d.customerPhone || '-'}</p>
+                                ${d.customerCompany ? `<p>${d.customerCompany}</p>` : ''}
+                            </div>
+                        </div>
+                        <div>
+                            <div class="inv-section-title">Pay To</div>
+                            <div class="inv-box">
+                                <h3>DDNetwork One</h3>
+                                <p>Kuala Lumpur, Malaysia</p>
+                                <p><strong>Email:</strong> sales@ddnet.my</p>
+                            </div>
+                        </div>
                     </div>
                     <table class="inv-table">
-                        <thead><tr><th>Description</th><th>Billing</th><th>Amount</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Billing</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             <tr>
-                                <td><strong>${d.package}</strong><br><span style="color:#64748b; font-size:12px;">${d.domain ? `Domain: ${d.domain}` : 'Domain pending'}</span></td>
-                                <td>${d.billingCycle || 'One-Time'}</td>
+                                <td>
+                                    <strong>${d.package}</strong><br>
+                                    <span style="color:#64748b; font-size:12px;">${d.domain ? `Domain: ${d.domain}` : 'Domain pending'}</span>
+                                </td>
+                                <td>
+                                    <span style="font-size:13px; background:#f1f5f9; padding:2px 6px; border-radius:4px;">${d.billingCycle || 'One-Time'}</span>
+                                </td>
                                 <td>RM ${total}</td>
                             </tr>
+                            ${d.voucherCode ? `<tr><td><strong>Discount</strong> <span style="color:#10b981; font-size:12px;">(${d.voucherCode})</span></td><td></td><td style="color:#10b981;">- RM 0.00</td></tr>` : ''}
                         </tbody>
                     </table>
                     <div class="inv-total-section">
                         <div class="inv-total-box">
                             <div class="inv-total-row"><span>Subtotal</span><span>RM ${total}</span></div>
+                            <div class="inv-total-row"><span>Tax (0%)</span><span>RM 0.00</span></div>
                             <div class="inv-total-row final"><span>Total Due</span><span>RM ${total}</span></div>
                         </div>
                     </div>
                     <div class="inv-bank-details">
-                        <div class="inv-bank-title"><i class="ri-bank-card-line"></i> Payment Methods</div>
+                        <div class="inv-bank-title"><i class="ri-bank-card-line" style="color:var(--primary)"></i> Payment Methods</div>
                         ${paymentMethodsHTML}
-                        <p style="margin-top:10px; font-size:12px; color:#64748b;">Ref: #${orderRef}</p>
+                        <p style="margin-top:10px; font-size:12px; color:#64748b;">Please include Invoice #${orderRef} in your payment reference.</p>
+                    </div>
+                    <div class="inv-footer">
+                        <p>Thank you for your business!</p>
+                        <p>Generated by DDNetwork Admin Portal</p>
                     </div>
                 `;
                 document.getElementById('invoice-content').innerHTML = invoiceHTML;
                 document.getElementById('invoiceModalOverlay').classList.add('open');
             } catch (err) {
+                console.error(err);
                 showToast("Error generating invoice", "error");
             }
         }
@@ -1497,73 +1515,65 @@
                 const doc = await db.collection("orders").doc(id).get();
                 if(!doc.exists) return;
                 const d = doc.data();
-                
                 let payLink = "https://ddnet.my"; 
                 try {
                     const pmSnap = await db.collection("payment_methods").where("active", "==", true).limit(1).get();
                     if(!pmSnap.empty) payLink = pmSnap.docs[0].data().link;
                 } catch(e) {}
-
                 const orderRef = id.substring(0,6).toUpperCase();
-                const msg = `Hi ${d.customerName}, Reminder for Order #${orderRef} (${d.package}). Amount: ${d.total}. Pay: ${payLink}`;
+                const msg = `👋 Hi ${d.customerName},\n\nReminder regarding your order with DDNetwork One.\n\n📄 *Invoice:* #${orderRef}\n📦 *Package:* ${d.package}\n💰 *Total:* ${d.total}\n\n💳 *Pay Here:* ${payLink}\n\nThank you! 🚀`;
                 let cleanPhone = d.customerPhone ? d.customerPhone.replace(/^0/, '60') : '60123456789';
                 if(!cleanPhone.startsWith('+')) cleanPhone = '+' + cleanPhone;
                 window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
-                logActivity(`Sent reminder for Order #${orderRef}`);
-            } catch(err) { showToast("Error sending reminder", "error"); }
+                showToast("Opening WhatsApp...", "success");
+                logActivity(`Sent payment reminder for Order #${orderRef}`);
+            } catch(err) {
+                console.error(err);
+                showToast("Error sending reminder", "error");
+            }
         }
 
-        // ORDER MODAL WITH MULTI-SELECT
         async function viewOrder(id) {
             const doc = await db.collection("orders").doc(id).get();
             const d = doc.data();
-            
-            // Fetch all potential reps
-            let crewOptions = '<option value="">Unassigned</option>';
-            const crewSnap = await db.collection("users").where("role", "in", ["admin", "crew"]).get();
-            crewSnap.forEach(c => {
-                const cData = c.data();
-                crewOptions += `<option value="${c.id}">${cData.name} (${cData.jobTitle || cData.role})</option>`;
-            });
-
-            // Parse existing reps
-            let currentReps = d.salesRepIds || [];
-            let repNames = d.salesRepNames || [];
-            
-            // HTML for chips of selected reps
-            let chipsHTML = currentReps.map((rid, index) => `
-                <div class="chip">
-                    ${repNames[index] || 'Unknown'} <i class="ri-close-line" onclick="removeRepFromModal('${rid}')"></i>
-                </div>
-            `).join('');
-
+            let salesRepOptions = '<option value="">Unassigned</option>';
+            let currentSalesRepId = d.salesRepId || "";
+            try {
+                const crewSnap = await db.collection("users").where("role", "in", ["super_admin", "admin", "crew"]).get();
+                crewSnap.forEach(c => {
+                    const cData = c.data();
+                    const selected = c.id === currentSalesRepId ? 'selected' : '';
+                    salesRepOptions += `<option value="${c.id}" ${selected}>${cData.name} (${cData.jobTitle || cData.role})</option>`;
+                });
+            } catch(e) { console.error(e); }
             const voucherDisplay = d.voucherCode ? `<div class="mb-4"><label>Voucher Used</label><input readonly value="${d.voucherCode}" style="color:var(--warning); border-color:var(--warning)"></div>` : '';
-
             showModal(`Manage Order`, `
                 ${voucherDisplay}
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                    <div><label>Name</label><input id="o-name" value="${d.customerName}"></div>
-                    <div><label>Email</label><input id="o-email" value="${d.customerEmail}"></div>
-                    <div><label>Phone</label><input id="o-phone" value="${d.customerPhone||''}"></div>
-                    <div><label>Total</label><input id="o-total" value="${d.total}"></div>
+                    <div><label class="text-muted text-sm">Name</label><input id="o-name" value="${d.customerName}"></div>
+                    <div><label class="text-muted text-sm">Email</label><input id="o-email" value="${d.customerEmail}"></div>
+                    <div><label class="text-muted text-sm">Phone</label><input id="o-phone" value="${d.customerPhone||''}"></div>
+                    <div><label class="text-muted text-sm">Total</label><input id="o-total" value="${d.total}"></div>
+                </div>
+                <div class="mb-4 p-2" style="background:rgba(59,130,246,0.05); border-radius:6px; border:1px solid rgba(59,130,246,0.1);">
+                    <div class="flex justify-between items-center">
+                        <span style="font-size:0.8rem; color:var(--text-muted);">Billing Cycle</span>
+                        <span class="font-bold" style="color:var(--primary);">${d.billingCycle || '-'}</span>
+                    </div>
                 </div>
                 <div class="mb-4">
+                    <label>Sales Representative (For Commission)</label>
+                    <select id="o-sales-rep">${salesRepOptions}</select>
+                    <small class="text-muted">Assigns commission credit to this crew member.</small>
+                </div>
+                <div class="mt-4">
                     <label>Client Domain</label>
                     <div style="display:flex; gap:10px;">
-                         <span style="padding:0.6rem; background:var(--bg-input); border:1px solid var(--border); border-radius:6px 0 0 6px; color:var(--text-muted);">https://</span>
+                         <span style="padding:0.6rem; background:var(--bg-input); border:1px solid var(--border); border-radius:6px 0 0 6px 0; color:var(--text-muted);">https://</span>
                          <input id="o-domain" value="${d.domain || ''}" placeholder="example.com" style="border-radius:0 6px 6px 0;">
                     </div>
+                    <small class="text-muted">Leave empty if no domain yet.</small>
                 </div>
-
-                <div class="mb-4">
-                    <label>Sales Representatives (Commission)</label>
-                    <div class="chip-container" id="modal-rep-chips">${chipsHTML}</div>
-                    <div style="display:flex; gap:10px;">
-                        <select id="o-add-rep-select" style="flex:1;">${crewOptions}</select>
-                        <button class="btn btn-secondary" onclick="addRepToModal()">Add</button>
-                    </div>
-                </div>
-
                 <label class="mt-4 mb-2 block">Update Status</label>
                 <select id="upd-status">
                     <option value="Pending" ${d.status=='Pending'?'selected':''}>Pending</option>
@@ -1572,46 +1582,6 @@
                     <option value="Cancelled" ${d.status=='Cancelled'?'selected':''}>Cancelled</option>
                 </select>
             `, `<button class="btn btn-primary" onclick="updateOrderDetails('${id}')">Save Changes</button>`);
-
-            // Store temporary list of reps in a window/global var for this modal session
-            window.tempRepIds = [...currentReps];
-            window.tempRepNames = [...repNames];
-        }
-
-        function addRepToModal() {
-            const select = document.getElementById('o-add-rep-select');
-            const uid = select.value;
-            const name = select.options[select.selectedIndex].text;
-            
-            if(!uid || window.tempRepIds.includes(uid)) return;
-
-            window.tempRepIds.push(uid);
-            window.tempRepNames.push(name);
-            
-            updateRepChipsUI();
-        }
-
-        function removeRepFromModal(uid) {
-            window.tempRepIds = window.tempRepIds.filter(id => id !== uid);
-            window.tempRepNames = window.tempRepNames.filter((n, i) => window.tempRepIds[i] !== uid); // sync by index logic slightly tricky, better to just redraw
-            // Actually, let's just redraw based on IDs to keep names synced
-            // Re-fetch names from select options or just pass the name alongside ID in the remove function
-            // For simplicity, let's find index and remove both
-            const idx = window.tempRepIds.indexOf(uid);
-            if(idx > -1) {
-                window.tempRepIds.splice(idx, 1);
-                window.tempRepNames.splice(idx, 1);
-            }
-            updateRepChipsUI();
-        }
-
-        function updateRepChipsUI() {
-            const container = document.getElementById('modal-rep-chips');
-            container.innerHTML = window.tempRepIds.map((rid, index) => `
-                <div class="chip">
-                    ${window.tempRepNames[index] || 'Unknown'} <i class="ri-close-line" onclick="removeRepFromModal('${rid}')"></i>
-                </div>
-            `).join('');
         }
 
         function updateOrderDetails(id) {
@@ -1621,14 +1591,21 @@
                 customerPhone: document.getElementById('o-phone').value,
                 total: document.getElementById('o-total').value,
                 domain: document.getElementById('o-domain').value.replace(/^https?:\/\//, ''), 
-                status: document.getElementById('upd-status').value,
-                salesRepIds: window.tempRepIds,
-                salesRepNames: window.tempRepNames
+                status: document.getElementById('upd-status').value
             };
-
+            const salesRepSelect = document.getElementById('o-sales-rep');
+            if(salesRepSelect) {
+                if(salesRepSelect.value) {
+                    const repName = salesRepSelect.options[salesRepSelect.selectedIndex].text;
+                    updateData.salesRepId = salesRepSelect.value;
+                    updateData.salesRepName = repName;
+                } else {
+                    updateData.salesRepId = firebase.firestore.FieldValue.delete();
+                    updateData.salesRepName = firebase.firestore.FieldValue.delete();
+                }
+            }
             db.collection("orders").doc(id).update(updateData).then(() => { 
-                closeModal(); showToast("Order Updated", "success"); 
-                logActivity(`Updated Order #${id.substr(0,6)}`);
+                closeModal(); showToast("Order Updated Successfully", "success"); logActivity(`Updated Order #${id.substr(0,6)}`);
             });
         }
 
@@ -1640,9 +1617,8 @@
             });
         }
 
-        // --- 8. CLIENTS ---
+        // --- 3. CLIENTS ---
         function renderClients() {
-            // Crew only see assigned clients? For now show all but restrict edit
             document.getElementById('main').innerHTML = `
                 <div class="table-container">
                     <div class="table-header">
@@ -1655,12 +1631,10 @@
                         </tbody></table>
                     </div>
                 </div>`;
-            
             db.collection("users").where("role", "==", "user").onSnapshot(snap => {
                 const tbody = document.getElementById('client-tbody');
                 if(!tbody) return;
                 if(snap.empty) { tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No clients found</td></tr>'; return; }
-                
                 tbody.innerHTML = snap.docs.map(doc => {
                     const u = doc.data();
                     const vStatus = u.personalVoucher ? u.personalVoucher.status : 'None';
@@ -1671,12 +1645,10 @@
                         <td>${u.email}<br><small style="color:var(--text-faint)">${u.phone||''}</small></td>
                         <td>${vStatus !== 'None' ? `<span class="badge" style="background:${vStatus==='active'?'var(--success)':'var(--text-faint)'}">${vCode}</span>` : '-'}</td>
                         <td>
-                            ${userRoleGroup !== 'crew' ? `
                             <button class="btn btn-sm btn-secondary" onclick="editClient('${doc.id}')">Edit</button>
                             <button class="btn btn-sm btn-secondary" onclick="resetPassword('${u.email}')">Reset PW</button>
                             <button class="btn btn-sm btn-primary" onclick="openAssignVoucherModal('${doc.id}', '${u.name}')">Assign Voucher</button>
-                            ` : `<span class="text-muted text-sm">View Only</span>`}
-                            ${isAdmin() ? `<button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Client')"><i class="ri-delete-bin-line"></i></button>` : ''}
+                            ${isSuperAdmin() ? `<button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Client')"><i class="ri-delete-bin-line"></i></button>` : ''}
                         </td>
                     </tr>`;
                 }).join('');
@@ -1694,50 +1666,43 @@
             });
         }
         function saveClient(uid) {
-            db.collection("users").doc(uid).update({ 
-                name: document.getElementById('e-name').value, 
-                phone: document.getElementById('e-phone').value, 
-                company: document.getElementById('e-comp').value 
-            }).then(() => { closeModal(); showToast("Client Updated", "success"); });
+            db.collection("users").doc(uid).update({ name: document.getElementById('e-name').value, phone: document.getElementById('e-phone').value, company: document.getElementById('e-comp').value }).then(() => { closeModal(); showToast("Client Updated", "success"); logActivity("Updated client details"); });
         }
         function resetPassword(email) {
-            if(confirm(`Send reset email to ${email}?`)) auth.sendPasswordResetEmail(email).then(() => showToast("Reset email sent", "success"));
+            if(confirm(`Send reset email to ${email}?`)) { auth.sendPasswordResetEmail(email).then(() => showToast("Reset email sent", "success")); }
         }
 
-        // --- 9. CREW MANAGEMENT ---
+        // --- 4. CREW MANAGEMENT (UPDATED) ---
         function renderCrew() {
-            if(userRoleGroup === 'crew') return renderAccessDenied();
-            // Admins can view but maybe restricted actions? Let's allow View for Admins, Edit for Super Admin
+            if(!isSuperAdmin()) return renderAccessDenied();
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:700;">Internal Crew</h2>
-                    ${userRoleGroup === 'super-admin' ? `<button class="btn btn-primary" onclick="openAddCrewModal()"><i class="ri-add-line"></i> Add Crew</button>` : ''}
+                    <button class="btn btn-primary" onclick="openAddCrewModal()"><i class="ri-add-line"></i> Add Crew</button>
                 </div>
                 <div class="table-container">
                     <div class="table-responsive">
-                        <table><thead><tr><th>Crew ID</th><th>Name</th><th>Job Title</th><th>Role</th><th>Comm. Rate</th><th>Actions</th></tr></thead><tbody id="crew-tbody">
-                        <tr><td colspan="6" class="text-center"><div class="loading-spinner"></div></td></tr>
+                        <table><thead><tr><th>Crew ID</th><th>Name</th><th>Email</th><th>Role</th><th>Job Title</th><th>Comm. Rate</th><th>Actions</th></tr></thead><tbody id="crew-tbody">
+                        <tr><td colspan="7" class="text-center"><div class="loading-spinner"></div></td></tr>
                         </tbody></table>
                     </div>
                 </div>`;
-            db.collection("users").where("role", "in", ["admin", "crew"]).onSnapshot(snap => {
+            db.collection("users").where("role", "in", ["super_admin", "admin", "crew"]).onSnapshot(snap => {
                 const tbody = document.getElementById('crew-tbody');
                 if(!tbody) return;
                 tbody.innerHTML = snap.docs.map(doc => {
                     const u = doc.data();
                     const rate = u.commissionRate ? (u.commissionRate * 100).toFixed(1) + '%' : '0%';
-                    const canEdit = userRoleGroup === 'super-admin';
                     return `<tr>
                         <td class="font-mono" style="color:var(--primary)">${u.crewId || 'N/A'}</td>
                         <td>${u.name}</td>
+                        <td>${u.email}</td>
+                        <td><span class="badge badge-${u.role==='super_admin'?'admin':(u.role==='admin'?'admin':'crew')}">${u.role}</span></td>
                         <td>${u.jobTitle||'-'}</td>
-                        <td><span class="badge badge-${u.role==='admin'?'admin':'crew'}">${u.role}</span></td>
-                        <td>${rate}</td>
+                        <td><span class="badge" style="background:var(--success)15; color:var(--success)">${rate}</span></td>
                         <td>
-                            ${canEdit ? `
                             <button class="btn btn-sm btn-secondary" onclick="editCrew('${doc.id}')"><i class="ri-pencil-line"></i></button>
                             <button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Crew')"><i class="ri-delete-bin-line"></i></button>
-                            ` : '<span class="text-muted text-sm">Locked</span>'}
                         </td>
                     </tr>`;
                 }).join('');
@@ -1752,28 +1717,47 @@
                 <div class="mb-4"><label>Crew ID</label><input id="c-id" value="${newCrewId}" readonly></div>
                 <div class="mb-4"><label>Full Name</label><input id="c-name"></div>
                 <div class="mb-4"><label>Email Address</label><input type="email" id="c-email"></div>
-                <div class="flex gap-4 mb-4">
-                    <div style="flex:1"><label>Job Title</label><select id="c-job" onchange="updateCrewRolePreview()">${jobOptions}</select></div>
-                </div>
+                
                 <div class="mb-4">
-                    <label>System Role</label>
-                    <input id="c-role-display" value="Super Admin" readonly style="color:var(--text-muted); background:var(--bg-sidebar);">
+                    <label>Job Title (Auto-Sets Role)</label>
+                    <select id="c-job" onchange="autoSetRoleAndRate()">
+                        <option value="">Select Job Title...</option>
+                        ${jobOptions}
+                    </select>
                 </div>
-                <div class="mb-4"><label>Commission Rate (%)</label><input type="number" step="0.1" id="c-rate"></div>
+
+                <div class="flex gap-4 mb-4">
+                    <div style="flex:1">
+                        <label>Role</label>
+                        <input type="text" id="c-role" readonly style="background:var(--bg-sidebar)">
+                    </div>
+                    <div style="flex:1">
+                        <label>Comm. Rate (%)</label>
+                        <input type="number" step="0.1" id="c-rate" readonly style="background:var(--bg-sidebar)">
+                    </div>
+                </div>
+
                 <div class="mb-4"><label>Temporary Password</label><input type="password" id="c-pass" placeholder="Set password"></div>
             `, `<button class="btn btn-primary" onclick="saveCrew('${newCrewId}')">Create Crew</button>`);
-            
-            updateCrewRolePreview();
         }
 
-        function updateCrewRolePreview() {
+        function autoSetRoleAndRate() {
             const title = document.getElementById('c-job').value;
-            const role = getRoleGroup(title);
-            const display = role === 'super-admin' ? 'Super Admin' : (role === 'admin' ? 'Admin' : 'Internal Crew');
-            document.getElementById('c-role-display').value = display;
-            
+            const roleInput = document.getElementById('c-role');
             const rateInput = document.getElementById('c-rate');
-            rateInput.value = (getDefaultRate(title) * 100).toFixed(1);
+            
+            // Auto Role Mapping
+            if(title === "Founder & Managing Director") {
+                roleInput.value = "Super Admin";
+            } else if (["Project & Client Manager", "Account / Operations / Marketing Manager"].includes(title)) {
+                roleInput.value = "Admin";
+            } else {
+                roleInput.value = "Internal Crew";
+            }
+
+            // Auto Rate
+            const defaultRate = getDefaultRate(title);
+            rateInput.value = (defaultRate * 100).toFixed(1);
         }
 
         async function saveCrew(newId) {
@@ -1781,20 +1765,23 @@
             const email = document.getElementById('c-email').value;
             const pass = document.getElementById('c-pass').value;
             const job = document.getElementById('c-job').value;
-            const role = getRoleGroup(job); // Calculate mapped role
             const rateVal = parseFloat(document.getElementById('c-rate').value);
 
-            if(!name || !email || !pass) return showToast("Please fill all fields", "error");
+            if(!name || !email || !pass || !job) return showToast("Please fill all fields", "error");
 
             try {
-                // Create Auth User
                 const userCredential = await auth.createUserWithEmailAndPassword(email, pass);
-                // Create Firestore Doc
+                
+                // Determine DB Role
+                let dbRole = 'crew';
+                if(job === "Founder & Managing Director") dbRole = 'super_admin';
+                else if(["Project & Client Manager", "Account / Operations / Marketing Manager"].includes(job)) dbRole = 'admin';
+
                 await db.collection("users").doc(userCredential.user.uid).set({
                     crewId: newId,
                     name: name,
                     email: email,
-                    role: role, // Saved as 'admin', 'crew', or 'super-admin'
+                    role: dbRole,
                     jobTitle: job,
                     commissionRate: isNaN(rateVal) ? 0.0 : (rateVal / 100),
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -1802,7 +1789,6 @@
                 closeModal();
                 showToast("Crew created successfully", "success");
                 logActivity(`Created new crew member: ${name} (${newId})`);
-                // NOTE: We do NOT sign in as the new user. Current session stays active.
             } catch(e) {
                 showToast(e.message, "error");
             }
@@ -1812,47 +1798,37 @@
             db.collection("users").doc(uid).get().then(doc => {
                 const u = doc.data();
                 const jobOptions = JOB_TITLES.map(j => `<option value="${j}" ${u.jobTitle===j?'selected':''}>${j}</option>`).join('');
-                
                 showModal("Edit Crew Member", `
-                    <div class="mb-4"><label>Crew ID</label><input id="e-c-id" value="${u.crewId}" readonly></div>
+                    <div class="mb-4"><label>Crew ID</label><input id="e-c-id" value="${u.crewId}"></div>
                     <div class="mb-4"><label>Full Name</label><input id="e-c-name" value="${u.name}"></div>
-                    <div class="mb-4"><label>Job Title</label><select id="e-c-job" onchange="updateEditCrewRolePreview()">${jobOptions}</select></div>
-                    <div class="mb-4"><label>System Role</label><input id="e-c-role-display" value="${u.role}" readonly style="color:var(--text-muted); background:var(--bg-sidebar);"></div>
-                    <div class="mb-4"><label>Commission Rate (%)</label><input type="number" step="0.1" id="e-c-rate" value="${(u.commissionRate*100).toFixed(1)}"></div>
+                    <div class="mb-4"><label>Job Title</label><select id="e-c-job">${jobOptions}</select></div>
+                    <div class="mb-4"><label>Role</label><select id="e-c-role">
+                        <option value="crew" ${u.role==='crew'?'selected':''}>Internal Crew</option>
+                        <option value="admin" ${u.role==='admin'?'selected':''}>Admin</option>
+                        <option value="super_admin" ${u.role==='super_admin'?'selected':''}>Super Admin</option>
+                    </select></div>
+                     <div class="mb-4"><label>Commission Rate (%)</label><input type="number" step="0.1" id="e-c-rate" value="${(u.commissionRate*100).toFixed(1)}"></div>
                 `, `<button class="btn btn-primary" onclick="updateCrewData('${uid}')">Save</button>`);
             });
         }
 
-        function updateEditCrewRolePreview() {
-             const title = document.getElementById('e-c-job').value;
-             const role = getRoleGroup(title);
-             const display = role === 'super-admin' ? 'Super Admin' : (role === 'admin' ? 'Admin' : 'Internal Crew');
-             document.getElementById('e-c-role-display').value = display;
-        }
-
         function updateCrewData(uid) {
             const rateVal = parseFloat(document.getElementById('e-c-rate').value);
-            const job = document.getElementById('e-c-job').value;
-            const role = getRoleGroup(job);
-            
             db.collection("users").doc(uid).update({
+                crewId: document.getElementById('e-c-id').value,
                 name: document.getElementById('e-c-name').value,
-                jobTitle: job,
-                role: role, // Update mapped role
+                jobTitle: document.getElementById('e-c-job').value,
+                role: document.getElementById('e-c-role').value,
                 commissionRate: isNaN(rateVal) ? 0.0 : (rateVal / 100)
-            }).then(() => {
-                closeModal();
-                showToast("Crew details updated", "success");
-                logActivity(`Updated crew member details`);
-            });
+            }).then(() => { closeModal(); showToast("Crew details updated", "success"); logActivity(`Updated crew member details`); });
         }
 
-        // --- 10. SUPPORT ---
+        // --- 5. SUPPORT ---
         function renderSupport() {
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <button class="btn btn-secondary" onclick="openCreateTicket()"><i class="ri-add-line"></i> Create New Ticket</button>
-                    <input type="text" id="ticketSearch" placeholder="Search..." style="width:200px;" onkeyup="filterTable('supp-tbody', this.value)">
+                    <input type="text" id="ticketSearch" placeholder="Search ID, Client..." style="width:200px;" onkeyup="filterTable('supp-tbody', this.value)">
                 </div>
                 <div class="table-container">
                     <div class="table-responsive">
@@ -1865,13 +1841,15 @@
                 const tbody = document.getElementById('supp-tbody');
                 if(!tbody) return;
                 if(snap.empty) { tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No tickets found</td></tr>'; return; }
-
                 tbody.innerHTML = snap.docs.map(doc => {
                     const d = doc.data();
-                    let statusBadge = d.status === 'Closed' ? 'var(--text-faint)' : (d.status === 'In Progress' ? 'var(--primary)' : 'var(--warning)');
+                    let statusBadge = '';
+                    if(d.status === 'Closed') statusBadge = 'var(--text-faint)';
+                    else if(d.status === 'In Progress') statusBadge = 'var(--primary)';
+                    else statusBadge = 'var(--warning)';
                     return `<tr>
                         <td class="font-mono" style="color:var(--ticket)">${d.ticketId || doc.id}</td>
-                        <td>${formatDateTime(d.timestamp)}</td>
+                        <td style="white-space:nowrap;">${formatDateTime(d.timestamp)}</td>
                         <td>${d.name}</td><td>${d.type}</td>
                         <td>${d.assignedToName || 'Unassigned'}</td>
                         <td><span class="badge" style="background:${statusBadge}15; color:${statusBadge}">${d.status}</span></td>
@@ -1883,6 +1861,7 @@
                 }).join('');
             });
         }
+
         async function openCreateTicket() {
             const newId = await getNextId('ticket');
             showModal("Create Support Ticket", `
@@ -1892,13 +1871,15 @@
                 <div class="mb-4"><label>Details</label><textarea id="tk-msg"></textarea></div>
             `, `<button class="btn btn-primary" onclick="saveNewTicket('${newId}')">Create</button>`);
         }
+
         function saveNewTicket(id) {
-            db.collection("tickets").add({ ticketId: id, name: document.getElementById('tk-name').value, type: document.getElementById('tk-type').value, message: document.getElementById('tk-msg').value, status: 'Open', timestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { closeModal(); showToast("Ticket Created", "success"); logActivity(`Created ticket ${id}`); });
+            db.collection("tickets").add({ ticketId: id, name: document.getElementById('tk-name').value, type: document.getElementById('tk-type').value, message: document.getElementById('tk-msg').value, status: 'Open', timestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { closeModal(); showToast("Ticket Created Successfully", "success"); logActivity(`Created new support ticket ${id}`); });
         }
+
         function viewTicket(id) {
             db.collection("tickets").doc(id).get().then(doc => {
                 const d = doc.data();
-                db.collection("users").where("role", "in", ["admin", "crew"]).get().then(snap => {
+                db.collection("users").where("role", "in", ["super_admin", "admin", "crew"]).get().then(snap => {
                     const crewOpts = snap.docs.map(c => `<option value="${c.id}" ${d.assignedTo===c.id?'selected':''}>${c.data().name}</option>`).join('');
                     showModal(`Ticket: ${d.ticketId || id}`, `
                         <p class="mb-4 p-4" style="background:var(--bg-sidebar); border-radius:8px; border:1px solid var(--border)">${d.message}</p>
@@ -1917,31 +1898,148 @@
             db.collection("tickets").doc(id).update({ status: newStatus, assignedTo: newAssignId || null, assignedToName: newAssignName }).then(() => { closeModal(); showToast("Ticket Updated", "success"); logActivity(`Updated Ticket #${id}`); });
         }
 
-        // --- 11. VOUCHERS (Super Admin Only) ---
-        function renderVouchers() {
-            if(userRoleGroup === 'crew') return renderAccessDenied();
-            // Logic similar to before but simplified for brevity, assuming existing logic holds
-             document.getElementById('main').innerHTML = `
-                <h2>Voucher Management</h2><p>Feature active for Super Admin only.</p>
-                <button class="btn btn-primary" onclick="openAssignVoucherModal(null,null)">Assign New</button>
-             `;
-             // Note: Implementing full voucher logic again would exceed response length limit significantly, 
-             // assuming existing Voucher logic from previous prompt is carried over or replaced by this stub.
-             // *Re-inserting basic structure for continuity*
-             // (In a real scenario, copy paste renderVouchers from previous turn and wrap it in permission check)
+        // --- 6. VOUCHERS ---
+        let currentVoucherFilter = 'All'; 
+
+        async function renderVouchers() {
+            document.getElementById('main').innerHTML = `
+                <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+                    <h3 style="font-size:1.25rem; font-weight:700;">Voucher Management</h3>
+                    <div class="flex gap-2">
+                        <button class="btn btn-primary" onclick="openAssignVoucherModal(null, null)"><i class="ri-add-line"></i> Assign New</button>
+                        <button class="btn btn-secondary" onclick="renderVouchers()"><i class="ri-refresh-line"></i> Sync Data</button>
+                    </div>
+                </div>
+                <div class="table-container" style="min-height: 200px; display:flex; justify-content:center; align-items:center;"><div id="voucher-loader" class="loading-spinner"></div></div>
+                <div class="table-container hidden" id="active-vouchers-container"><div class="table-header"><h3>Active Vouchers</h3></div><div class="table-responsive"><table><thead><tr><th>User</th><th>Code</th><th>Status</th><th>Value</th><th>Expiry</th><th>Actions</th></tr></thead><tbody id="vouch-active"></tbody></table></div></div>
+                <div class="table-container hidden" id="history-vouchers-container"><div class="table-header"><div class="flex items-center gap-4"><h3>Voucher History</h3><div class="filter-group"><select id="voucher-filter" class="filter-select" onchange="updateHistoryFilter(this.value)"><option value="All">Show All</option><option value="Redeemed">Redeemed Only</option><option value="Expired">Expired Only</option><option value="Disabled">Disabled Only</option></select></div></div></div><div class="table-responsive"><table><thead><tr><th>Code</th><th>User</th><th>Status</th><th>Date Moved</th><th>Actions</th></tr></thead><tbody id="vouch-history"></tbody></table></div></div>
+            `;
+            await syncVoucherLogic();
+            document.getElementById('voucher-loader').parentElement.classList.add('hidden');
+            document.getElementById('active-vouchers-container').classList.remove('hidden');
+            document.getElementById('history-vouchers-container').classList.remove('hidden');
+
+            db.collection("users").where("personalVoucher", "!=", null).onSnapshot(snap => {
+                const tbody = document.getElementById('vouch-active');
+                if(!tbody) return;
+                tbody.innerHTML = '';
+                snap.forEach(doc => {
+                    const u = doc.data();
+                    const v = u.personalVoucher;
+                    const vStatus = v.status ? v.status : 'Active';
+                    let statusColor = 'var(--success)';
+                    const statusLower = vStatus.toLowerCase();
+                    if (statusLower === 'suspended') statusColor = 'var(--danger)';
+                    tbody.innerHTML += `<tr>
+                        <td>${u.name}</td>
+                        <td class="font-mono" style="color:var(--primary)">${v.code}</td>
+                        <td><span class="badge" style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}25">${vStatus}</span></td>
+                        <td>${v.type=='fixed'?'RM '+v.value:v.value*100+'%'}</td>
+                        <td>${v.expiryDate ? new Date(v.expiryDate.seconds*1000).toLocaleDateString() : '-'}</td>
+                        <td><button class="btn btn-sm btn-secondary" onclick="editVoucher('${doc.id}', '${v.code}')">Edit</button><button class="btn btn-sm btn-success" onclick="markRedeem('${doc.id}', '${v.code}')"><i class="ri-check-double-line"></i> Redeem</button><button class="btn btn-sm btn-danger" onclick="disableVoucher('${doc.id}', '${v.code}')"><i class="ri-delete-bin-line"></i> Disable</button></td>
+                    </tr>`;
+                });
+            });
+            const updateHistoryListener = (filterVal) => {
+                db.collection("vouchers_history").orderBy("movedAt", "desc").limit(50).onSnapshot(snap => {
+                    const tbody = document.getElementById('vouch-history');
+                    if(!tbody) return;
+                    tbody.innerHTML = '';
+                    snap.forEach(doc => {
+                        const v = doc.data();
+                        if(filterVal !== 'All' && v.status !== filterVal) return;
+                        let actionBtn = v.status === 'Redeemed' ? `<small style="color:var(--text-faint)">Locked</small>` : `<button class="btn btn-sm btn-success" onclick="restoreVoucher('${v.code}', '${v.ownerUid}')">Restore</button>`;
+                        let statusColor = 'var(--text-faint)';
+                        if (v.status === 'Redeemed') statusColor = 'var(--success)';
+                        if (v.status === 'Expired') statusColor = 'var(--warning)'; 
+                        if (v.status === 'Disabled') statusColor = 'var(--text-faint)';
+                        tbody.innerHTML += `<tr><td class="font-mono">${v.code}</td><td>${v.assignedToName || '-'}</td><td><span class="badge" style="background:${statusColor}15; color:${statusColor}">${v.status}</span></td><td>${v.movedAt ? formatDateTime(v.movedAt) : '-'}</td><td>${actionBtn}</td></tr>`;
+                    });
+                });
+            };
+            updateHistoryListener(currentVoucherFilter);
         }
-        // *Skipping Voucher CRUD implementation here to save space, assume it works as previous code but restricted*
+        window.updateHistoryFilter = (val) => { currentVoucherFilter = val; };
+        async function syncVoucherLogic() {
+            const usersSnap = await db.collection("users").where("personalVoucher", "!=", null).get();
+            if(usersSnap.empty) return;
+            let movedCount = 0;
+            for (const userDoc of usersSnap.docs) {
+                const uid = userDoc.id;
+                const uData = userDoc.data();
+                const vouch = uData.personalVoucher;
+                const code = vouch.code;
+                let moveToHistory = false;
+                let statusReason = "";
+                if(vouch.expiryDate) {
+                    const expDate = vouch.expiryDate.toDate ? vouch.expiryDate.toDate() : new Date(vouch.expiryDate);
+                    if(new Date() > expDate) { moveToHistory = true; statusReason = "Expired"; }
+                }
+                const currentStatus = (vouch.status || '').toLowerCase();
+                if (currentStatus === 'redeemed' && !moveToHistory) { moveToHistory = true; statusReason = "Redeemed"; } else if (currentStatus === 'disabled' && !moveToHistory) { moveToHistory = true; statusReason = "Disabled"; }
+                if(moveToHistory) {
+                    await db.collection("vouchers_history").doc(code).set({ ...vouch, ownerUid: uid, assignedToName: uData.name, status: statusReason, movedAt: firebase.firestore.FieldValue.serverTimestamp() });
+                    await db.collection("users").doc(uid).update({ personalVoucher: firebase.firestore.FieldValue.delete() });
+                    console.log(`Moved ${code} to history as ${statusReason}`);
+                    movedCount++;
+                }
+            }
+            if(movedCount > 0) showToast(`Synced ${movedCount} vouchers to history`, "success");
+        }
+        function editVoucher(uid, code) {
+            db.collection("users").doc(uid).get().then(doc => {
+                const v = doc.data().personalVoucher;
+                const exp = v.expiryDate ? new Date(v.expiryDate.seconds*1000).toISOString().split('T')[0] : '';
+                const currentStatus = v.status ? v.status : 'Active';
+                showModal(`Edit Voucher ${code}`, `
+                    <label>Code</label><input id="e-v-code" value="${v.code}" class="mb-4">
+                    <label>Status</label><select id="e-v-status" class="mb-4"><option value="Active" ${currentStatus==='Active'?'selected':''}>Active</option><option value="Suspended" ${currentStatus==='Suspended'?'selected':''}>Suspended</option></select>
+                    <label>Value</label><input type="number" id="e-v-val" value="${v.value}" class="mb-4">
+                    <label>Expiry Date</label><input type="date" id="e-v-exp" value="${exp}" class="mb-4">
+                `, `<button class="btn btn-primary" onclick="saveEditVoucher('${uid}')">Save</button>`);
+            });
+        }
+        function saveEditVoucher(uid) {
+            const newCode = document.getElementById('e-v-code').value.toUpperCase();
+            const newStatus = document.getElementById('e-v-status').value;            
+            db.collection("users").doc(uid).get().then(doc => {
+                const v = doc.data().personalVoucher;
+                db.collection("users").doc(uid).update({ personalVoucher: { ...v, code: newCode, value: parseFloat(document.getElementById('e-v-val').value), expiryDate: document.getElementById('e-v-exp').value ? new Date(document.getElementById('e-v-exp').value) : null, status: newStatus } }).then(() => { closeModal(); showToast("Voucher Updated", "success"); logActivity(`Edited voucher ${newCode}`); });
+            });
+        }
+        async function markRedeem(uid, code) {
+            if(!confirm(`Mark voucher ${code} as Redeemed?`)) return;
+            const userDoc = await db.collection("users").doc(uid).get();
+            const uData = userDoc.data();
+            const vouch = uData.personalVoucher;
+            await db.collection("vouchers_history").doc(code).set({ ...vouch, ownerUid: uid, assignedToName: uData.name, status: "Redeemed", movedAt: firebase.firestore.FieldValue.serverTimestamp() });
+            await db.collection("users").doc(uid).update({ personalVoucher: firebase.firestore.FieldValue.delete() });
+            showToast("Voucher Redeemed", "success");
+            logActivity(`Marked voucher ${code} as Redeemed`);
+        }
+        async function disableVoucher(uid, code) {
+            if(!confirm(`Disable voucher ${code}?`)) return;
+            const userDoc = await db.collection("users").doc(uid).get();
+            const uData = userDoc.data();
+            const vouch = uData.personalVoucher;
+            await db.collection("vouchers_history").doc(code).set({ ...vouch, ownerUid: uid, assignedToName: uData.name, status: "Disabled", movedAt: firebase.firestore.FieldValue.serverTimestamp() });
+            await db.collection("users").doc(uid).update({ personalVoucher: firebase.firestore.FieldValue.delete() });
+            showToast("Voucher Disabled", "info");
+            logActivity(`Disabled voucher ${code}`);
+        }
         function openAssignVoucherModal(uid, userName) {
             const promise = uid ? Promise.resolve(null) : db.collection("users").where("role", "==", "user").get();
             promise.then(snap => {
                 let userSelect = '';
-                if(snap) userSelect = `<label>Select Client</label><select id="v-user" class="mb-4">${snap.docs.map(d => `<option value="${d.id}">${d.data().name}</option>`).join('')}</select>`;
-                else userSelect = `<input type="hidden" id="v-user" value="${uid}">`;
+                if(snap) { userSelect = `<label>Select Client</label><select id="v-user" class="mb-4">${snap.docs.map(d => `<option value="${d.id}">${d.data().name}</option>`).join('')}</select>`; } else { userSelect = `<input type="hidden" id="v-user" value="${uid}">`; }
                 const autoCode = `GIFT-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
                 showModal("Assign Voucher", `
                     ${userSelect}
                     <div class="mb-4"><label>Code</label><input id="v-code" value="${autoCode}"></div>
-                    <div class="flex gap-4 mb-4"><div style="flex:1"><label>Type</label><select id="v-val-type"><option value="fixed">Fixed (RM)</option><option value="percent">Percent (%)</option></select></div><div style="flex:1"><label>Value</label><input type="number" id="v-val"></div></div>
+                    <div class="flex gap-4 mb-4">
+                        <div style="flex:1"><label>Type</label><select id="v-val-type"><option value="fixed">Fixed (RM)</option><option value="percent">Percent (%)</option></select></div>
+                        <div style="flex:1"><label>Value</label><input type="number" id="v-val"></div>
+                    </div>
                     <label>Expiry Date</label><input type="date" id="v-exp" class="mb-4">
                 `, `<button class="btn btn-primary" onclick="submitAssignVoucher()">Assign</button>`);
             });
@@ -1951,162 +2049,484 @@
             const code = document.getElementById('v-code').value.toUpperCase();
             db.collection("users").doc(uid).update({ personalVoucher: { code: code, type: document.getElementById('v-val-type').value, value: parseFloat(document.getElementById('v-val').value), expiryDate: document.getElementById('v-exp').value ? new Date(document.getElementById('v-exp').value) : null, status: 'active', auditLog: [{ action: 'Created', by: userData.email, date: new Date().toISOString() }] }}).then(() => { closeModal(); showToast(`Voucher ${code} Assigned!`, "success"); logActivity(`Assigned voucher ${code}`); });
         }
-
-        // --- 12. CONFIG (Super Admin Only) ---
-        function renderConfig() {
-            if(userRoleGroup !== 'super-admin') return renderAccessDenied();
-            // Use existing Config logic
-            document.getElementById('main').innerHTML = `<h2>System Config</h2><p>Restricted to Super Admin.</p>`;
-            // (Insert full config HTML/JS from previous turn here)
-            // ... (omitted for brevity, assume structure)
+        function restoreVoucher(code, ownerUid) {
+            if(!confirm("Restore this voucher?")) return;
+            db.collection("vouchers_history").doc(code).get().then(hist => {
+                if(!hist.exists) return showToast("Error", "error");
+                const v = hist.data();
+                db.collection("users").doc(ownerUid).update({ personalVoucher: { ...v, status: 'active' } }).then(() => {
+                    db.collection("vouchers_history").doc(code).delete().then(() => { showToast("Voucher Restored", "success"); logActivity(`Restored voucher ${code}`); });
+                });
+            });
         }
 
-        // --- 13. PORTFOLIO (Admin+) ---
-        function renderPortfolio() {
-            if(userRoleGroup === 'crew') return renderAccessDenied();
+        // --- 7. CONTENT & PACKAGES ---
+        function renderContent() {
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
-                    <h2>Client Portfolio</h2>
-                    ${userRoleGroup === 'super-admin' ? `<button class="btn btn-primary" onclick="openAddPortfolioModal()"><i class="ri-add-line"></i> Add Project</button>` : ''}
+                    <h2 style="font-size:1.25rem; font-weight:700;">Content & Packages</h2>
+                    <button class="btn btn-primary" onclick="saveContentChanges()"><i class="ri-save-line"></i> Save Changes</button>
                 </div>
-                <div class="table-container"><div class="table-responsive"><table><thead><tr><th>Project</th><th>Link</th><th>Status</th></tr></thead><tbody id="portfolio-tbody"><tr><td colspan="3" class="text-center"><div class="loading-spinner"></div></td></tr></tbody></table></div></div>
+                <div class="config-section">
+                    <h3 style="margin-bottom:1rem;">Frontend Package Features</h3>
+                    <p class="mb-4 text-sm text-muted">Edit feature list displayed on main website. (One feature per line)</p>
+                    <textarea id="content-frontend" rows="6"></textarea>
+                </div>
+                <div class="config-section">
+                    <h3 style="margin-bottom:1rem;">AI Package Features</h3>
+                    <p class="mb-4 text-sm text-muted">Edit feature list displayed on website. (One feature per line)</p>
+                    <textarea id="content-ai" rows="6"></textarea>
+                </div>
+            `;
+            db.collection("config").doc("site_settings").get().then(doc => {
+                const siteData = doc.exists ? doc.data() : {};
+                const packages = siteData.packageDetails || {};
+                const frontendFeatures = (packages.frontend && packages.frontend.features) ? packages.frontend.features : ["Up to 5 Pages", "Animations", "Contact Forms", "WhatsApp Integration"];
+                const aiFeatures = (packages.ai && packages.ai.features) ? packages.ai.features : ["All Front-End Features", "AI Chatbot Integration", "Lead Auto-Response", "Smart Analytics"];
+                document.getElementById('content-frontend').value = frontendFeatures.join('\n');
+                document.getElementById('content-ai').value = aiFeatures.join('\n');
+            });
+        }
+        function saveContentChanges() {
+            const frontendLines = document.getElementById('content-frontend').value.split('\n').filter(l => l.trim() !== '');
+            const aiLines = document.getElementById('content-ai').value.split('\n').filter(l => l.trim() !== '');
+            const btn = document.querySelector('button[onclick="saveContentChanges()"]');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<div class="loading-spinner" style="width:16px; height:16px; border-width:2px;"></div> Saving...`;
+            db.collection("config").doc("site_settings").get().then(doc => {
+                const data = doc.exists ? doc.data() : {};
+                const newPkgDetails = data.packageDetails || {};
+                newPkgDetails.frontend = { features: frontendLines };
+                newPkgDetails.ai = { features: aiLines };
+                db.collection("config").doc("site_settings").update({ packageDetails: newPkgDetails }).then(() => {
+                    showToast("Content updated successfully!", "success");
+                    logActivity("Updated website content features");
+                    btn.innerHTML = originalHTML;
+                });
+            }).catch(err => { showToast("Error updating: " + err.message, "error"); btn.innerHTML = originalHTML; });
+        }
+
+        // --- 8. CONFIG ---
+        function renderConfig() {
+            if(!isSuperAdmin()) return renderAccessDenied();
+            document.getElementById('main').innerHTML = `
+                <h2 style="font-size:1.25rem; font-weight:700; margin-bottom:1.5rem;">System Configuration</h2>
+                <div class="config-section">
+                    <div class="config-header flex justify-between">
+                        <span>Maintenance Mode</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="maint-toggle" onchange="toggleMaintenance()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <p class="text-muted text-sm mb-4">Toggle a warning banner on main site and restrict access.</p>
+                    <div class="mb-4">
+                        <label>Maintenance Message</label>
+                        <textarea id="maint-msg" class="mb-2" rows="3">We are currently performing scheduled maintenance.</textarea>
+                        <button class="btn btn-sm btn-secondary" onclick="saveMaintMsg()">Update Message</button>
+                    </div>
+                </div>
+                <div class="config-section">
+                    <div class="config-header">Dynamic Pricing Override</div>
+                    <p class="text-muted text-sm mb-4">Base prices for different modules (Syncs with Main Site).</p>
+                    <div class="price-grid">
+                        <div><label>HTML Package Price</label><div class="flex gap-2"><input id="price-html" type="number"><button class="btn btn-primary" onclick="savePrice('html', 'price-html')">Save</button></div></div>
+                        <div><label>Frontend Package Price</label><div class="flex gap-2"><input id="price-fe" type="number"><button class="btn btn-primary" onclick="savePrice('frontend', 'price-fe')">Save</button></div></div>
+                        <div><label>AI/Data Price (Base)</label><div class="flex gap-2"><input id="price-ai" type="number"><button class="btn btn-primary" onclick="savePrice('ai', 'price-ai')">Save</button></div></div>
+                    </div>
+                </div>
+                <div class="config-section">
+                    <div class="config-header flex justify-between">
+                        <span>Payment Gateways</span>
+                        <button class="btn btn-sm btn-primary" onclick="addGateway()"><i class="ri-add-line"></i> Add Gateway</button>
+                    </div>
+                    <div id="gateway-list" class="flex flex-col gap-4"></div>
+                </div>
+            `;
+            db.collection("config").doc("site_settings").get().then(doc => {
+                if(doc.exists) {
+                    const d = doc.data();
+                    if(d.maintenance_active) document.getElementById('maint-toggle').checked = true;
+                    if(d.maintenance_message) document.getElementById('maint-msg').value = d.maintenance_message;
+                    if(d.prices) {
+                        if(d.prices.html) document.getElementById('price-html').value = d.prices.html;
+                        if(d.prices.frontend) document.getElementById('price-fe').value = d.prices.frontend;
+                        if(d.prices.ai) document.getElementById('price-ai').value = d.prices.ai;
+                    }
+                }
+            });
+            db.collection("payment_methods").onSnapshot(snap => {
+                const list = document.getElementById('gateway-list');
+                if(!list) return;
+                list.innerHTML = '';
+                snap.forEach(doc => {
+                    const gw = doc.data();
+                    list.innerHTML += `
+                        <div class="gateway-card">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <strong style="color:var(--primary)">${gw.name}</strong>
+                                <span class="badge ${gw.active?'badge-success':'badge-danger'}" style="${gw.active?'background:rgba(16,185,129,0.1);color:#10b981':'background:rgba(239,68,68,0.1);color:#ef4444'}">${gw.active?'Active':'Inactive'}</span>
+                            </div>
+                            <div class="text-sm text-muted" style="word-break:break-all;">${gw.link || 'No Link'}</div>
+                            <div style="display:flex; gap:8px; margin-top:8px;">
+                                <button class="btn btn-sm btn-secondary" onclick="editGateway('${doc.id}')"><i class="ri-pencil-line"></i></button>
+                                <button class="btn btn-sm btn-secondary" onclick="toggleGatewayStatus('${doc.id}')"><i class="ri-refresh-line"></i></button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteGateway('${doc.id}')"><i class="ri-delete-bin-line"></i></button>
+                            </div>
+                        </div>`;
+                });
+            });
+        }
+        function toggleMaintenance() {
+            const isActive = document.getElementById('maint-toggle').checked;
+            db.collection("config").doc("site_settings").update({ maintenance_active: isActive }).then(() => { showToast(`Maintenance Mode ${isActive ? 'Enabled' : 'Disabled'}`, isActive?'warning':'success'); logActivity(`Toggled maintenance mode to ${isActive}`); });
+        }
+        function saveMaintMsg() { db.collection("config").doc("site_settings").update({ maintenance_message: document.getElementById('maint-msg').value }).then(() => showToast("Message Saved", "success")); }
+        function savePrice(key, elemId) {
+            const theVal = parseFloat(document.getElementById(elemId).value);
+            if(!theVal) return showToast("Invalid price", "error");
+            db.collection("config").doc("site_settings").update({ [`prices.${key}`]:theVal }).then(() => showToast("Price Updated", "success"));
+        }
+        function addGateway() {
+            showModal("Add Payment Gateway", `
+                <label>Gateway Name</label><input id="gw-name" class="mb-4">
+                <label>Payment Link / URL</label><input id="gw-link" class="mb-4">
+            `, `<button class="btn btn-primary" onclick="saveNewGateway()">Add</button>`);
+        }
+        async function saveNewGateway() {
+            const name = document.getElementById('gw-name').value;
+            const link = document.getElementById('gw-link').value;
+            await db.collection("payment_methods").add({ name, link, active: true });
+            closeModal();
+            showToast("Gateway Added", "success");
+            logActivity(`Added payment gateway: ${name}`);
+        }
+        function editGateway(docId) {
+            db.collection("payment_methods").doc(docId).get().then(doc => {
+                const gw = doc.data();
+                showModal("Edit Payment Gateway", `
+                    <label>Gateway Name</label><input id="e-gw-name" value="${gw.name}" class="mb-4">
+                    <label>Payment Link / URL</label><input id="e-gw-link" value="${gw.link}" class="mb-4">
+                `, `<button class="btn btn-primary" onclick="saveEditedGateway('${docId}')">Save</button>`);
+            });
+        }
+        async function saveEditedGateway(docId) {
+            const name = document.getElementById('e-gw-name').value;
+            const link = document.getElementById('e-gw-link').value;
+            await db.collection("payment_methods").doc(docId).update({ name, link });
+            closeModal();
+            renderConfig();
+            showToast("Gateway Updated", "success");
+            logActivity(`Edited payment gateway: ${name}`);
+        }
+        async function toggleGatewayStatus(docId) {
+            const docRef = await db.collection("payment_methods").doc(docId).get();
+            const currentStatus = docRef.data().active;
+            await db.collection("payment_methods").doc(docId).update({ active: !currentStatus });
+            renderConfig();
+        }
+        async function deleteGateway(docId) {
+            if(!confirm("Delete gateway?")) return;
+            await db.collection("payment_methods").doc(docId).delete();
+            renderConfig();
+        }
+
+        // --- 9. PORTFOLIO MANAGEMENT ---
+        function renderPortfolio() {
+            document.getElementById('main').innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h2 style="font-size:1.25rem; font-weight:700;">Client Portfolio</h2>
+                    <button class="btn btn-primary" onclick="openAddPortfolioModal()"><i class="ri-add-line"></i> Add Project</button>
+                </div>
+                <div class="table-container">
+                    <div class="table-header"><h3>Projects (clients_portfolio)</h3></div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead><tr><th>Thumbnail</th><th>Project Name</th><th>Website Link</th><th>Status</th><th>Actions</th></tr></thead>
+                            <tbody id="portfolio-tbody">
+                                <tr><td colspan="5" class="text-center"><div class="loading-spinner"></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             `;
             db.collection("clients_portfolio").orderBy("timestamp", "desc").onSnapshot(snap => {
                 const tbody = document.getElementById('portfolio-tbody');
                 if(!tbody) return;
-                if(snap.empty) { tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No projects</td></tr>'; return; }
+                if(snap.empty) { tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No portfolio projects found.</td></tr>'; return; }
                 tbody.innerHTML = snap.docs.map(doc => {
                     const p = doc.data();
-                    return `<tr><td>${p.name}</td><td><a href="${p.link}" target="_blank">Visit</a></td><td>${p.status?'Active':'Inactive'}</td></tr>`;
+                    const statusBadge = p.status ? `<span class="badge" style="background:var(--success)15; color:var(--success); border:1px solid var(--success)25">Active</span>` : `<span class="badge" style="background:var(--text-faint); color:var(--text-muted); border:1px solid var(--border)">Inactive</span>`;
+                    return `<tr>
+                        <td><img src="${p.img}" alt="thumb" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border);" onerror="this.src='https://placehold.co/50?text=No+Img'"></td>
+                        <td><strong>${p.name}</strong></td>
+                        <td><a href="${p.link}" target="_blank" class="btn btn-sm btn-secondary"><i class="ri-external-link-line"></i> Visit</a></td>
+                        <td>${statusBadge}</td>
+                        <td><button class="btn btn-sm btn-secondary" onclick="editPortfolio('${doc.id}')"><i class="ri-pencil-line"></i></button><button class="btn ${p.status ? 'btn-danger' : 'btn-success'}" onclick="togglePortfolioStatus('${doc.id}', ${!p.status})"><i class="${p.status ? 'ri-eye-off-line' : 'ri-eye-line'}"></i></button><button class="btn btn-sm btn-danger" onclick="deletePortfolio('${doc.id}')"><i class="ri-delete-bin-line"></i></button></td>
+                    </tr>`;
                 }).join('');
             });
         }
         function openAddPortfolioModal() {
-            // Simplified
-            showModal("Add Project", `
-                <input id="p-name" class="mb-4" placeholder="Project Name">
-                <input id="p-link" class="mb-4" placeholder="Link">
-            `, `<button class="btn btn-primary" onclick="savePortfolio()">Save</button>`);
+            const initialId = generateDocIdFromName('');
+            showModal("Add New Project", `
+                <div class="mb-4"><label>Project Name</label><input type="text" id="p-name" placeholder="e.g. Clinic Azam" oninput="updateDocIdPreview()"><small style="color:var(--text-faint)">ID will be generated from name</small></div>
+                <div class="mb-4"><label>Generated ID (Auto)</label><input type="text" id="p-doc-id" readonly value="${initialId}" class="font-mono" style="color:var(--primary); background:var(--bg-sidebar);"></div>
+                <div class="mb-4"><label>Image URL</label><input type="text" id="p-img" placeholder="https://..."><small style="color:var(--text-faint)">Direct link to image file.</small></div>
+                <div class="mb-4"><label>Website Link</label><input type="text" id="p-link" placeholder="https://..."></div>
+                <div class="flex items-center gap-4">
+                    <label class="toggle-switch"><input type="checkbox" id="p-status" checked><span class="slider"></span></label>
+                    <span style="font-size:0.9rem; color:var(--text-main);">Visible on Main Site</span>
+                </div>
+            `, `<button class="btn btn-primary" onclick="saveNewPortfolio()">Create Project</button>`);
         }
-        function savePortfolio() {
+        function saveNewPortfolio() {
             const name = document.getElementById('p-name').value;
+            const img = document.getElementById('p-img').value;
             const link = document.getElementById('p-link').value;
-            db.collection("clients_portfolio").add({ name, link, status: true, timestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { closeModal(); showToast("Added", "success"); });
+            const status = document.getElementById('p-status').checked;
+            const customId = document.getElementById('p-doc-id').value;
+            if(!name || !img || !link) return showToast("Please fill in all fields.", "error");
+            db.collection("clients_portfolio").doc(customId).set({ name, img, link, status, timestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { closeModal(); showToast("Project added successfully", "success"); logActivity(`Added portfolio project: ${name} (ID: ${customId})`); }).catch(err => { showToast("Error: " + err.message, "error"); });
         }
-
-        // --- 14. CONTENT (Admin+) ---
-        function renderContent() {
-            if(userRoleGroup === 'crew') return renderAccessDenied();
-            document.getElementById('main').innerHTML = `<h2>Content & Packages</h2><p>Restricted to Admin & Super Admin.</p>`;
-        }
-
-        // --- 15. REQUESTS ---
-        function renderRequests() {
-            document.getElementById('main').innerHTML = `
-                <h2>Customer Requests</h2>
-                <div class="table-container"><div class="table-responsive"><table><thead><tr><th>Client</th><th>Type</th><th>Status</th></tr></thead><tbody id="req-tbody"><tr><td colspan="3" class="text-center"><div class="loading-spinner"></div></td></tr></tbody></table></div></div>
-            `;
-            db.collection("customer_requests").orderBy("timestamp", "desc").onSnapshot(snap => {
-                const tbody = document.getElementById('req-tbody');
-                if(!tbody) return;
-                if(snap.empty) { tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No requests</td></tr>'; return; }
-                tbody.innerHTML = snap.docs.map(doc => {
-                    const d = doc.data();
-                    return `<tr><td>${d.name}</td><td>${d.type}</td><td>${d.status}</td></tr>`;
-                }).join('');
+        function editPortfolio(docId) {
+            db.collection("clients_portfolio").doc(docId).get().then(doc => {
+                const p = doc.data();
+                showModal("Edit Project", `
+                    <div class="mb-4"><label>Project Name</label><input type="text" id="e-p-name" value="${p.name}"><small style="color:var(--text-faint)">Editing name does not change ID</small></div>
+                    <div class="mb-4"><label>Image URL</label><input type="text" id="e-p-img" value="${p.img}"></div>
+                    <div class="mb-4"><label>Website Link</label><input type="text" id="e-p-link" value="${p.link}"></div>
+                    <div class="flex items-center gap-4">
+                        <label class="toggle-switch"><input type="checkbox" id="e-p-status" ${p.status ? 'checked' : ''}><span class="slider"></span></label>
+                        <span style="font-size:0.9rem; color:var(--text-main);">Visible on Main Site</span>
+                    </div>
+                `, `<button class="btn btn-primary" onclick="updatePortfolio('${docId}')">Save Changes</button>`);
             });
         }
-
-        // --- 16. PUBLIC PROMOS (Super Admin Only) ---
-        function renderPublicPromos() {
-            if(userRoleGroup !== 'super-admin') return renderAccessDenied();
-            document.getElementById('main').innerHTML = `<h2>Public Promo Codes</h2><p>Restricted to Super Admin.</p>`;
+        function updatePortfolio(docId) {
+            const updates = { name: document.getElementById('e-p-name').value, img: document.getElementById('e-p-img').value, link: document.getElementById('e-p-link').value, status: document.getElementById('e-p-status').checked };
+            db.collection("clients_portfolio").doc(docId).update(updates).then(() => { closeModal(); showToast("Project updated", "success"); logActivity(`Updated portfolio project: ${updates.name}`); }).catch(err => { showToast("Error updating: " + err.message, "error"); });
+        }
+        function togglePortfolioStatus(docId, newStatus) {
+            const action = newStatus ? "Activated" : "Deactivated";
+            db.collection("clients_portfolio").doc(docId).update({ status: newStatus }).then(() => { showToast(`Project ${action}`, "info"); logActivity(`${action} portfolio project`); });
+        }
+        function deletePortfolio(docId) {
+            if(!confirm("Are you sure you want to delete this project? This cannot be undone.")) return;
+            db.collection("clients_portfolio").doc(docId).delete().then(() => { showToast("Project deleted", "success"); logActivity(`Deleted portfolio project`); }).catch(err => { showToast("Error deleting: " + err.message, "error"); });
         }
 
-        // --- 17. PROFILE ---
+        // --- 10. PROFILE ---
         function renderMyProfile() {
             document.getElementById('main').innerHTML = `
                 <div class="p-4" style="background:var(--bg-surface); border:1px solid var(--border); border-radius:12px; max-width:500px; margin:0 auto;">
                     <div class="flex items-center gap-4 mb-6">
                         <div class="u-avatar" style="width:50px; height:50px; font-size:1.5rem;">${(userData.name || 'A').charAt(0)}</div>
-                        <div><h2>${userData.name}</h2><span class="badge badge-${userRoleGroup}">${userRoleGroup.toUpperCase()}</span></div>
+                        <div>
+                            <h2 style="font-size:1.25rem;">${userData.name}</h2>
+                            <span class="badge badge-${userData.role==='super_admin'?'admin':(userData.role==='admin'?'admin':'crew')}">${userData.role==='super_admin'?'Super Admin':(userData.role==='admin'?'Admin':'Crew')}</span>
+                        </div>
                     </div>
-                    <div class="mb-4"><label class="text-muted">Job Title</label><input value="${userData.jobTitle||'N/A'}" readonly></div>
+                    <div class="mb-4"><label class="text-muted">Name</label><input value="${userData.name}" readonly></div>
                     <div class="mb-4"><label class="text-muted">Email</label><input value="${userData.email}" readonly></div>
                     <div class="mb-4"><label class="text-muted">Crew ID</label><input value="${userData.crewId || 'N/A'}" readonly></div>
+                    <div class="mb-4"><label class="text-muted">Job Title</label><input value="${userData.jobTitle||'N/A'}" readonly></div>
                 </div>`;
         }
-
         function filterTable(id, text) {
             const trs = document.querySelectorAll(`#${id} tr`);
             text = text.toLowerCase();
             trs.forEach(tr => tr.style.display = tr.innerText.toLowerCase().includes(text)?'':'none');
         }
 
-        // --- 18. COMMISSIONS (Updated Logic) ---
-        async function renderCommissions() {
-            if(userRoleGroup === 'crew' && !userData.commissionRate) {
-                // Crew with 0 rate probably shouldn't see this, but let them see "0.00"
-            }
-
+        // --- 11. CUSTOMER REQUESTS ---
+        function renderRequests() {
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
-                    <h2>My Commissions</h2>
-                    <button class="btn btn-secondary" onclick="renderCommissions()"><i class="ri-refresh-line"></i> Refresh</button>
+                    <h2 style="font-size:1.25rem; font-weight:700;">Customer Requests</h2>
+                    <input type="text" id="reqSearch" placeholder="Search Client..." style="width:200px;" onkeyup="filterTable('req-tbody', this.value)">
                 </div>
-                <div class="stats-grid" id="comm-stats"><div class="page-loader"><div class="loading-spinner"></div></div></div>
                 <div class="table-container">
-                    <div class="table-header"><h3>Payout Ledger</h3></div>
                     <div class="table-responsive">
-                        <table><thead><tr><th>Order Ref</th><th>Package</th><th>Amount</th><th>My Cut</th></tr></thead><tbody id="comm-tbody"><tr><td colspan="4" class="text-center"><div class="loading-spinner"></div></td></tr></tbody></table>
+                        <table>
+                            <thead><tr><th>Date</th><th>Client</th><th>Type</th><th>Summary</th><th>Status</th><th>Action</th></tr></thead>
+                            <tbody id="req-tbody">
+                                <tr><td colspan="6" class="text-center"><div class="loading-spinner"></div></td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             `;
+            db.collection("customer_requests").orderBy("timestamp", "desc").onSnapshot(snap => {
+                const tbody = document.getElementById('req-tbody');
+                if(!tbody) return;
+                if(snap.empty) { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No requests found</td></tr>'; return; }
+                tbody.innerHTML = snap.docs.map(doc => {
+                    const d = doc.data();
+                    const type = d.type || 'content';
+                    let badgeClass = 'badge-content';
+                    let summaryText = '';
+                    if(type === 'content') { summaryText = d.details ? d.details.substring(0, 30) + '...' : 'Update Content'; badgeClass = 'badge-content'; } 
+                    else if (type === 'upgrade') { summaryText = `${d.currentPlan || 'Old'} → ${d.newPlan || 'New'}`; badgeClass = 'badge-upgrade'; } 
+                    else if (type === 'renew') { summaryText = `${d.plan || 'Plan'} (${d.duration || '1yr'})`; badgeClass = 'badge-renew'; } 
+                    else if (type === 'remove') { summaryText = d.details ? 'Remove Content' : 'Remove Item'; badgeClass = 'badge-remove'; }
+                    const statusColor = d.status === 'Completed' ? 'var(--success)' : 'var(--warning)';
+                    return `<tr>
+                        <td style="white-space:nowrap;">${formatDateTime(d.timestamp)}</td>
+                        <td><strong>${d.name}</strong><br><small style="color:var(--text-faint)">${d.phone || ''}</small></td>
+                        <td><span class="badge ${badgeClass}">${type.toUpperCase()}</span></td>
+                        <td>${summaryText} ${d.hasFile ? '<i class="ri-attachment-line" title="File Attached" style="color:var(--primary)"></i>' : ''}</td>
+                        <td><span class="badge" style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}25">${d.status}</span></td>
+                        <td><button class="btn btn-sm btn-secondary" onclick="viewRequestDetails('${doc.id}')">View</button><button class="btn btn-sm btn-success" onclick="updateRequestStatus('${doc.id}', 'Completed')">Done</button><button class="btn btn-sm btn-danger" onclick="deleteItem('request','${doc.id}')"><i class="ri-delete-bin-line"></i></button></td>
+                    </tr>`;
+                }).join('');
+            });
+        }
+        function viewRequestDetails(id) {
+            db.collection("customer_requests").doc(id).get().then(doc => {
+                const d = doc.data();
+                const type = d.type;
+                let detailsHTML = '';
+                if(type === 'content') {
+                    detailsHTML = `
+                        <div class="mb-4"><label>Description</label><textarea readonly rows="4">${d.details || 'No description provided.'}</textarea></div>
+                        <div class="mb-4"><label>Attachments</label><div class="flex items-center gap-2 text-sm"><i class="${d.hasFile ? 'ri-checkbox-circle-fill text-success' : 'ri-close-circle-fill text-muted'}"></i>${d.hasFile ? 'User attached a file via website form.' : 'No file attached.'}</div></div>
+                    `;
+                } else if (type === 'upgrade') {
+                    detailsHTML = `
+                        <div class="flex gap-4 mb-4"><div style="flex:1"><label>Current Plan</label><input value="${d.currentPlan || '-'}" readonly></div><div style="flex:1"><label>New Plan</label><input value="${d.newPlan || '-'}" readonly></div></div>
+                        <div class="mb-4"><label>Additional Notes</label><textarea readonly rows="3">${d.details || '-'}</textarea></div>
+                    `;
+                } else if (type === 'renew') {
+                    detailsHTML = `<div class="flex gap-4 mb-4"><div style="flex:1"><label>Plan to Renew</label><input value="${d.plan || '-'}" readonly></div><div style="flex:1"><label>Duration</label><input value="${d.duration || '-'}" readonly></div></div>`;
+                } else if (type === 'remove') {
+                    detailsHTML = `<div class="mb-4"><label>Items to Remove</label><textarea readonly rows="3">${d.details || '-'}</textarea></div>`;
+                }
+                showModal(`Request Details (${type.toUpperCase()})`, `
+                    <div class="mb-4 p-4" style="background:var(--bg-sidebar); border-radius:8px; border:1px solid var(--border)">
+                        <div class="text-sm text-muted mb-1">Client Info</div>
+                        <strong>${d.name}</strong> (${d.phone})<br>${d.userId ? `<small class="text-muted">User ID: ${d.userId}</small>` : ''}
+                    </div>
+                    ${detailsHTML}
+                    <div class="mt-4"><label>Update Status</label><select id="req-status-select"><option value="Pending" ${d.status==='Pending'?'selected':''}>Pending</option><option value="Completed" ${d.status==='Completed'?'selected':''}>Completed</option></select></div>
+                `, `<button class="btn btn-primary" onclick="updateRequestStatus('${id}', null, true)">Save Status</button>`);
+            });
+        }
+        function updateRequestStatus(id, newStatus = null, fromModal = false) {
+            const statusToSet = newStatus || document.getElementById('req-status-select').value;
+            db.collection("customer_requests").doc(id).update({ status: statusToSet }).then(() => {
+                if(fromModal) closeModal();
+                showToast("Request Status Updated", "success");
+                logActivity(`Updated request status to ${statusToSet}`);
+            }).catch(err => { showToast("Error updating: " + err.message, "error"); });
+        }
+        function deleteItem(collection, id) {
+            if(!confirm("Delete this item permanently?")) return;
+            db.collection(collection).doc(id).delete().then(() => { showToast("Item deleted", "success"); logActivity(`Deleted item from ${collection}`); });
+        }
 
+        // --- 12. PUBLIC PROMO CODES ---
+        function renderPublicPromos() {
+            document.getElementById('main').innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h2 style="font-size:1.25rem; font-weight:700;">Public Promo Codes</h2>
+                    <button class="btn btn-primary" onclick="addPublicPromo()"><i class="ri-add-line"></i> Add Code</button>
+                </div>
+                <div class="table-container">
+                    <div class="table-header"><h3>Active Codes (config/promo_codes)</h3></div>
+                    <div class="table-responsive">
+                        <table><thead><tr><th>Code</th><th>Discount (%)</th><th>Action</th></tr></thead><tbody id="public-promos-tbody">
+                        <tr><td colspan="3" class="text-center"><div class="loading-spinner"></div></td></tr>
+                        </tbody></table>
+                    </div>
+                </div>
+            `;
+            db.collection("promo_codes").onSnapshot(snap => {
+                const tbody = document.getElementById('public-promos-tbody');
+                if(!tbody) return;
+                if(snap.empty) { tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No public promo codes found.</td></tr>'; return; }
+                tbody.innerHTML = snap.docs.map(doc => {
+                    const code = doc.id; 
+                    const data = doc.data();
+                    const discountPercent = (data.discount * 100) + '%';
+                    return `<tr>
+                        <td class="font-mono" style="color:var(--warning); font-weight:700;">${code}</td>
+                        <td><span class="badge" style="background:var(--success)15; color:var(--success); border:1px solid var(--success)25">${discountPercent}</span></td>
+                        <td><button class="btn btn-sm btn-danger" onclick="deletePublicPromo('${code}')"><i class="ri-delete-bin-line"></i> Delete</button></td>
+                    </tr>`;
+                }).join('');
+            });
+        }
+        function addPublicPromo() {
+            showModal("Add Public Promo Code", `
+                <div class="mb-4"><label>Promo Code (ID)</label><input type="text" id="pub-promo-code" placeholder="e.g. WELCOME10" style="text-transform:uppercase;"><small class="text-muted">Users will enter this exact code.</small></div>
+                <div class="mb-4"><label>Discount Percentage</label><input type="number" id="pub-promo-discount" placeholder="0.1 for 10%"><small class="text-muted">Decimal (e.g., 0.10 = 10%)</small></div>
+            `, `<button class="btn btn-primary" onclick="savePublicPromo()">Create Code</button>`);
+        }
+        async function savePublicPromo() {
+            const code = document.getElementById('pub-promo-code').value.trim().toUpperCase();
+            const discount = parseFloat(document.getElementById('pub-promo-discount').value);
+            if(!code || isNaN(discount)) return showToast("Invalid Input", "error");
+            try {
+                await db.collection("promo_codes").doc(code).set({ discount: discount });
+                closeModal();
+                showToast("Promo Code Created", "success");
+                logActivity(`Created public promo code: ${code}`);
+            } catch(e) { showToast("Error: " + e.message, "error"); }
+        }
+        async function deletePublicPromo(code) {
+            if(!confirm(`Delete promo code ${code}?`)) return;
+            try {
+                await db.collection("promo_codes").doc(code).delete();
+                showToast("Promo Code Deleted", "success");
+                logActivity(`Deleted public promo code: ${code}`);
+            } catch(e) { showToast("Error deleting: " + e.message, "error"); }
+        }
+
+        // --- 13. COMMISSIONS ---
+        async function renderCommissions() {
+            document.getElementById('main').innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h2 style="font-size:1.25rem; font-weight:700;">My Commissions</h2>
+                    <button class="btn btn-secondary" onclick="renderCommissions()"><i class="ri-refresh-line"></i> Refresh</button>
+                </div>
+                <div class="stats-grid" id="comm-stats">
+                    <div class="page-loader"><div class="loading-spinner"></div></div>
+                </div>
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Payout Ledger (Paid Orders Only)</h3>
+                        ${isSuperAdmin() ? '<small class="text-muted">Admin View: Seeing all commissions.</small>' : '<small class="text-muted">Viewing your assigned sales only.</small>'}
+                    </div>
+                    <div class="table-responsive">
+                        <table><thead><tr><th>Order Ref</th><th>Package</th><th>Amount</th><th>Type</th><th>My Cut</th></tr></thead><tbody id="comm-tbody">
+                            <tr><td colspan="5" class="text-center"><div class="loading-spinner"></div></td></tr>
+                        </tbody></table>
+                    </div>
+                </div>
+            `;
+            const isFounder = userData.jobTitle && userData.jobTitle.includes("Founder");
+            const myUid = currentUser.uid;
             const ordersSnap = await db.collection("orders").where("status", "==", "Paid").get();
             const ordersList = ordersSnap.docs.map(d => ({id: d.id, ...d.data()}));
-
             let totalEarnings = 0;
             let commDetails = [];
-            const myUid = currentUser.uid;
-
-            // LOGIC IMPLEMENTATION
             ordersList.forEach(order => {
                 let commission = 0;
                 const amount = parseFloat(order.total.replace('RM ', '')) || 0;
-
-                // 1. Founder Logic
-                if (userData.jobTitle === "Founder & Managing Director") {
-                    // 5% of EVERYTHING
+                const cycle = (order.billingCycle || 'One-Time').toLowerCase();
+                if (isFounder) {
                     commission = amount * 0.05;
-                    commDetails.push({
-                        ref: order.id.substring(0,6),
-                        pkg: order.package,
-                        amt: amount,
-                        comm: commission,
-                        note: "Founder Override (5%)"
-                    });
+                    commDetails.push({ ref: order.id.substring(0,6), pkg: order.package, amt: amount, cycle: cycle, comm: commission });
                 } else {
-                    // 2. Admin & Crew Logic
-                    // Check if I am assigned
-                    const repIds = order.salesRepIds || [];
-                    if (repIds.includes(myUid)) {
-                        // Calculate based on MY specific rate
+                    if(order.salesRepId === myUid) {
                         const myRate = userData.commissionRate || 0;
                         commission = amount * myRate;
-                        commDetails.push({
-                            ref: order.id.substring(0,6),
-                            pkg: order.package,
-                            amt: amount,
-                            comm: commission,
-                            note: "Assigned Sales"
-                        });
+                        commDetails.push({ ref: order.id.substring(0,6), pkg: order.package, amt: amount, cycle: cycle, comm: commission });
                     }
                 }
                 totalEarnings += commission;
             });
-
-            // Render Stats
             document.getElementById('comm-stats').innerHTML = `
                 <div class="stat-card">
                     <div class="stat-icon" style="color:var(--success); background:var(--success)15"><i class="ri-wallet-3-line"></i></div>
@@ -2122,37 +2542,37 @@
                         <div class="stat-label">Eligible Transactions</div>
                     </div>
                 </div>
+                ${isFounder ? `
+                <div class="stat-card">
+                    <div class="stat-icon" style="color:var(--warning); background:var(--warning)15"><i class="ri-vip-crown-line"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-val">Founder View</div>
+                        <div class="stat-label">5% of All Revenue</div>
+                    </div>
+                </div>` : `
                 <div class="stat-card">
                     <div class="stat-icon" style="color:var(--info); background:var(--info)15"><i class="ri-user-star-line"></i></div>
                     <div class="stat-info">
                         <div class="stat-val">${(userData.commissionRate*100).toFixed(1)}%</div>
                         <div class="stat-label">My Rate</div>
                     </div>
-                </div>
+                </div>`}
             `;
-
-            // Render Table
             const tbody = document.getElementById('comm-tbody');
             if(commDetails.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted">No commissions found.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">No commissions found.</td></tr>`;
             } else {
                 tbody.innerHTML = commDetails.map(c => `
                     <tr>
                         <td class="font-mono" style="color:var(--primary)">${c.ref}</td>
                         <td>${c.pkg}</td>
                         <td>RM ${c.amt}</td>
+                        <td><span class="badge badge-crew" style="background:rgba(255,255,255,0.05); border:1px solid var(--border); text-transform:capitalize;">${c.cycle}</span></td>
                         <td style="color:var(--success); font-weight:700;">+ RM ${c.comm.toFixed(2)}</td>
                     </tr>
                 `).join('');
             }
         }
-
-        // Placeholder for generic delete item
-        function deleteItem(col, id) {
-            if(!confirm("Delete this item?")) return;
-            db.collection(col).doc(id).delete().then(() => showToast("Deleted", "success"));
-        }
-
     </script>
 </body>
 </html>
