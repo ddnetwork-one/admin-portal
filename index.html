@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Admin Portal v11.4(ddn)</title>
+    <title>Admin Portal v11.5(ddn)</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -597,6 +597,28 @@
             position: fixed; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 3001; background: rgba(15, 23, 42, 0.9); padding: 8px; border-radius: 12px; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
+        /* --- Multi Select Styles --- */
+        .multi-select-container {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-input);
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .checkbox-item:hover { background: rgba(255,255,255,0.05); }
+        .checkbox-item input { width: auto; margin: 0; }
+        .checkbox-item span { font-size: 0.9rem; color: var(--text-main); }
+
         /* RESPONSIVENESS */
         @media(max-width: 1024px) {
             aside { transform: translateX(-100%); width: 280px; box-shadow: 20px 0 40px rgba(0,0,0,0.5); }
@@ -689,7 +711,7 @@
     <div id="auth-screen">
         <div class="auth-card">
             <img src="https://raw.githubusercontent.com/ddnetwork-ent/ddnetwork/refs/heads/main/DDN%20Logo%20NoBG.png" alt="Logo">
-            <h2 class="mb-4" style="color:white; font-weight: 700; letter-spacing: -0.5px;">Admin Portal v11.4</h2>
+            <h2 class="mb-4" style="color:white; font-weight: 700; letter-spacing: -0.5px;">Admin Portal v11.5</h2>
             <form id="loginForm">
                 <input type="text" id="loginInput" class="mb-4" placeholder="Email or Crew ID" required>
                 <input type="password" id="loginPass" class="mb-4" placeholder="Password" required>
@@ -708,7 +730,7 @@
                 <button class="btn-icon" onclick="toggleSidebar()" title="Toggle Menu"><i class="ri-menu-line" style="font-size: 1.4rem;"></i></button>
                 <div class="header-brand">
                     <img src="https://raw.githubusercontent.com/ddnetwork-ent/ddnetwork/refs/heads/main/DDN%20Logo%20NoBG.png">
-                    <span>DDN v11.4</span>
+                    <span>DDN v11.5</span>
                 </div>
             </div>
             <div class="header-actions">
@@ -727,7 +749,7 @@
             </div>
         </header>
 
-        <!-- SIDEBAR -->
+        <!-- SIDEBAR (All visible to all employees) -->
         <aside id="sidebar">
             <div class="user-mini-profile">
                 <div class="u-info">
@@ -740,57 +762,57 @@
             </div>
             
             <div class="nav-scroll">
-                <!-- OVERVIEW (Visible to All) -->
+                <!-- OVERVIEW -->
                 <div class="nav-item active" onclick="navigateTo('/')">
                     <i class="ri-dashboard-line"></i> <span class="nav-text">Overview</span>
                 </div>
                 
-                <!-- OPERATIONS (Super Admin & Admin Only) -->
-                <div class="nav-section-title nav-group-admin nav-group-super"><span class="nav-text">Operations</span></div>
-                <div class="nav-item nav-group-admin nav-group-super" onclick="navigateTo('/orders')">
+                <!-- OPERATIONS -->
+                <div class="nav-section-title"><span class="nav-text">Operations</span></div>
+                <div class="nav-item" onclick="navigateTo('/orders')">
                     <i class="ri-shopping-bag-3-line"></i> <span class="nav-text">Orders</span>
                 </div>
-                <div class="nav-item nav-group-admin nav-group-super" onclick="navigateTo('/clients')">
+                <div class="nav-item" onclick="navigateTo('/clients')">
                     <i class="ri-user-line"></i> <span class="nav-text">Clients</span>
                 </div>
-                <div class="nav-item nav-group-admin nav-group-super" onclick="navigateTo('/requests')">
+                <div class="nav-item" onclick="navigateTo('/requests')">
                     <i class="ri-database-2-line"></i> <span class="nav-text">Customer Requests</span>
                 </div>
-                <div class="nav-item nav-group-admin nav-group-super" onclick="navigateTo('/support')">
+                <div class="nav-item" onclick="navigateTo('/support')">
                     <i class="ri-customer-service-2-line"></i> <span class="nav-text">Support Tickets</span>
                 </div>
-                <div class="nav-item nav-group-admin nav-group-super" onclick="navigateTo('/vouchers')">
+                <div class="nav-item" onclick="navigateTo('/vouchers')">
                     <i class="ri-ticket-2-line"></i> <span class="nav-text">Vouchers</span>
                 </div>
                 
-                <!-- MANAGEMENT (Super Admin & Admin Only) -->
-                <div class="nav-section-title nav-group-admin nav-group-super"><span class="nav-text">Management</span></div>
-                <div class="nav-item nav-group-admin nav-group-super" onclick="navigateTo('/portfolio')">
+                <!-- MANAGEMENT -->
+                <div class="nav-section-title"><span class="nav-text">Management</span></div>
+                <div class="nav-item" onclick="navigateTo('/portfolio')">
                     <i class="ri-gallery-line"></i> <span class="nav-text">Portfolio</span>
                 </div>
-                <div class="nav-item nav-group-admin nav-group-super" onclick="navigateTo('/content')">
+                <div class="nav-item" onclick="navigateTo('/content')">
                     <i class="ri-layout-masonry-line"></i> <span class="nav-text">Content & Pkg</span>
                 </div>
-                <div class="nav-item nav-group-admin nav-group-super" onclick="navigateTo('/public-promos')">
+                <div class="nav-item" onclick="navigateTo('/public-promos')">
                     <i class="ri-coupon-3-line"></i> <span class="nav-text">Public Promos</span>
                 </div>
                 
-                <!-- SUPER ADMIN ONLY SECTIONS -->
-                <div class="nav-section-title nav-group-super"><span class="nav-text">System</span></div>
-                <div class="nav-item nav-group-super" onclick="navigateTo('/crew')">
+                <!-- SYSTEM -->
+                <div class="nav-section-title"><span class="nav-text">System</span></div>
+                <div class="nav-item" onclick="navigateTo('/crew')">
                     <i class="ri-team-line"></i> <span class="nav-text">Internal Crew</span>
                 </div>
-                <div class="nav-item nav-group-super" onclick="navigateTo('/config')">
+                <div class="nav-item" onclick="navigateTo('/config')">
                     <i class="ri-settings-4-line"></i> <span class="nav-text">System Config</span>
                 </div>
                 
-                <!-- FINANCE (Visible to All Crew) -->
+                <!-- FINANCE -->
                 <div class="nav-section-title"><span class="nav-text">Finance</span></div>
                 <div class="nav-item" onclick="navigateTo('/commissions')">
                     <i class="ri-money-dollar-circle-line"></i> <span class="nav-text">Commissions</span>
                 </div>
                 
-                <!-- PERSONAL (Visible to All) -->
+                <!-- PERSONAL -->
                 <div class="nav-section-title"><span class="nav-text">Personal</span></div>
                 <div class="nav-item" onclick="navigateTo('/my-profile')">
                     <i class="ri-user-settings-line"></i> <span class="nav-text">My Profile</span>
@@ -840,50 +862,38 @@
     <script>
         // --- CONSTANTS & CONFIG ---
         
-        // Updated Job Titles and Mapping
+        // Updated Job Titles & Rates based on Prompt
         const JOB_TITLES = [
-            // Super Admin
-            "Founder & Managing Director",
-            // Admin Group
-            "Project & Client Manager",
-            "Account / Operations / Marketing Manager",
-            // Sales & Growth (Internal Crew)
-            "Business Development Executive",
-            "Sales Executive",
-            // Customer Success (Internal Crew)
-            "Client Success Coordinator",
-            "Client Experience Executive",
-            // Technical (Internal Crew)
-            "Technical Specialist",
-            "Web Developer",
-            "Full Stack Developer",
-            "Automation & AI Specialist",
-            // Support (Internal Crew)
-            "Support Operations Executive"
+            "Founder & Managing Director", // Super Admin, 5%
+            "Project & Client Manager", // Admin, 3-5%
+            "Account / Operations / Marketing Manager", // Admin, 3-5%
+            "Finance / Billing Executive", // Admin, None
+            "People / Team Operations Executive", // Admin, None
+            "Business Development Executive", // Crew, 10-15%
+            "Sales Executive", // Crew, 10-15%
+            "Client Success Coordinator", // Crew, 2-3%
+            "Client Experience Executive", // Crew, 2-3%
+            "Technical Specialist", // Crew, 3-5%
+            "Web Developer", // Crew, 3-5%
+            "Full Stack Developer", // Crew, 3-5%
+            "Automation & AI Specialist", // Crew, 3-5%
+            "Support Operations Executive" // Crew, 2-3%
         ];
 
         const DEFAULT_COMMISSION_RATES = {
             "Founder & Managing Director": 0.05,
-            
-            // Management: 3-5% (Used midpoint for default)
             "Project & Client Manager": 0.04,
             "Account / Operations / Marketing Manager": 0.04,
-            
-            // Sales: 10-15%
+            "Finance / Billing Executive": 0.0,
+            "People / Team Operations Executive": 0.0,
             "Business Development Executive": 0.125,
             "Sales Executive": 0.125,
-
-            // CS: 2-3%
             "Client Success Coordinator": 0.025,
             "Client Experience Executive": 0.025,
-
-            // Tech: 3-5%
             "Technical Specialist": 0.04,
             "Web Developer": 0.04,
             "Full Stack Developer": 0.05,
             "Automation & AI Specialist": 0.05,
-
-            // Support: 2-3%
             "Support Operations Executive": 0.025
         };
 
@@ -968,18 +978,10 @@
                  try {
                      const snap = await db.collection("users").where("crewId", "!=", null).get();
                      let existingIds = [];
-                     snap.forEach(doc => {
-                         const id = doc.data().crewId;
-                         if(id) existingIds.push(parseInt(id));
-                     });
+                     snap.forEach(doc => { const id = doc.data().crewId; if(id) existingIds.push(parseInt(id)); });
                      existingIds.sort((a,b) => a-b);
                      let nextId = 1;
-                     if(existingIds.length > 0) {
-                         for(let i=0; i<existingIds.length; i++) {
-                             if(existingIds[i] === nextId) nextId++;
-                             else break;
-                         }
-                     }
+                     if(existingIds.length > 0) { for(let i=0; i<existingIds.length; i++) { if(existingIds[i] === nextId) nextId++; else break; } }
                      return String(nextId).padStart(3, '0');
                  } catch(e) { return "001"; }
             } else if (type === 'ticket') {
@@ -1019,7 +1021,7 @@
             auth.signInWithEmailAndPassword(emailToUse, pass).catch(err => showToast(err.message, "error"));
         });
 
-        // AUTH STATE LISTENER (Prevents Login Screen on Refresh)
+        // AUTH STATE LISTENER
         auth.onAuthStateChanged((user) => {
             if(user) {
                 db.collection("users").doc(user.uid).get().then(doc => {
@@ -1036,26 +1038,13 @@
                         document.getElementById('side-avatar').innerText = (userData.name || 'A').charAt(0).toUpperCase();
                         document.getElementById('header-avatar').innerText = (userData.name || 'A').charAt(0).toUpperCase();
 
-                        // --- ACCESS CONTROL LOGIC ---
-                        const role = userData.role || 'crew';
-                        
-                        // Hide all restricted groups first
-                        document.querySelectorAll('.nav-group-super, .nav-group-admin').forEach(el => el.classList.add('hidden'));
-
-                        if (role === 'super_admin') {
-                            // Show everything
-                            document.querySelectorAll('.nav-group-super, .nav-group-admin').forEach(el => el.classList.remove('hidden'));
+                        // All employees can see sidebar
+                        // Notifications restricted to Admins
+                        if(userData.role === 'crew') {
+                            document.getElementById('notif-btn').style.display = 'none';
+                        } else {
                             document.getElementById('notif-btn').style.display = 'flex'; 
                             listenForNotifications(); 
-                        } else if (role === 'admin') {
-                            // Show Admin groups, hide Super Admin groups
-                            document.querySelectorAll('.nav-group-admin').forEach(el => el.classList.remove('hidden'));
-                            document.getElementById('notif-btn').style.display = 'flex'; 
-                            listenForNotifications();
-                        } else {
-                            // Internal Crew: Only see Overview, Commissions, My Profile
-                            // (Restricted sections already hidden by CSS class logic)
-                            document.getElementById('notif-btn').style.display = 'none';
                         }
 
                         initRouter();
@@ -1066,7 +1055,6 @@
                     }
                 });
             } else {
-                // No User
                 document.getElementById('dashboard').classList.add('hidden');
                 document.getElementById('auth-screen').classList.remove('hidden');
             }
@@ -1107,6 +1095,30 @@
             });
         }
 
+        // --- ACCESS CONTROL HELPERS ---
+        // Internal Crew (role: 'crew') has LIMITED WRITE ACCESS.
+        // Write Access: Overview, Orders, Requests, Support
+        // Read Only: Clients, Vouchers, Portfolio, Content, Promos, Crew, Config, Commissions, Profile
+        function canWrite(resource) {
+            if (!userData) return false;
+            // Admin and Super Admin have write access to everything
+            if (userData.role === 'admin' || userData.role === 'super_admin') return true;
+            // Internal Crew
+            if (userData.role === 'crew') {
+                const allowedResources = ['orders', 'requests', 'support', 'overview'];
+                return allowedResources.includes(resource);
+            }
+            return false;
+        }
+
+        function checkAccessAndDeny(resource) {
+            if (!canWrite(resource)) {
+                showToast("Access denied, please contact IT or your superior.", "error");
+                return true; // Access Denied
+            }
+            return false; // Access Granted
+        }
+
         // --- ROUTING SYSTEM ---
         const routes = {
             '/': renderOverview,
@@ -1125,25 +1137,6 @@
         };
 
         function navigateTo(path) {
-            // Permission Check before Navigation
-            const role = userData.role;
-            
-            // Super Admin: ALL ACCESS
-            // Admin: NO 'crew', NO 'config'
-            // Crew: ONLY '/', 'commissions', 'my-profile'
-            
-            if (role === 'crew') {
-                if (!['/', '/commissions', '/my-profile'].includes(path)) {
-                    renderAccessDenied();
-                    return;
-                }
-            } else if (role === 'admin') {
-                if (['/crew', '/config'].includes(path)) {
-                    renderAccessDenied();
-                    return;
-                }
-            }
-
             window.history.pushState({ path: path }, "", path);
             loadRoute(path);
         }
@@ -1222,22 +1215,6 @@
                 console.error("Delete error:", error);
                 showToast("Error deleting user: " + error.message, "error");
             }
-        }
-
-        function renderAccessDenied() {
-            document.getElementById('main').innerHTML = `
-                <div class="access-denied-container">
-                    <i class="ri-lock-2-line access-denied-icon"></i>
-                    <h1 class="access-denied-title">Access Denied</h1>
-                    <p class="access-denied-desc">
-                        You do not have permission to view this section.
-                    </p>
-                    <button class="btn btn-primary" onclick="navigateTo('/')">Return to Dashboard</button>
-                    <div style="margin-top: 2rem; color: var(--text-faint); font-size: 0.9rem;">
-                        Please Contact IT or Danial Danish if you believe this is an error.
-                    </div>
-                </div>
-            `;
         }
 
         // ---1. OVERVIEW ---
@@ -1368,6 +1345,9 @@
                     if(d.status === 'Completed') statusColor = 'var(--success)';
                     if(d.status === 'Paid') statusColor = 'var(--primary)';
                     if(d.status === 'Cancelled') statusColor = 'var(--danger)';
+                    
+                    // Crew can see Manage/PDF/WA. Admin can see Delete.
+                    // Internal Crew CAN Edit Orders based on Prompt ("Orders - All employees")
                     
                     return `<tr>
                         <td style="white-space:nowrap;">${formatDateTime(d.timestamp)}</td>
@@ -1511,6 +1491,8 @@
         }
 
         async function sendPaymentReminder(id) {
+            if(checkAccessAndDeny('orders')) return; // Write check
+
             try {
                 const doc = await db.collection("orders").doc(id).get();
                 if(!doc.exists) return;
@@ -1521,7 +1503,26 @@
                     if(!pmSnap.empty) payLink = pmSnap.docs[0].data().link;
                 } catch(e) {}
                 const orderRef = id.substring(0,6).toUpperCase();
-                const msg = `👋 Hi ${d.customerName},\n\nReminder regarding your order with DDNetwork One.\n\n📄 *Invoice:* #${orderRef}\n📦 *Package:* ${d.package}\n💰 *Total:* ${d.total}\n\n💳 *Pay Here:* ${payLink}\n\nThank you! 🚀`;
+
+                // OWA Logic based on status
+                let msg = "";
+                if (d.status === "Pending" || d.status === "Cancelled" || !d.status) {
+                    // Incomplete/Pending Template
+                    msg = `Hi ${d.customerName},
+This is ${userData.name} from DDNetwork.
+
+We noticed that your order #${orderRef} is incomplete. Kindly complete remaining details/payment so we can process your order promptly.
+
+If you need any assistance, feel free to reply to this message.
+
+Thank you for choosing DDNetwork.
+
+– DDNetwork Team`;
+                } else {
+                    // Paid/Completed (Generic Thank you or Receipt)
+                    msg = `👋 Hi ${d.customerName},\n\nReminder regarding your order with DDNetwork One.\n\n📄 *Invoice:* #${orderRef}\n📦 *Package:* ${d.package}\n💰 *Total:* ${d.total}\n\n💳 *Payment Link:* ${payLink}\n\nThank you! 🚀`;
+                }
+                
                 let cleanPhone = d.customerPhone ? d.customerPhone.replace(/^0/, '60') : '60123456789';
                 if(!cleanPhone.startsWith('+')) cleanPhone = '+' + cleanPhone;
                 window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
@@ -1534,18 +1535,36 @@
         }
 
         async function viewOrder(id) {
+            // Crew can view and edit order details? Prompt: "Orders - All employees". 
+            // Internal Crew has Write Access to Orders.
+            
+            if(checkAccessAndDeny('orders')) return;
+
             const doc = await db.collection("orders").doc(id).get();
             const d = doc.data();
-            let salesRepOptions = '<option value="">Unassigned</option>';
-            let currentSalesRepId = d.salesRepId || "";
+            
+            // Multi-select Sales Rep Logic
+            let salesRepHTML = '<div class="multi-select-container">';
+            const currentReps = d.salesRepIds || []; // Array of IDs
+            
             try {
                 const crewSnap = await db.collection("users").where("role", "in", ["super_admin", "admin", "crew"]).get();
-                crewSnap.forEach(c => {
-                    const cData = c.data();
-                    const selected = c.id === currentSalesRepId ? 'selected' : '';
-                    salesRepOptions += `<option value="${c.id}" ${selected}>${cData.name} (${cData.jobTitle || cData.role})</option>`;
-                });
+                if(crewSnap.empty) {
+                    salesRepHTML = '<div class="p-4 text-muted">No staff found</div>';
+                } else {
+                    crewSnap.forEach(c => {
+                        const cData = c.data();
+                        const isChecked = currentReps.includes(c.id) ? 'checked' : '';
+                        salesRepHTML += `
+                            <label class="checkbox-item">
+                                <input type="checkbox" class="rep-checkbox" value="${c.id}" ${isChecked}>
+                                <span>${cData.name} (${cData.jobTitle || cData.role})</span>
+                            </label>`;
+                    });
+                }
             } catch(e) { console.error(e); }
+            salesRepHTML += '</div>';
+
             const voucherDisplay = d.voucherCode ? `<div class="mb-4"><label>Voucher Used</label><input readonly value="${d.voucherCode}" style="color:var(--warning); border-color:var(--warning)"></div>` : '';
             showModal(`Manage Order`, `
                 ${voucherDisplay}
@@ -1562,9 +1581,9 @@
                     </div>
                 </div>
                 <div class="mb-4">
-                    <label>Sales Representative (For Commission)</label>
-                    <select id="o-sales-rep">${salesRepOptions}</select>
-                    <small class="text-muted">Assigns commission credit to this crew member.</small>
+                    <label>Sales Representatives (Multiple)</label>
+                    ${salesRepHTML}
+                    <small class="text-muted">Select all employees entitled to commission for this order.</small>
                 </div>
                 <div class="mt-4">
                     <label>Client Domain</label>
@@ -1585,6 +1604,8 @@
         }
 
         function updateOrderDetails(id) {
+            if(checkAccessAndDeny('orders')) return;
+
             const updateData = {
                 customerName: document.getElementById('o-name').value,
                 customerEmail: document.getElementById('o-email').value,
@@ -1593,23 +1614,28 @@
                 domain: document.getElementById('o-domain').value.replace(/^https?:\/\//, ''), 
                 status: document.getElementById('upd-status').value
             };
-            const salesRepSelect = document.getElementById('o-sales-rep');
-            if(salesRepSelect) {
-                if(salesRepSelect.value) {
-                    const repName = salesRepSelect.options[salesRepSelect.selectedIndex].text;
-                    updateData.salesRepId = salesRepSelect.value;
-                    updateData.salesRepName = repName;
-                } else {
-                    updateData.salesRepId = firebase.firestore.FieldValue.delete();
-                    updateData.salesRepName = firebase.firestore.FieldValue.delete();
-                }
-            }
+            
+            // Handle Multi-select Reps
+            const checkboxes = document.querySelectorAll('.rep-checkbox:checked');
+            const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+            const selectedNames = [];
+
+            // Need to fetch names for logging/display if possible, or just store IDs. 
+            // For simplicity in this snippet, we just store IDs. 
+            // A robust system would store {id, name} objects.
+            
+            updateData.salesRepIds = selectedIds;
+            // Clear old single fields if they exist
+            updateData.salesRepId = firebase.firestore.FieldValue.delete();
+            updateData.salesRepName = firebase.firestore.FieldValue.delete();
+
             db.collection("orders").doc(id).update(updateData).then(() => { 
                 closeModal(); showToast("Order Updated Successfully", "success"); logActivity(`Updated Order #${id.substr(0,6)}`);
             });
         }
 
         function deleteOrder(id) {
+            if(!isSuperAdmin()) return;
             if(!confirm("Delete this order?")) return;
             db.collection("orders").doc(id).delete().then(() => {
                 showToast("Order Deleted", "success");
@@ -1619,6 +1645,8 @@
 
         // --- 3. CLIENTS ---
         function renderClients() {
+            // Crew Read Only
+            const canEdit = canWrite('clients');
             document.getElementById('main').innerHTML = `
                 <div class="table-container">
                     <div class="table-header">
@@ -1639,22 +1667,28 @@
                     const u = doc.data();
                     const vStatus = u.personalVoucher ? u.personalVoucher.status : 'None';
                     const vCode = u.personalVoucher ? u.personalVoucher.code : '-';
+                    
+                    let buttons = `
+                        ${canEdit ? `<button class="btn btn-sm btn-secondary" onclick="editClient('${doc.id}')">Edit</button>` : ''}
+                        ${canEdit ? `<button class="btn btn-sm btn-secondary" onclick="resetPassword('${u.email}')">Reset PW</button>` : ''}
+                        ${canEdit ? `<button class="btn btn-sm btn-primary" onclick="openAssignVoucherModal('${doc.id}', '${u.name}')">Assign Voucher</button>` : ''}
+                        ${isSuperAdmin() ? `<button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Client')"><i class="ri-delete-bin-line"></i></button>` : ''}
+                    `;
+
                     return `<tr>
                         <td>${u.name}</td>
                         <td>${u.company||'-'}</td>
                         <td>${u.email}<br><small style="color:var(--text-faint)">${u.phone||''}</small></td>
                         <td>${vStatus !== 'None' ? `<span class="badge" style="background:${vStatus==='active'?'var(--success)':'var(--text-faint)'}">${vCode}</span>` : '-'}</td>
                         <td>
-                            <button class="btn btn-sm btn-secondary" onclick="editClient('${doc.id}')">Edit</button>
-                            <button class="btn btn-sm btn-secondary" onclick="resetPassword('${u.email}')">Reset PW</button>
-                            <button class="btn btn-sm btn-primary" onclick="openAssignVoucherModal('${doc.id}', '${u.name}')">Assign Voucher</button>
-                            ${isSuperAdmin() ? `<button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Client')"><i class="ri-delete-bin-line"></i></button>` : ''}
+                            <div style="display:flex; gap:5px;">${buttons}</div>
                         </td>
                     </tr>`;
                 }).join('');
             });
         }
         function editClient(uid) {
+            if(checkAccessAndDeny('clients')) return;
             db.collection("users").doc(uid).get().then(doc => {
                 const u = doc.data();
                 showModal("Edit Client", `
@@ -1666,19 +1700,22 @@
             });
         }
         function saveClient(uid) {
+            if(checkAccessAndDeny('clients')) return;
             db.collection("users").doc(uid).update({ name: document.getElementById('e-name').value, phone: document.getElementById('e-phone').value, company: document.getElementById('e-comp').value }).then(() => { closeModal(); showToast("Client Updated", "success"); logActivity("Updated client details"); });
         }
         function resetPassword(email) {
+            if(checkAccessAndDeny('clients')) return;
             if(confirm(`Send reset email to ${email}?`)) { auth.sendPasswordResetEmail(email).then(() => showToast("Reset email sent", "success")); }
         }
 
-        // --- 4. CREW MANAGEMENT (UPDATED) ---
+        // --- 4. CREW MANAGEMENT ---
         function renderCrew() {
-            if(!isSuperAdmin()) return renderAccessDenied();
+            // Crew Read Only
+            const canEdit = canWrite('crew');
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:700;">Internal Crew</h2>
-                    <button class="btn btn-primary" onclick="openAddCrewModal()"><i class="ri-add-line"></i> Add Crew</button>
+                    ${canEdit && isSuperAdmin() ? `<button class="btn btn-primary" onclick="openAddCrewModal()"><i class="ri-add-line"></i> Add Crew</button>` : ''}
                 </div>
                 <div class="table-container">
                     <div class="table-responsive">
@@ -1693,6 +1730,13 @@
                 tbody.innerHTML = snap.docs.map(doc => {
                     const u = doc.data();
                     const rate = u.commissionRate ? (u.commissionRate * 100).toFixed(1) + '%' : '0%';
+                    let buttons = '';
+                    if (canEdit) {
+                        buttons = `<button class="btn btn-sm btn-secondary" onclick="editCrew('${doc.id}')"><i class="ri-pencil-line"></i></button>`;
+                        if (isSuperAdmin()) {
+                            buttons += `<button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Crew')"><i class="ri-delete-bin-line"></i></button>`;
+                        }
+                    }
                     return `<tr>
                         <td class="font-mono" style="color:var(--primary)">${u.crewId || 'N/A'}</td>
                         <td>${u.name}</td>
@@ -1700,16 +1744,14 @@
                         <td><span class="badge badge-${u.role==='super_admin'?'admin':(u.role==='admin'?'admin':'crew')}">${u.role}</span></td>
                         <td>${u.jobTitle||'-'}</td>
                         <td><span class="badge" style="background:var(--success)15; color:var(--success)">${rate}</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-secondary" onclick="editCrew('${doc.id}')"><i class="ri-pencil-line"></i></button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Crew')"><i class="ri-delete-bin-line"></i></button>
-                        </td>
+                        <td>${buttons}</td>
                     </tr>`;
                 }).join('');
             });
         }
         
         async function openAddCrewModal() {
+            if(checkAccessAndDeny('crew')) return;
             const newCrewId = await getNextId('crew');
             const jobOptions = JOB_TITLES.map(j => `<option value="${j}">${j}</option>`).join('');
             
@@ -1717,7 +1759,6 @@
                 <div class="mb-4"><label>Crew ID</label><input id="c-id" value="${newCrewId}" readonly></div>
                 <div class="mb-4"><label>Full Name</label><input id="c-name"></div>
                 <div class="mb-4"><label>Email Address</label><input type="email" id="c-email"></div>
-                
                 <div class="mb-4">
                     <label>Job Title (Auto-Sets Role)</label>
                     <select id="c-job" onchange="autoSetRoleAndRate()">
@@ -1725,7 +1766,6 @@
                         ${jobOptions}
                     </select>
                 </div>
-
                 <div class="flex gap-4 mb-4">
                     <div style="flex:1">
                         <label>Role</label>
@@ -1736,7 +1776,6 @@
                         <input type="number" step="0.1" id="c-rate" readonly style="background:var(--bg-sidebar)">
                     </div>
                 </div>
-
                 <div class="mb-4"><label>Temporary Password</label><input type="password" id="c-pass" placeholder="Set password"></div>
             `, `<button class="btn btn-primary" onclick="saveCrew('${newCrewId}')">Create Crew</button>`);
         }
@@ -1746,14 +1785,12 @@
             const roleInput = document.getElementById('c-role');
             const rateInput = document.getElementById('c-rate');
             
-            // Auto Role Mapping
-            if(title === "Founder & Managing Director") {
-                roleInput.value = "Super Admin";
-            } else if (["Project & Client Manager", "Account / Operations / Marketing Manager"].includes(title)) {
-                roleInput.value = "Admin";
-            } else {
-                roleInput.value = "Internal Crew";
-            }
+            // Auto Role Mapping based on Prompt
+            let dbRole = 'crew'; // Default
+            if(title === "Founder & Managing Director") dbRole = 'super_admin';
+            else if (["Project & Client Manager", "Account / Operations / Marketing Manager", "Finance / Billing Executive", "People / Team Operations Executive"].includes(title)) dbRole = 'admin';
+
+            roleInput.value = dbRole.toUpperCase();
 
             // Auto Rate
             const defaultRate = getDefaultRate(title);
@@ -1761,6 +1798,7 @@
         }
 
         async function saveCrew(newId) {
+            if(checkAccessAndDeny('crew')) return;
             const name = document.getElementById('c-name').value;
             const email = document.getElementById('c-email').value;
             const pass = document.getElementById('c-pass').value;
@@ -1772,10 +1810,10 @@
             try {
                 const userCredential = await auth.createUserWithEmailAndPassword(email, pass);
                 
-                // Determine DB Role
+                // Determine DB Role again to be safe
                 let dbRole = 'crew';
                 if(job === "Founder & Managing Director") dbRole = 'super_admin';
-                else if(["Project & Client Manager", "Account / Operations / Marketing Manager"].includes(job)) dbRole = 'admin';
+                else if (["Project & Client Manager", "Account / Operations / Marketing Manager", "Finance / Billing Executive", "People / Team Operations Executive"].includes(job)) dbRole = 'admin';
 
                 await db.collection("users").doc(userCredential.user.uid).set({
                     crewId: newId,
@@ -1795,6 +1833,7 @@
         }
 
         function editCrew(uid) {
+            if(checkAccessAndDeny('crew')) return;
             db.collection("users").doc(uid).get().then(doc => {
                 const u = doc.data();
                 const jobOptions = JOB_TITLES.map(j => `<option value="${j}" ${u.jobTitle===j?'selected':''}>${j}</option>`).join('');
@@ -1813,6 +1852,7 @@
         }
 
         function updateCrewData(uid) {
+            if(checkAccessAndDeny('crew')) return;
             const rateVal = parseFloat(document.getElementById('e-c-rate').value);
             db.collection("users").doc(uid).update({
                 crewId: document.getElementById('e-c-id').value,
@@ -1825,6 +1865,7 @@
 
         // --- 5. SUPPORT ---
         function renderSupport() {
+            // Crew can edit (Prompt: All employees)
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <button class="btn btn-secondary" onclick="openCreateTicket()"><i class="ri-add-line"></i> Create New Ticket</button>
@@ -1863,6 +1904,7 @@
         }
 
         async function openCreateTicket() {
+            if(checkAccessAndDeny('support')) return;
             const newId = await getNextId('ticket');
             showModal("Create Support Ticket", `
                 <div class="mb-4"><label>Generated ID</label><input value="${newId}" readonly class="font-mono" style="color:var(--ticket)"></div>
@@ -1873,10 +1915,12 @@
         }
 
         function saveNewTicket(id) {
+            if(checkAccessAndDeny('support')) return;
             db.collection("tickets").add({ ticketId: id, name: document.getElementById('tk-name').value, type: document.getElementById('tk-type').value, message: document.getElementById('tk-msg').value, status: 'Open', timestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { closeModal(); showToast("Ticket Created Successfully", "success"); logActivity(`Created new support ticket ${id}`); });
         }
 
         function viewTicket(id) {
+            if(checkAccessAndDeny('support')) return;
             db.collection("tickets").doc(id).get().then(doc => {
                 const d = doc.data();
                 db.collection("users").where("role", "in", ["super_admin", "admin", "crew"]).get().then(snap => {
@@ -1892,6 +1936,7 @@
             });
         }
         function saveTicketDetails(id) {
+            if(checkAccessAndDeny('support')) return;
             const newStatus = document.getElementById('tk-status').value;
             const newAssignId = document.getElementById('tk-assign').value;
             const newAssignName = newAssignId ? document.getElementById('tk-assign').options[document.getElementById('tk-assign').selectedIndex].text : "";
@@ -1902,11 +1947,12 @@
         let currentVoucherFilter = 'All'; 
 
         async function renderVouchers() {
+            const canEdit = canWrite('vouchers');
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
                     <h3 style="font-size:1.25rem; font-weight:700;">Voucher Management</h3>
                     <div class="flex gap-2">
-                        <button class="btn btn-primary" onclick="openAssignVoucherModal(null, null)"><i class="ri-add-line"></i> Assign New</button>
+                        ${canEdit ? `<button class="btn btn-primary" onclick="openAssignVoucherModal(null, null)"><i class="ri-add-line"></i> Assign New</button>` : ''}
                         <button class="btn btn-secondary" onclick="renderVouchers()"><i class="ri-refresh-line"></i> Sync Data</button>
                     </div>
                 </div>
@@ -1930,13 +1976,20 @@
                     let statusColor = 'var(--success)';
                     const statusLower = vStatus.toLowerCase();
                     if (statusLower === 'suspended') statusColor = 'var(--danger)';
+                    
+                    let actions = `<button class="btn btn-sm btn-secondary" onclick="editVoucher('${doc.id}', '${v.code}')">Edit</button>`;
+                    if (canEdit) {
+                        actions += `<button class="btn btn-sm btn-success" onclick="markRedeem('${doc.id}', '${v.code}')"><i class="ri-check-double-line"></i> Redeem</button>`;
+                        actions += `<button class="btn btn-sm btn-danger" onclick="disableVoucher('${doc.id}', '${v.code}')"><i class="ri-delete-bin-line"></i> Disable</button>`;
+                    }
+
                     tbody.innerHTML += `<tr>
                         <td>${u.name}</td>
                         <td class="font-mono" style="color:var(--primary)">${v.code}</td>
                         <td><span class="badge" style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}25">${vStatus}</span></td>
                         <td>${v.type=='fixed'?'RM '+v.value:v.value*100+'%'}</td>
                         <td>${v.expiryDate ? new Date(v.expiryDate.seconds*1000).toLocaleDateString() : '-'}</td>
-                        <td><button class="btn btn-sm btn-secondary" onclick="editVoucher('${doc.id}', '${v.code}')">Edit</button><button class="btn btn-sm btn-success" onclick="markRedeem('${doc.id}', '${v.code}')"><i class="ri-check-double-line"></i> Redeem</button><button class="btn btn-sm btn-danger" onclick="disableVoucher('${doc.id}', '${v.code}')"><i class="ri-delete-bin-line"></i> Disable</button></td>
+                        <td>${actions}</td>
                     </tr>`;
                 });
             });
@@ -1948,7 +2001,7 @@
                     snap.forEach(doc => {
                         const v = doc.data();
                         if(filterVal !== 'All' && v.status !== filterVal) return;
-                        let actionBtn = v.status === 'Redeemed' ? `<small style="color:var(--text-faint)">Locked</small>` : `<button class="btn btn-sm btn-success" onclick="restoreVoucher('${v.code}', '${v.ownerUid}')">Restore</button>`;
+                        let actionBtn = v.status === 'Redeemed' ? `<small style="color:var(--text-faint)">Locked</small>` : (canEdit ? `<button class="btn btn-sm btn-success" onclick="restoreVoucher('${v.code}', '${v.ownerUid}')">Restore</button>` : '');
                         let statusColor = 'var(--text-faint)';
                         if (v.status === 'Redeemed') statusColor = 'var(--success)';
                         if (v.status === 'Expired') statusColor = 'var(--warning)'; 
@@ -1987,6 +2040,7 @@
             if(movedCount > 0) showToast(`Synced ${movedCount} vouchers to history`, "success");
         }
         function editVoucher(uid, code) {
+            if(checkAccessAndDeny('vouchers')) return;
             db.collection("users").doc(uid).get().then(doc => {
                 const v = doc.data().personalVoucher;
                 const exp = v.expiryDate ? new Date(v.expiryDate.seconds*1000).toISOString().split('T')[0] : '';
@@ -2000,6 +2054,7 @@
             });
         }
         function saveEditVoucher(uid) {
+            if(checkAccessAndDeny('vouchers')) return;
             const newCode = document.getElementById('e-v-code').value.toUpperCase();
             const newStatus = document.getElementById('e-v-status').value;            
             db.collection("users").doc(uid).get().then(doc => {
@@ -2008,6 +2063,7 @@
             });
         }
         async function markRedeem(uid, code) {
+            if(checkAccessAndDeny('vouchers')) return;
             if(!confirm(`Mark voucher ${code} as Redeemed?`)) return;
             const userDoc = await db.collection("users").doc(uid).get();
             const uData = userDoc.data();
@@ -2018,6 +2074,7 @@
             logActivity(`Marked voucher ${code} as Redeemed`);
         }
         async function disableVoucher(uid, code) {
+            if(checkAccessAndDeny('vouchers')) return;
             if(!confirm(`Disable voucher ${code}?`)) return;
             const userDoc = await db.collection("users").doc(uid).get();
             const uData = userDoc.data();
@@ -2028,6 +2085,7 @@
             logActivity(`Disabled voucher ${code}`);
         }
         function openAssignVoucherModal(uid, userName) {
+            if(checkAccessAndDeny('vouchers')) return;
             const promise = uid ? Promise.resolve(null) : db.collection("users").where("role", "==", "user").get();
             promise.then(snap => {
                 let userSelect = '';
@@ -2045,11 +2103,13 @@
             });
         }
         function submitAssignVoucher() {
+            if(checkAccessAndDeny('vouchers')) return;
             const uid = document.getElementById('v-user').value;
             const code = document.getElementById('v-code').value.toUpperCase();
             db.collection("users").doc(uid).update({ personalVoucher: { code: code, type: document.getElementById('v-val-type').value, value: parseFloat(document.getElementById('v-val').value), expiryDate: document.getElementById('v-exp').value ? new Date(document.getElementById('v-exp').value) : null, status: 'active', auditLog: [{ action: 'Created', by: userData.email, date: new Date().toISOString() }] }}).then(() => { closeModal(); showToast(`Voucher ${code} Assigned!`, "success"); logActivity(`Assigned voucher ${code}`); });
         }
         function restoreVoucher(code, ownerUid) {
+            if(checkAccessAndDeny('vouchers')) return;
             if(!confirm("Restore this voucher?")) return;
             db.collection("vouchers_history").doc(code).get().then(hist => {
                 if(!hist.exists) return showToast("Error", "error");
@@ -2062,20 +2122,21 @@
 
         // --- 7. CONTENT & PACKAGES ---
         function renderContent() {
+            const canEdit = canWrite('content');
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:700;">Content & Packages</h2>
-                    <button class="btn btn-primary" onclick="saveContentChanges()"><i class="ri-save-line"></i> Save Changes</button>
+                    ${canEdit ? `<button class="btn btn-primary" onclick="saveContentChanges()"><i class="ri-save-line"></i> Save Changes</button>` : ''}
                 </div>
                 <div class="config-section">
                     <h3 style="margin-bottom:1rem;">Frontend Package Features</h3>
                     <p class="mb-4 text-sm text-muted">Edit feature list displayed on main website. (One feature per line)</p>
-                    <textarea id="content-frontend" rows="6"></textarea>
+                    <textarea id="content-frontend" rows="6" ${canEdit?'':'readonly'}></textarea>
                 </div>
                 <div class="config-section">
                     <h3 style="margin-bottom:1rem;">AI Package Features</h3>
                     <p class="mb-4 text-sm text-muted">Edit feature list displayed on website. (One feature per line)</p>
-                    <textarea id="content-ai" rows="6"></textarea>
+                    <textarea id="content-ai" rows="6" ${canEdit?'':'readonly'}></textarea>
                 </div>
             `;
             db.collection("config").doc("site_settings").get().then(doc => {
@@ -2088,6 +2149,7 @@
             });
         }
         function saveContentChanges() {
+            if(checkAccessAndDeny('content')) return;
             const frontendLines = document.getElementById('content-frontend').value.split('\n').filter(l => l.trim() !== '');
             const aiLines = document.getElementById('content-ai').value.split('\n').filter(l => l.trim() !== '');
             const btn = document.querySelector('button[onclick="saveContentChanges()"]');
@@ -2108,37 +2170,39 @@
 
         // --- 8. CONFIG ---
         function renderConfig() {
-            if(!isSuperAdmin()) return renderAccessDenied();
+            // Crew Read Only
+            const canEdit = canWrite('config');
             document.getElementById('main').innerHTML = `
                 <h2 style="font-size:1.25rem; font-weight:700; margin-bottom:1.5rem;">System Configuration</h2>
                 <div class="config-section">
                     <div class="config-header flex justify-between">
                         <span>Maintenance Mode</span>
+                        ${canEdit ? `
                         <label class="toggle-switch">
                             <input type="checkbox" id="maint-toggle" onchange="toggleMaintenance()">
                             <span class="slider"></span>
-                        </label>
+                        </label>` : `<span class="badge" style="background:var(--bg-input)">Read Only</span>`}
                     </div>
                     <p class="text-muted text-sm mb-4">Toggle a warning banner on main site and restrict access.</p>
                     <div class="mb-4">
                         <label>Maintenance Message</label>
-                        <textarea id="maint-msg" class="mb-2" rows="3">We are currently performing scheduled maintenance.</textarea>
-                        <button class="btn btn-sm btn-secondary" onclick="saveMaintMsg()">Update Message</button>
+                        <textarea id="maint-msg" class="mb-2" rows="3" ${canEdit?'':'readonly'}>We are currently performing scheduled maintenance.</textarea>
+                        ${canEdit ? `<button class="btn btn-sm btn-secondary" onclick="saveMaintMsg()">Update Message</button>` : ''}
                     </div>
                 </div>
                 <div class="config-section">
                     <div class="config-header">Dynamic Pricing Override</div>
                     <p class="text-muted text-sm mb-4">Base prices for different modules (Syncs with Main Site).</p>
                     <div class="price-grid">
-                        <div><label>HTML Package Price</label><div class="flex gap-2"><input id="price-html" type="number"><button class="btn btn-primary" onclick="savePrice('html', 'price-html')">Save</button></div></div>
-                        <div><label>Frontend Package Price</label><div class="flex gap-2"><input id="price-fe" type="number"><button class="btn btn-primary" onclick="savePrice('frontend', 'price-fe')">Save</button></div></div>
-                        <div><label>AI/Data Price (Base)</label><div class="flex gap-2"><input id="price-ai" type="number"><button class="btn btn-primary" onclick="savePrice('ai', 'price-ai')">Save</button></div></div>
+                        <div><label>HTML Package Price</label><div class="flex gap-2"><input id="price-html" type="number" ${canEdit?'':'readonly'}>${canEdit?'<button class="btn btn-primary" onclick="savePrice(\'html\', \'price-html\')">Save</button>':''}</div></div>
+                        <div><label>Frontend Package Price</label><div class="flex gap-2"><input id="price-fe" type="number" ${canEdit?'':'readonly'}>${canEdit?'<button class="btn btn-primary" onclick="savePrice(\'frontend\', \'price-fe\')">Save</button>':''}</div></div>
+                        <div><label>AI/Data Price (Base)</label><div class="flex gap-2"><input id="price-ai" type="number" ${canEdit?'':'readonly'}>${canEdit?'<button class="btn btn-primary" onclick="savePrice(\'ai\', \'price-ai\')">Save</button>':''}</div></div>
                     </div>
                 </div>
                 <div class="config-section">
                     <div class="config-header flex justify-between">
                         <span>Payment Gateways</span>
-                        <button class="btn btn-sm btn-primary" onclick="addGateway()"><i class="ri-add-line"></i> Add Gateway</button>
+                        ${canEdit ? `<button class="btn btn-sm btn-primary" onclick="addGateway()"><i class="ri-add-line"></i> Add Gateway</button>` : ''}
                     </div>
                     <div id="gateway-list" class="flex flex-col gap-4"></div>
                 </div>
@@ -2168,85 +2232,58 @@
                                 <span class="badge ${gw.active?'badge-success':'badge-danger'}" style="${gw.active?'background:rgba(16,185,129,0.1);color:#10b981':'background:rgba(239,68,68,0.1);color:#ef4444'}">${gw.active?'Active':'Inactive'}</span>
                             </div>
                             <div class="text-sm text-muted" style="word-break:break-all;">${gw.link || 'No Link'}</div>
+                            ${canEdit ? `
                             <div style="display:flex; gap:8px; margin-top:8px;">
                                 <button class="btn btn-sm btn-secondary" onclick="editGateway('${doc.id}')"><i class="ri-pencil-line"></i></button>
                                 <button class="btn btn-sm btn-secondary" onclick="toggleGatewayStatus('${doc.id}')"><i class="ri-refresh-line"></i></button>
                                 <button class="btn btn-sm btn-danger" onclick="deleteGateway('${doc.id}')"><i class="ri-delete-bin-line"></i></button>
-                            </div>
+                            </div>` : ''}
                         </div>`;
                 });
             });
         }
-        function toggleMaintenance() {
+        function toggleMaintenance() { if(checkAccessAndDeny('config')) return;
             const isActive = document.getElementById('maint-toggle').checked;
             db.collection("config").doc("site_settings").update({ maintenance_active: isActive }).then(() => { showToast(`Maintenance Mode ${isActive ? 'Enabled' : 'Disabled'}`, isActive?'warning':'success'); logActivity(`Toggled maintenance mode to ${isActive}`); });
         }
-        function saveMaintMsg() { db.collection("config").doc("site_settings").update({ maintenance_message: document.getElementById('maint-msg').value }).then(() => showToast("Message Saved", "success")); }
-        function savePrice(key, elemId) {
+        function saveMaintMsg() { if(checkAccessAndDeny('config')) return; db.collection("config").doc("site_settings").update({ maintenance_message: document.getElementById('maint-msg').value }).then(() => showToast("Message Saved", "success")); }
+        function savePrice(key, elemId) { if(checkAccessAndDeny('config')) return;
             const theVal = parseFloat(document.getElementById(elemId).value);
             if(!theVal) return showToast("Invalid price", "error");
             db.collection("config").doc("site_settings").update({ [`prices.${key}`]:theVal }).then(() => showToast("Price Updated", "success"));
         }
-        function addGateway() {
-            showModal("Add Payment Gateway", `
-                <label>Gateway Name</label><input id="gw-name" class="mb-4">
-                <label>Payment Link / URL</label><input id="gw-link" class="mb-4">
-            `, `<button class="btn btn-primary" onclick="saveNewGateway()">Add</button>`);
+        function addGateway() { if(checkAccessAndDeny('config')) return;
+            showModal("Add Payment Gateway", `<label>Gateway Name</label><input id="gw-name" class="mb-4"><label>Payment Link / URL</label><input id="gw-link" class="mb-4">`, `<button class="btn btn-primary" onclick="saveNewGateway()">Add</button>`);
         }
-        async function saveNewGateway() {
-            const name = document.getElementById('gw-name').value;
-            const link = document.getElementById('gw-link').value;
-            await db.collection("payment_methods").add({ name, link, active: true });
-            closeModal();
-            showToast("Gateway Added", "success");
-            logActivity(`Added payment gateway: ${name}`);
+        async function saveNewGateway() { if(checkAccessAndDeny('config')) return;
+            const name = document.getElementById('gw-name').value; const link = document.getElementById('gw-link').value;
+            await db.collection("payment_methods").add({ name, link, active: true }); closeModal(); showToast("Gateway Added", "success"); logActivity(`Added payment gateway: ${name}`);
         }
-        function editGateway(docId) {
-            db.collection("payment_methods").doc(docId).get().then(doc => {
-                const gw = doc.data();
-                showModal("Edit Payment Gateway", `
-                    <label>Gateway Name</label><input id="e-gw-name" value="${gw.name}" class="mb-4">
-                    <label>Payment Link / URL</label><input id="e-gw-link" value="${gw.link}" class="mb-4">
-                `, `<button class="btn btn-primary" onclick="saveEditedGateway('${docId}')">Save</button>`);
-            });
+        function editGateway(docId) { if(checkAccessAndDeny('config')) return;
+            db.collection("payment_methods").doc(docId).get().then(doc => { const gw = doc.data(); showModal("Edit Payment Gateway", `<label>Gateway Name</label><input id="e-gw-name" value="${gw.name}" class="mb-4"><label>Payment Link / URL</label><input id="e-gw-link" value="${gw.link}" class="mb-4">`, `<button class="btn btn-primary" onclick="saveEditedGateway('${docId}')">Save</button>`); });
         }
-        async function saveEditedGateway(docId) {
-            const name = document.getElementById('e-gw-name').value;
-            const link = document.getElementById('e-gw-link').value;
-            await db.collection("payment_methods").doc(docId).update({ name, link });
-            closeModal();
-            renderConfig();
-            showToast("Gateway Updated", "success");
-            logActivity(`Edited payment gateway: ${name}`);
+        async function saveEditedGateway(docId) { if(checkAccessAndDeny('config')) return;
+            const name = document.getElementById('e-gw-name').value; const link = document.getElementById('e-gw-link').value;
+            await db.collection("payment_methods").doc(docId).update({ name, link }); closeModal(); renderConfig(); showToast("Gateway Updated", "success"); logActivity(`Edited payment gateway: ${name}`);
         }
-        async function toggleGatewayStatus(docId) {
-            const docRef = await db.collection("payment_methods").doc(docId).get();
-            const currentStatus = docRef.data().active;
-            await db.collection("payment_methods").doc(docId).update({ active: !currentStatus });
-            renderConfig();
+        async function toggleGatewayStatus(docId) { if(checkAccessAndDeny('config')) return;
+            const docRef = await db.collection("payment_methods").doc(docId).get(); const currentStatus = docRef.data().active;
+            await db.collection("payment_methods").doc(docId).update({ active: !currentStatus }); renderConfig();
         }
-        async function deleteGateway(docId) {
-            if(!confirm("Delete gateway?")) return;
-            await db.collection("payment_methods").doc(docId).delete();
-            renderConfig();
-        }
+        async function deleteGateway(docId) { if(checkAccessAndDeny('config')) return; if(!confirm("Delete gateway?")) return; await db.collection("payment_methods").doc(docId).delete(); renderConfig(); }
 
         // --- 9. PORTFOLIO MANAGEMENT ---
         function renderPortfolio() {
+            const canEdit = canWrite('portfolio');
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:700;">Client Portfolio</h2>
-                    <button class="btn btn-primary" onclick="openAddPortfolioModal()"><i class="ri-add-line"></i> Add Project</button>
+                    ${canEdit ? `<button class="btn btn-primary" onclick="openAddPortfolioModal()"><i class="ri-add-line"></i> Add Project</button>` : ''}
                 </div>
                 <div class="table-container">
                     <div class="table-header"><h3>Projects (clients_portfolio)</h3></div>
                     <div class="table-responsive">
-                        <table>
-                            <thead><tr><th>Thumbnail</th><th>Project Name</th><th>Website Link</th><th>Status</th><th>Actions</th></tr></thead>
-                            <tbody id="portfolio-tbody">
-                                <tr><td colspan="5" class="text-center"><div class="loading-spinner"></div></td></tr>
-                            </tbody>
-                        </table>
+                        <table><thead><tr><th>Thumbnail</th><th>Project Name</th><th>Website Link</th><th>Status</th><th>Actions</th></tr></thead><tbody id="portfolio-tbody"><tr><td colspan="5" class="text-center"><div class="loading-spinner"></div></td></tr></tbody></table>
                     </div>
                 </div>
             `;
@@ -2257,67 +2294,60 @@
                 tbody.innerHTML = snap.docs.map(doc => {
                     const p = doc.data();
                     const statusBadge = p.status ? `<span class="badge" style="background:var(--success)15; color:var(--success); border:1px solid var(--success)25">Active</span>` : `<span class="badge" style="background:var(--text-faint); color:var(--text-muted); border:1px solid var(--border)">Inactive</span>`;
+                    let actions = '';
+                    if (canEdit) {
+                        actions = `<button class="btn btn-sm btn-secondary" onclick="editPortfolio('${doc.id}')"><i class="ri-pencil-line"></i></button><button class="btn ${p.status ? 'btn-danger' : 'btn-success'}" onclick="togglePortfolioStatus('${doc.id}', ${!p.status})"><i class="${p.status ? 'ri-eye-off-line' : 'ri-eye-line'}"></i></button><button class="btn btn-sm btn-danger" onclick="deletePortfolio('${doc.id}')"><i class="ri-delete-bin-line"></i></button>`;
+                    }
                     return `<tr>
                         <td><img src="${p.img}" alt="thumb" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border);" onerror="this.src='https://placehold.co/50?text=No+Img'"></td>
                         <td><strong>${p.name}</strong></td>
                         <td><a href="${p.link}" target="_blank" class="btn btn-sm btn-secondary"><i class="ri-external-link-line"></i> Visit</a></td>
                         <td>${statusBadge}</td>
-                        <td><button class="btn btn-sm btn-secondary" onclick="editPortfolio('${doc.id}')"><i class="ri-pencil-line"></i></button><button class="btn ${p.status ? 'btn-danger' : 'btn-success'}" onclick="togglePortfolioStatus('${doc.id}', ${!p.status})"><i class="${p.status ? 'ri-eye-off-line' : 'ri-eye-line'}"></i></button><button class="btn btn-sm btn-danger" onclick="deletePortfolio('${doc.id}')"><i class="ri-delete-bin-line"></i></button></td>
+                        <td>${actions}</td>
                     </tr>`;
                 }).join('');
             });
         }
-        function openAddPortfolioModal() {
+        function openAddPortfolioModal() { if(checkAccessAndDeny('portfolio')) return;
             const initialId = generateDocIdFromName('');
             showModal("Add New Project", `
                 <div class="mb-4"><label>Project Name</label><input type="text" id="p-name" placeholder="e.g. Clinic Azam" oninput="updateDocIdPreview()"><small style="color:var(--text-faint)">ID will be generated from name</small></div>
                 <div class="mb-4"><label>Generated ID (Auto)</label><input type="text" id="p-doc-id" readonly value="${initialId}" class="font-mono" style="color:var(--primary); background:var(--bg-sidebar);"></div>
                 <div class="mb-4"><label>Image URL</label><input type="text" id="p-img" placeholder="https://..."><small style="color:var(--text-faint)">Direct link to image file.</small></div>
                 <div class="mb-4"><label>Website Link</label><input type="text" id="p-link" placeholder="https://..."></div>
-                <div class="flex items-center gap-4">
-                    <label class="toggle-switch"><input type="checkbox" id="p-status" checked><span class="slider"></span></label>
-                    <span style="font-size:0.9rem; color:var(--text-main);">Visible on Main Site</span>
-                </div>
+                <div class="flex items-center gap-4"><label class="toggle-switch"><input type="checkbox" id="p-status" checked><span class="slider"></span></label><span style="font-size:0.9rem; color:var(--text-main);">Visible on Main Site</span></div>
             `, `<button class="btn btn-primary" onclick="saveNewPortfolio()">Create Project</button>`);
         }
-        function saveNewPortfolio() {
-            const name = document.getElementById('p-name').value;
-            const img = document.getElementById('p-img').value;
-            const link = document.getElementById('p-link').value;
-            const status = document.getElementById('p-status').checked;
-            const customId = document.getElementById('p-doc-id').value;
+        function saveNewPortfolio() { if(checkAccessAndDeny('portfolio')) return;
+            const name = document.getElementById('p-name').value; const img = document.getElementById('p-img').value; const link = document.getElementById('p-link').value; const status = document.getElementById('p-status').checked; const customId = document.getElementById('p-doc-id').value;
             if(!name || !img || !link) return showToast("Please fill in all fields.", "error");
             db.collection("clients_portfolio").doc(customId).set({ name, img, link, status, timestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { closeModal(); showToast("Project added successfully", "success"); logActivity(`Added portfolio project: ${name} (ID: ${customId})`); }).catch(err => { showToast("Error: " + err.message, "error"); });
         }
-        function editPortfolio(docId) {
+        function editPortfolio(docId) { if(checkAccessAndDeny('portfolio')) return;
             db.collection("clients_portfolio").doc(docId).get().then(doc => {
                 const p = doc.data();
                 showModal("Edit Project", `
                     <div class="mb-4"><label>Project Name</label><input type="text" id="e-p-name" value="${p.name}"><small style="color:var(--text-faint)">Editing name does not change ID</small></div>
                     <div class="mb-4"><label>Image URL</label><input type="text" id="e-p-img" value="${p.img}"></div>
                     <div class="mb-4"><label>Website Link</label><input type="text" id="e-p-link" value="${p.link}"></div>
-                    <div class="flex items-center gap-4">
-                        <label class="toggle-switch"><input type="checkbox" id="e-p-status" ${p.status ? 'checked' : ''}><span class="slider"></span></label>
-                        <span style="font-size:0.9rem; color:var(--text-main);">Visible on Main Site</span>
-                    </div>
+                    <div class="flex items-center gap-4"><label class="toggle-switch"><input type="checkbox" id="e-p-status" ${p.status ? 'checked' : ''}><span class="slider"></span></label><span style="font-size:0.9rem; color:var(--text-main);">Visible on Main Site</span></div>
                 `, `<button class="btn btn-primary" onclick="updatePortfolio('${docId}')">Save Changes</button>`);
             });
         }
-        function updatePortfolio(docId) {
+        function updatePortfolio(docId) { if(checkAccessAndDeny('portfolio')) return;
             const updates = { name: document.getElementById('e-p-name').value, img: document.getElementById('e-p-img').value, link: document.getElementById('e-p-link').value, status: document.getElementById('e-p-status').checked };
             db.collection("clients_portfolio").doc(docId).update(updates).then(() => { closeModal(); showToast("Project updated", "success"); logActivity(`Updated portfolio project: ${updates.name}`); }).catch(err => { showToast("Error updating: " + err.message, "error"); });
         }
-        function togglePortfolioStatus(docId, newStatus) {
+        function togglePortfolioStatus(docId, newStatus) { if(checkAccessAndDeny('portfolio')) return;
             const action = newStatus ? "Activated" : "Deactivated";
             db.collection("clients_portfolio").doc(docId).update({ status: newStatus }).then(() => { showToast(`Project ${action}`, "info"); logActivity(`${action} portfolio project`); });
         }
-        function deletePortfolio(docId) {
-            if(!confirm("Are you sure you want to delete this project? This cannot be undone.")) return;
-            db.collection("clients_portfolio").doc(docId).delete().then(() => { showToast("Project deleted", "success"); logActivity(`Deleted portfolio project`); }).catch(err => { showToast("Error deleting: " + err.message, "error"); });
-        }
+        function deletePortfolio(docId) { if(checkAccessAndDeny('portfolio')) return; if(!confirm("Are you sure you want to delete this project? This cannot be undone.")) return; db.collection("clients_portfolio").doc(docId).delete().then(() => { showToast("Project deleted", "success"); logActivity(`Deleted portfolio project`); }).catch(err => { showToast("Error deleting: " + err.message, "error"); }); }
 
         // --- 10. PROFILE ---
         function renderMyProfile() {
+            // Crew Read Only
+            const canEdit = canWrite('profile');
             document.getElementById('main').innerHTML = `
                 <div class="p-4" style="background:var(--bg-surface); border:1px solid var(--border); border-radius:12px; max-width:500px; margin:0 auto;">
                     <div class="flex items-center gap-4 mb-6">
@@ -2331,6 +2361,7 @@
                     <div class="mb-4"><label class="text-muted">Email</label><input value="${userData.email}" readonly></div>
                     <div class="mb-4"><label class="text-muted">Crew ID</label><input value="${userData.crewId || 'N/A'}" readonly></div>
                     <div class="mb-4"><label class="text-muted">Job Title</label><input value="${userData.jobTitle||'N/A'}" readonly></div>
+                    ${!canEdit ? '<p class="text-center text-muted text-sm mt-4">Profile is read-only for your role.</p>' : ''}
                 </div>`;
         }
         function filterTable(id, text) {
@@ -2341,6 +2372,7 @@
 
         // --- 11. CUSTOMER REQUESTS ---
         function renderRequests() {
+            const canEdit = canWrite('requests');
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:700;">Customer Requests</h2>
@@ -2348,12 +2380,7 @@
                 </div>
                 <div class="table-container">
                     <div class="table-responsive">
-                        <table>
-                            <thead><tr><th>Date</th><th>Client</th><th>Type</th><th>Summary</th><th>Status</th><th>Action</th></tr></thead>
-                            <tbody id="req-tbody">
-                                <tr><td colspan="6" class="text-center"><div class="loading-spinner"></div></td></tr>
-                            </tbody>
-                        </table>
+                        <table><thead><tr><th>Date</th><th>Client</th><th>Type</th><th>Summary</th><th>Status</th><th>Action</th></tr></thead><tbody id="req-tbody"><tr><td colspan="6" class="text-center"><div class="loading-spinner"></div></td></tr></tbody></table>
                     </div>
                 </div>
             `;
@@ -2371,37 +2398,34 @@
                     else if (type === 'renew') { summaryText = `${d.plan || 'Plan'} (${d.duration || '1yr'})`; badgeClass = 'badge-renew'; } 
                     else if (type === 'remove') { summaryText = d.details ? 'Remove Content' : 'Remove Item'; badgeClass = 'badge-remove'; }
                     const statusColor = d.status === 'Completed' ? 'var(--success)' : 'var(--warning)';
+                    
+                    let actions = `<button class="btn btn-sm btn-secondary" onclick="viewRequestDetails('${doc.id}')">View</button>`;
+                    if (canEdit) {
+                        actions += `<button class="btn btn-sm btn-success" onclick="updateRequestStatus('${doc.id}', 'Completed')">Done</button>`;
+                        actions += `<button class="btn btn-sm btn-danger" onclick="deleteItem('request','${doc.id}')"><i class="ri-delete-bin-line"></i></button>`;
+                    }
+
                     return `<tr>
                         <td style="white-space:nowrap;">${formatDateTime(d.timestamp)}</td>
                         <td><strong>${d.name}</strong><br><small style="color:var(--text-faint)">${d.phone || ''}</small></td>
                         <td><span class="badge ${badgeClass}">${type.toUpperCase()}</span></td>
                         <td>${summaryText} ${d.hasFile ? '<i class="ri-attachment-line" title="File Attached" style="color:var(--primary)"></i>' : ''}</td>
                         <td><span class="badge" style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}25">${d.status}</span></td>
-                        <td><button class="btn btn-sm btn-secondary" onclick="viewRequestDetails('${doc.id}')">View</button><button class="btn btn-sm btn-success" onclick="updateRequestStatus('${doc.id}', 'Completed')">Done</button><button class="btn btn-sm btn-danger" onclick="deleteItem('request','${doc.id}')"><i class="ri-delete-bin-line"></i></button></td>
+                        <td>${actions}</td>
                     </tr>`;
                 }).join('');
             });
         }
         function viewRequestDetails(id) {
+            if(checkAccessAndDeny('requests')) return;
             db.collection("customer_requests").doc(id).get().then(doc => {
                 const d = doc.data();
                 const type = d.type;
                 let detailsHTML = '';
-                if(type === 'content') {
-                    detailsHTML = `
-                        <div class="mb-4"><label>Description</label><textarea readonly rows="4">${d.details || 'No description provided.'}</textarea></div>
-                        <div class="mb-4"><label>Attachments</label><div class="flex items-center gap-2 text-sm"><i class="${d.hasFile ? 'ri-checkbox-circle-fill text-success' : 'ri-close-circle-fill text-muted'}"></i>${d.hasFile ? 'User attached a file via website form.' : 'No file attached.'}</div></div>
-                    `;
-                } else if (type === 'upgrade') {
-                    detailsHTML = `
-                        <div class="flex gap-4 mb-4"><div style="flex:1"><label>Current Plan</label><input value="${d.currentPlan || '-'}" readonly></div><div style="flex:1"><label>New Plan</label><input value="${d.newPlan || '-'}" readonly></div></div>
-                        <div class="mb-4"><label>Additional Notes</label><textarea readonly rows="3">${d.details || '-'}</textarea></div>
-                    `;
-                } else if (type === 'renew') {
-                    detailsHTML = `<div class="flex gap-4 mb-4"><div style="flex:1"><label>Plan to Renew</label><input value="${d.plan || '-'}" readonly></div><div style="flex:1"><label>Duration</label><input value="${d.duration || '-'}" readonly></div></div>`;
-                } else if (type === 'remove') {
-                    detailsHTML = `<div class="mb-4"><label>Items to Remove</label><textarea readonly rows="3">${d.details || '-'}</textarea></div>`;
-                }
+                if(type === 'content') { detailsHTML = `<div class="mb-4"><label>Description</label><textarea readonly rows="4">${d.details || 'No description provided.'}</textarea></div><div class="mb-4"><label>Attachments</label><div class="flex items-center gap-2 text-sm"><i class="${d.hasFile ? 'ri-checkbox-circle-fill text-success' : 'ri-close-circle-fill text-muted'}"></i>${d.hasFile ? 'User attached a file via website form.' : 'No file attached.'}</div></div>`; } 
+                else if (type === 'upgrade') { detailsHTML = `<div class="flex gap-4 mb-4"><div style="flex:1"><label>Current Plan</label><input value="${d.currentPlan || '-'}" readonly></div><div style="flex:1"><label>New Plan</label><input value="${d.newPlan || '-'}" readonly></div></div><div class="mb-4"><label>Additional Notes</label><textarea readonly rows="3">${d.details || '-'}</textarea></div>`; } 
+                else if (type === 'renew') { detailsHTML = `<div class="flex gap-4 mb-4"><div style="flex:1"><label>Plan to Renew</label><input value="${d.plan || '-'}" readonly></div><div style="flex:1"><label>Duration</label><input value="${d.duration || '-'}" readonly></div></div>`; } 
+                else if (type === 'remove') { detailsHTML = `<div class="mb-4"><label>Items to Remove</label><textarea readonly rows="3">${d.details || '-'}</textarea></div>`; }
                 showModal(`Request Details (${type.toUpperCase()})`, `
                     <div class="mb-4 p-4" style="background:var(--bg-sidebar); border-radius:8px; border:1px solid var(--border)">
                         <div class="text-sm text-muted mb-1">Client Info</div>
@@ -2413,6 +2437,7 @@
             });
         }
         function updateRequestStatus(id, newStatus = null, fromModal = false) {
+            if(checkAccessAndDeny('requests')) return;
             const statusToSet = newStatus || document.getElementById('req-status-select').value;
             db.collection("customer_requests").doc(id).update({ status: statusToSet }).then(() => {
                 if(fromModal) closeModal();
@@ -2421,23 +2446,26 @@
             }).catch(err => { showToast("Error updating: " + err.message, "error"); });
         }
         function deleteItem(collection, id) {
+            // This is generic, but let's check permission based on context if possible.
+            // For now, rely on specific checks in calling functions or a generic 'system' check.
+            // Deleting items usually requires higher access. Let's assume Admin/SuperAdmin for generic delete unless specific override.
+            if(!isAdmin()) return showToast("Access Denied", "error");
             if(!confirm("Delete this item permanently?")) return;
             db.collection(collection).doc(id).delete().then(() => { showToast("Item deleted", "success"); logActivity(`Deleted item from ${collection}`); });
         }
 
         // --- 12. PUBLIC PROMO CODES ---
         function renderPublicPromos() {
+            const canEdit = canWrite('promos');
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:700;">Public Promo Codes</h2>
-                    <button class="btn btn-primary" onclick="addPublicPromo()"><i class="ri-add-line"></i> Add Code</button>
+                    ${canEdit ? `<button class="btn btn-primary" onclick="addPublicPromo()"><i class="ri-add-line"></i> Add Code</button>` : ''}
                 </div>
                 <div class="table-container">
                     <div class="table-header"><h3>Active Codes (config/promo_codes)</h3></div>
                     <div class="table-responsive">
-                        <table><thead><tr><th>Code</th><th>Discount (%)</th><th>Action</th></tr></thead><tbody id="public-promos-tbody">
-                        <tr><td colspan="3" class="text-center"><div class="loading-spinner"></div></td></tr>
-                        </tbody></table>
+                        <table><thead><tr><th>Code</th><th>Discount (%)</th><th>Action</th></tr></thead><tbody id="public-promos-tbody"><tr><td colspan="3" class="text-center"><div class="loading-spinner"></div></td></tr></tbody></table>
                     </div>
                 </div>
             `;
@@ -2449,42 +2477,32 @@
                     const code = doc.id; 
                     const data = doc.data();
                     const discountPercent = (data.discount * 100) + '%';
+                    let actions = '';
+                    if (canEdit) {
+                        actions = `<button class="btn btn-sm btn-danger" onclick="deletePublicPromo('${code}')"><i class="ri-delete-bin-line"></i> Delete</button>`;
+                    }
                     return `<tr>
                         <td class="font-mono" style="color:var(--warning); font-weight:700;">${code}</td>
                         <td><span class="badge" style="background:var(--success)15; color:var(--success); border:1px solid var(--success)25">${discountPercent}</span></td>
-                        <td><button class="btn btn-sm btn-danger" onclick="deletePublicPromo('${code}')"><i class="ri-delete-bin-line"></i> Delete</button></td>
+                        <td>${actions}</td>
                     </tr>`;
                 }).join('');
             });
         }
-        function addPublicPromo() {
-            showModal("Add Public Promo Code", `
-                <div class="mb-4"><label>Promo Code (ID)</label><input type="text" id="pub-promo-code" placeholder="e.g. WELCOME10" style="text-transform:uppercase;"><small class="text-muted">Users will enter this exact code.</small></div>
-                <div class="mb-4"><label>Discount Percentage</label><input type="number" id="pub-promo-discount" placeholder="0.1 for 10%"><small class="text-muted">Decimal (e.g., 0.10 = 10%)</small></div>
-            `, `<button class="btn btn-primary" onclick="savePublicPromo()">Create Code</button>`);
+        function addPublicPromo() { if(checkAccessAndDeny('promos')) return;
+            showModal("Add Public Promo Code", `<div class="mb-4"><label>Promo Code (ID)</label><input type="text" id="pub-promo-code" placeholder="e.g. WELCOME10" style="text-transform:uppercase;"><small class="text-muted">Users will enter this exact code.</small></div><div class="mb-4"><label>Discount Percentage</label><input type="number" id="pub-promo-discount" placeholder="0.1 for 10%"><small class="text-muted">Decimal (e.g., 0.10 = 10%)</small></div>`, `<button class="btn btn-primary" onclick="savePublicPromo()">Create Code</button>`);
         }
-        async function savePublicPromo() {
-            const code = document.getElementById('pub-promo-code').value.trim().toUpperCase();
-            const discount = parseFloat(document.getElementById('pub-promo-discount').value);
+        async function savePublicPromo() { if(checkAccessAndDeny('promos')) return;
+            const code = document.getElementById('pub-promo-code').value.trim().toUpperCase(); const discount = parseFloat(document.getElementById('pub-promo-discount').value);
             if(!code || isNaN(discount)) return showToast("Invalid Input", "error");
-            try {
-                await db.collection("promo_codes").doc(code).set({ discount: discount });
-                closeModal();
-                showToast("Promo Code Created", "success");
-                logActivity(`Created public promo code: ${code}`);
-            } catch(e) { showToast("Error: " + e.message, "error"); }
+            try { await db.collection("promo_codes").doc(code).set({ discount: discount }); closeModal(); showToast("Promo Code Created", "success"); logActivity(`Created public promo code: ${code}`); } catch(e) { showToast("Error: " + e.message, "error"); }
         }
-        async function deletePublicPromo(code) {
-            if(!confirm(`Delete promo code ${code}?`)) return;
-            try {
-                await db.collection("promo_codes").doc(code).delete();
-                showToast("Promo Code Deleted", "success");
-                logActivity(`Deleted public promo code: ${code}`);
-            } catch(e) { showToast("Error deleting: " + e.message, "error"); }
-        }
+        async function deletePublicPromo(code) { if(checkAccessAndDeny('promos')) return; if(!confirm(`Delete promo code ${code}?`)) return; try { await db.collection("promo_codes").doc(code).delete(); showToast("Promo Code Deleted", "success"); logActivity(`Deleted public promo code: ${code}`); } catch(e) { showToast("Error deleting: " + e.message, "error"); } }
 
         // --- 13. COMMISSIONS ---
         async function renderCommissions() {
+            // Crew Read Only
+            const canEdit = canWrite('commissions');
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:700;">My Commissions</h2>
@@ -2499,9 +2517,7 @@
                         ${isSuperAdmin() ? '<small class="text-muted">Admin View: Seeing all commissions.</small>' : '<small class="text-muted">Viewing your assigned sales only.</small>'}
                     </div>
                     <div class="table-responsive">
-                        <table><thead><tr><th>Order Ref</th><th>Package</th><th>Amount</th><th>Type</th><th>My Cut</th></tr></thead><tbody id="comm-tbody">
-                            <tr><td colspan="5" class="text-center"><div class="loading-spinner"></div></td></tr>
-                        </tbody></table>
+                        <table><thead><tr><th>Order Ref</th><th>Package</th><th>Amount</th><th>Type</th><th>My Cut</th></tr></thead><tbody id="comm-tbody"><tr><td colspan="5" class="text-center"><div class="loading-spinner"></div></td></tr></tbody></table>
                     </div>
                 </div>
             `;
@@ -2519,7 +2535,10 @@
                     commission = amount * 0.05;
                     commDetails.push({ ref: order.id.substring(0,6), pkg: order.package, amt: amount, cycle: cycle, comm: commission });
                 } else {
-                    if(order.salesRepId === myUid) {
+                    // Check if my ID is in the new array OR the old single ID field
+                    const reps = order.salesRepIds || [];
+                    const oldRep = order.salesRepId;
+                    if(reps.includes(myUid) || oldRep === myUid) {
                         const myRate = userData.commissionRate || 0;
                         commission = amount * myRate;
                         commDetails.push({ ref: order.id.substring(0,6), pkg: order.package, amt: amount, cycle: cycle, comm: commission });
