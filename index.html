@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Admin Portal v11.2(ddn)</title>
+    <title>Admin Portal v11.3(ddn)</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -802,7 +802,7 @@
     <div id="auth-screen">
         <div class="auth-card">
             <img src="https://raw.githubusercontent.com/ddnetwork-ent/ddnetwork/refs/heads/main/DDN%20Logo%20NoBG.png" alt="Logo">
-            <h2 class="mb-4" style="color:white; font-weight: 700; letter-spacing: -0.5px;">Admin Portal v11.2</h2>
+            <h2 class="mb-4" style="color:white; font-weight: 700; letter-spacing: -0.5px;">Admin Portal v11.3</h2>
             <form id="loginForm">
                 <input type="text" id="loginInput" class="mb-4" placeholder="Email or Crew ID" required>
                 <input type="password" id="loginPass" class="mb-4" placeholder="Password" required>
@@ -821,7 +821,7 @@
                 <button class="btn-icon" onclick="toggleSidebar()" title="Toggle Menu"><i class="ri-menu-line" style="font-size: 1.4rem;"></i></button>
                 <div class="header-brand">
                     <img src="https://raw.githubusercontent.com/ddnetwork-ent/ddnetwork/refs/heads/main/DDN%20Logo%20NoBG.png">
-                    <span>DDN v11.2</span>
+                    <span>DDN v11.3</span>
                 </div>
             </div>
             <div class="header-actions">
@@ -951,57 +951,60 @@
     <script>
         // --- CONSTANTS & CONFIG ---
         
-        // Job Titles as requested
+        // Updated Job Titles based on Request
         const JOB_TITLES = [
-            // Management
+            // Founder
             "Founder & Managing Director",
-            "Managing Director",
-            "Operations Lead",
-            // Project & Client
+            // Admin / Management Group
             "Project & Client Manager",
-            "Client Operations Lead",
-            "Client Coordinator",
-            "Account Manager",
-            // Sales & Growth
+            "Account / Operations / Marketing Manager",
+            "Finance / Billing Executive",
+            "People / Team Operations Executive",
+            // Sales & Growth (Internal Crew)
             "Business Development Executive",
             "Sales Executive",
-            "Growth Executive",
-            "Partnership Executive",
-            // Customer / Success
+            // Customer Success
             "Client Success Coordinator",
             "Client Experience Executive",
-            "Service Operations Executive",
-            "Support Operations Executive",
             // Technical
+            "Technical Specialist",
             "Web Developer",
-            "Front-End Developer",
             "Full Stack Developer",
-            "System & Portal Specialist",
-            "Automation / AI Specialist",
-            // Marketing
-            "Digital Marketing Executive",
-            "Content Executive",
-            "Brand & Media Executive",
-            // Generic
-            "Operations Executive",
-            "Project Executive",
-            "Technical Executive"
+            "Automation & AI Specialist",
+            // Support
+            "Support Operations Executive"
         ];
 
-        // Default Commission Rates based on Prompt
+        // Updated Default Commission Rates
         const DEFAULT_COMMISSION_RATES = {
             "Founder & Managing Director": 0.05,
-            "Project & Client Manager": 0.05,
-            "Business Development Executive": 0.125, // Midpoint 10-15%
+            
+            // Management: 3-5%
+            "Project & Client Manager": 0.04,
+            "Account / Operations / Marketing Manager": 0.04,
+            
+            // Finance: 1-2%
+            "Finance / Billing Executive": 0.015,
+            
+            // People Ops: 0%
+            "People / Team Operations Executive": 0.0,
+
+            // Sales: 10-15%
+            "Business Development Executive": 0.125,
             "Sales Executive": 0.125,
-            "Growth Executive": 0.10,
-            "Partnership Executive": 0.10,
-            "Client Success Coordinator": 0.025, // Midpoint 2-3%
+
+            // CS: 2-3%
+            "Client Success Coordinator": 0.025,
             "Client Experience Executive": 0.025,
-            "Web Developer": 0.04, // Midpoint 3-5%
-            "Front-End Developer": 0.04,
+
+            // Tech: 3-5%
+            "Technical Specialist": 0.04,
+            "Web Developer": 0.04,
             "Full Stack Developer": 0.05,
-            "System & Portal Specialist": 0.03
+            "Automation & AI Specialist": 0.05,
+
+            // Support: 0%
+            "Support Operations Executive": 0.0
         };
 
         // Helper to get rate
@@ -1057,7 +1060,7 @@
 
         // --- LOGGING HELPER (ADMIN ONLY) ---
         function logActivity(msg) {
-            if(!currentUser || !isAdmin()) return; 
+            if(!currentUser) return; 
             db.collection("activity_logs").add({
                 message: msg,
                 actor: userData.email,
@@ -1170,16 +1173,17 @@
                             document.getElementById('nav-crew').classList.add('hidden');
                             document.getElementById('nav-config').classList.add('hidden');
                             document.getElementById('nav-public-promos').classList.add('hidden'); 
-                            document.getElementById('nav-commissions').classList.add('hidden'); // Hide commission for non-admin
                             document.getElementById('notif-btn').style.display = 'none'; 
                         } else {
                             document.getElementById('nav-crew').classList.remove('hidden');
                             document.getElementById('nav-config').classList.remove('hidden');
                             document.getElementById('nav-public-promos').classList.remove('hidden');
-                            document.getElementById('nav-commissions').classList.remove('hidden');
                             document.getElementById('notif-btn').style.display = 'flex';
                             listenForNotifications(); 
                         }
+
+                        // UPDATED: Commissions tab visible to ALL Crew & Admin
+                        document.getElementById('nav-commissions').classList.remove('hidden');
 
                         initRouter();
                         initializeDatabase(); 
@@ -1695,7 +1699,7 @@ Thank you! 🚀`;
             const doc = await db.collection("orders").doc(id).get();
             const d = doc.data();
             
-            // Fetch Sales Rep options for the new logic
+            // Fetch Sales Rep options for new logic
             let salesRepOptions = '<option value="">Unassigned</option>';
             let currentSalesRepId = d.salesRepId || "";
             
@@ -3107,14 +3111,14 @@ Thank you! 🚀`;
             }
         }
 
-        // --- 13. COMMISSIONS (NEW TAB) ---
+        // --- 13. COMMISSIONS (UPDATED: ALL CREW & FOUNDER LOGIC) ---
         async function renderCommissions() {
-            if(!isAdmin()) return;
+            // Access check: Visible to all Crew & Admin (handled in Auth state)
             
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
-                    <h2 style="font-size:1.25rem; font-weight:700;">Commission Calculator</h2>
-                    <button class="btn btn-secondary" onclick="renderCommissions()"><i class="ri-refresh-line"></i> Recalculate</button>
+                    <h2 style="font-size:1.25rem; font-weight:700;">My Commissions</h2>
+                    <button class="btn btn-secondary" onclick="renderCommissions()"><i class="ri-refresh-line"></i> Refresh</button>
                 </div>
 
                 <div class="stats-grid" id="comm-stats">
@@ -3124,17 +3128,17 @@ Thank you! 🚀`;
                 <div class="table-container">
                     <div class="table-header">
                         <h3>Payout Ledger (Paid Orders Only)</h3>
-                        <small class="text-muted">Calculated based on Sales Rep assigned in Orders.</small>
+                        ${isAdmin() ? '<small class="text-muted">Admin View: Seeing all commissions.</small>' : '<small class="text-muted">Viewing your assigned sales only.</small>'}
                     </div>
                     <div class="table-responsive">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Crew Member</th>
-                                    <th>Job Title</th>
-                                    <th>Rate</th>
-                                    <th>Total Earnings</th>
-                                    <th>Details</th>
+                                    <th>Order Ref</th>
+                                    <th>Package</th>
+                                    <th>Amount</th>
+                                    <th>Type</th>
+                                    <th>My Cut</th>
                                 </tr>
                             </thead>
                             <tbody id="comm-tbody">
@@ -3145,126 +3149,107 @@ Thank you! 🚀`;
                 </div>
             `;
 
-            // 1. Fetch Crew
-            const crewSnap = await db.collection("users").where("role", "in", ["admin", "crew"]).get();
-            const crewList = crewSnap.docs.map(d => ({id: d.id, ...d.data()}));
+            // 1. Check if Current User is Founder
+            const isFounder = userData.jobTitle && userData.jobTitle.includes("Founder");
+            const myUid = currentUser.uid;
 
             // 2. Fetch Paid Orders
             const ordersSnap = await db.collection("orders").where("status", "==", "Paid").get();
             const ordersList = ordersSnap.docs.map(d => ({id: d.id, ...d.data()}));
 
-            // 3. Calculate
-            const commMap = {}; // uid -> { total: 0, details: [] }
-            let totalPayout = 0;
+            let totalEarnings = 0;
+            let commDetails = [];
 
+            // 3. Calculate Logic
             ordersList.forEach(order => {
-                if(!order.salesRepId) return; // No one assigned
-
-                const amount = parseFloat(order.total.replace('RM ', '')) || 0;
-                const rep = crewList.find(c => c.id === order.salesRepId);
-                if(!rep) return;
-
-                const rate = rep.commissionRate || 0;
-                if(rate <= 0) return;
-
-                // LOGIC FROM PROMPT
                 let commission = 0;
+                const amount = parseFloat(order.total.replace('RM ', '')) || 0;
                 const cycle = (order.billingCycle || 'One-Time').toLowerCase();
 
-                if(cycle === 'monthly') {
-                    // Monthly subscription - Commission paid monthly (we assume current snapshot is "this month")
-                    commission = amount * rate; 
-                } else if (cycle === 'yearly') {
-                    // Yearly - Paid once upfront
-                    commission = amount * rate;
+                if (isFounder) {
+                    // FOUNDER LOGIC: 5% of EVERYTHING regardless of assigned Sales Rep
+                    commission = amount * 0.05;
+                    commDetails.push({
+                        ref: order.id.substring(0,6),
+                        pkg: order.package,
+                        amt: amount,
+                        cycle: cycle,
+                        comm: commission
+                    });
                 } else {
-                    // One-time project
-                    commission = amount * rate;
-                }
+                    // REGULAR CREW LOGIC: Only if assigned to ME
+                    if(order.salesRepId === myUid) {
+                        // Get my rate from userData stored in memory or 0
+                        const myRate = userData.commissionRate || 0;
+                        
+                        if(cycle === 'monthly') {
+                            commission = amount * myRate;
+                        } else if (cycle === 'yearly') {
+                            commission = amount * myRate;
+                        } else {
+                            commission = amount * myRate;
+                        }
 
-                if(!commMap[rep.id]) {
-                    commMap[rep.id] = {
-                        name: rep.name,
-                        job: rep.jobTitle || 'Crew',
-                        rate: rate,
-                        total: 0,
-                        details: []
-                    };
+                        commDetails.push({
+                            ref: order.id.substring(0,6),
+                            pkg: order.package,
+                            amt: amount,
+                            cycle: cycle,
+                            comm: commission
+                        });
+                    }
                 }
-
-                commMap[rep.id].total += commission;
-                commMap[rep.id].details.push({
-                    ref: order.id.substring(0,6),
-                    amt: amount,
-                    comm: commission,
-                    cycle: cycle
-                });
+                totalEarnings += commission;
             });
 
             // 4. Render Stats
-            Object.values(commMap).forEach(c => totalPayout += c.total);
-
             document.getElementById('comm-stats').innerHTML = `
                 <div class="stat-card">
                     <div class="stat-icon" style="color:var(--success); background:var(--success)15"><i class="ri-wallet-3-line"></i></div>
                     <div class="stat-info">
-                        <div class="stat-val">RM ${totalPayout.toFixed(2)}</div>
+                        <div class="stat-val">RM ${totalEarnings.toFixed(2)}</div>
                         <div class="stat-label">Total Pending Payouts</div>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon" style="color:var(--primary); background:var(--primary)15"><i class="ri-user-star-line"></i></div>
+                    <div class="stat-icon" style="color:var(--primary); background:var(--primary)15"><i class="ri-file-list-3-line"></i></div>
                     <div class="stat-info">
-                        <div class="stat-val">${Object.keys(commMap).length}</div>
-                        <div class="stat-label">Active Earners</div>
+                        <div class="stat-val">${commDetails.length}</div>
+                        <div class="stat-label">Eligible Transactions</div>
                     </div>
                 </div>
+                ${isFounder ? `
                 <div class="stat-card">
-                    <div class="stat-icon" style="color:var(--info); background:var(--info)15"><i class="ri-file-list-3-line"></i></div>
+                    <div class="stat-icon" style="color:var(--warning); background:var(--warning)15"><i class="ri-vip-crown-line"></i></div>
                     <div class="stat-info">
-                        <div class="stat-val">${ordersList.length}</div>
-                        <div class="stat-label">Paid Orders Analyzed</div>
+                        <div class="stat-val">Founder View</div>
+                        <div class="stat-label">5% of All Revenue</div>
                     </div>
-                </div>
+                </div>` : `
+                <div class="stat-card">
+                    <div class="stat-icon" style="color:var(--info); background:var(--info)15"><i class="ri-user-star-line"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-val">${(userData.commissionRate*100).toFixed(1)}%</div>
+                        <div class="stat-label">My Rate</div>
+                    </div>
+                </div>`}
             `;
 
             // 5. Render Table
             const tbody = document.getElementById('comm-tbody');
-            if(Object.keys(commMap).length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No commissions found. Ensure Sales Reps are assigned in Orders.</td></tr>';
+            if(commDetails.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">No commissions found.</td></tr>`;
             } else {
-                tbody.innerHTML = Object.values(commMap).map(c => `
+                tbody.innerHTML = commDetails.map(c => `
                     <tr>
-                        <td><strong>${c.name}</strong></td>
-                        <td>${c.job}</td>
-                        <td><span class="badge" style="background:var(--primary)15; color:var(--primary)">${(c.rate*100).toFixed(1)}%</span></td>
-                        <td style="color:var(--success); font-weight:700;">RM ${c.total.toFixed(2)}</td>
-                        <td>
-                            <button class="btn btn-sm btn-secondary" onclick="showCommDetails('${c.name.replace(/'/g, "\\'")}', ${JSON.stringify(c.details).replace(/"/g, '&quot;')})">View Breakdown</button>
-                        </td>
+                        <td class="font-mono" style="color:var(--primary)">${c.ref}</td>
+                        <td>${c.pkg}</td>
+                        <td>RM ${c.amt}</td>
+                        <td><span class="badge badge-crew" style="background:rgba(255,255,255,0.05); border:1px solid var(--border); text-transform:capitalize;">${c.cycle}</span></td>
+                        <td style="color:var(--success); font-weight:700;">+ RM ${c.comm.toFixed(2)}</td>
                     </tr>
                 `).join('');
             }
-        }
-
-        function showCommDetails(name, details) {
-            const rows = details.map(d => `
-                <tr>
-                    <td>${d.ref}</td>
-                    <td>RM ${d.amt}</td>
-                    <td style="text-transform:capitalize">${d.cycle}</td>
-                    <td style="color:var(--success)">+ RM ${d.comm.toFixed(2)}</td>
-                </tr>
-            `).join('');
-
-            showModal(`Commission Breakdown: ${name}`, `
-                <div style="max-height:300px; overflow-y:auto;">
-                    <table>
-                        <thead><tr><th>Order Ref</th><th>Order Amt</th><th>Type</th><th>Cut</th></tr></thead>
-                        <tbody>${rows}</tbody>
-                    </table>
-                </div>
-            `, `<button class="btn btn-primary" onclick="closeModal()">Close</button>`);
         }
 
     </script>
