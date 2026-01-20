@@ -802,7 +802,7 @@
     <div id="auth-screen">
         <div class="auth-card">
             <img src="https://raw.githubusercontent.com/ddnetwork-ent/ddnetwork/refs/heads/main/DDN%20Logo%20NoBG.png" alt="Logo">
-            <h2 class="mb-4" style="color:white; font-weight: 700; letter-spacing: -0.5px;">Admin Portal v11.0</h2>
+            <h2 class="mb-4" style="color:white; font-weight: 700; letter-spacing: -0.5px;">Admin Portal v11.2</h2>
             <form id="loginForm">
                 <input type="text" id="loginInput" class="mb-4" placeholder="Email or Crew ID" required>
                 <input type="password" id="loginPass" class="mb-4" placeholder="Password" required>
@@ -821,7 +821,7 @@
                 <button class="btn-icon" onclick="toggleSidebar()" title="Toggle Menu"><i class="ri-menu-line" style="font-size: 1.4rem;"></i></button>
                 <div class="header-brand">
                     <img src="https://raw.githubusercontent.com/ddnetwork-ent/ddnetwork/refs/heads/main/DDN%20Logo%20NoBG.png">
-                    <span>DDN v11.0</span>
+                    <span>DDN v11.2</span>
                 </div>
             </div>
             <div class="header-actions">
@@ -878,6 +878,11 @@
                     <i class="ri-ticket-2-line"></i> <span class="nav-text">Vouchers</span>
                 </div>
                 
+                <div class="nav-section-title"><span class="nav-text">Finance</span></div>
+                <div class="nav-item" id="nav-commissions" onclick="navigateTo('/commissions')">
+                    <i class="ri-money-dollar-circle-line"></i> <span class="nav-text">Commissions</span>
+                </div>
+
                 <div class="nav-section-title"><span class="nav-text">Management</span></div>
                 <div class="nav-item" onclick="navigateTo('/portfolio')">
                     <i class="ri-gallery-line"></i> <span class="nav-text">Portfolio</span>
@@ -944,6 +949,66 @@
 
     <!-- JAVASCRIPT -->
     <script>
+        // --- CONSTANTS & CONFIG ---
+        
+        // Job Titles as requested
+        const JOB_TITLES = [
+            // Management
+            "Founder & Managing Director",
+            "Managing Director",
+            "Operations Lead",
+            // Project & Client
+            "Project & Client Manager",
+            "Client Operations Lead",
+            "Client Coordinator",
+            "Account Manager",
+            // Sales & Growth
+            "Business Development Executive",
+            "Sales Executive",
+            "Growth Executive",
+            "Partnership Executive",
+            // Customer / Success
+            "Client Success Coordinator",
+            "Client Experience Executive",
+            "Service Operations Executive",
+            "Support Operations Executive",
+            // Technical
+            "Web Developer",
+            "Front-End Developer",
+            "Full Stack Developer",
+            "System & Portal Specialist",
+            "Automation / AI Specialist",
+            // Marketing
+            "Digital Marketing Executive",
+            "Content Executive",
+            "Brand & Media Executive",
+            // Generic
+            "Operations Executive",
+            "Project Executive",
+            "Technical Executive"
+        ];
+
+        // Default Commission Rates based on Prompt
+        const DEFAULT_COMMISSION_RATES = {
+            "Founder & Managing Director": 0.05,
+            "Project & Client Manager": 0.05,
+            "Business Development Executive": 0.125, // Midpoint 10-15%
+            "Sales Executive": 0.125,
+            "Growth Executive": 0.10,
+            "Partnership Executive": 0.10,
+            "Client Success Coordinator": 0.025, // Midpoint 2-3%
+            "Client Experience Executive": 0.025,
+            "Web Developer": 0.04, // Midpoint 3-5%
+            "Front-End Developer": 0.04,
+            "Full Stack Developer": 0.05,
+            "System & Portal Specialist": 0.03
+        };
+
+        // Helper to get rate
+        function getDefaultRate(title) {
+            return DEFAULT_COMMISSION_RATES[title] || 0.0;
+        }
+
         // --- FIREBASE SETUP ---
         const firebaseConfig = {
             apiKey: "AIzaSyAwf31b-wpYQwPbd-3DxnqGVRw8g3xq938",
@@ -1105,11 +1170,13 @@
                             document.getElementById('nav-crew').classList.add('hidden');
                             document.getElementById('nav-config').classList.add('hidden');
                             document.getElementById('nav-public-promos').classList.add('hidden'); 
+                            document.getElementById('nav-commissions').classList.add('hidden'); // Hide commission for non-admin
                             document.getElementById('notif-btn').style.display = 'none'; 
                         } else {
                             document.getElementById('nav-crew').classList.remove('hidden');
                             document.getElementById('nav-config').classList.remove('hidden');
                             document.getElementById('nav-public-promos').classList.remove('hidden');
+                            document.getElementById('nav-commissions').classList.remove('hidden');
                             document.getElementById('notif-btn').style.display = 'flex';
                             listenForNotifications(); 
                         }
@@ -1171,7 +1238,8 @@
             '/portfolio': renderPortfolio,
             '/requests': renderRequests,
             '/my-profile': renderMyProfile,
-            '/public-promos': renderPublicPromos 
+            '/public-promos': renderPublicPromos,
+            '/commissions': renderCommissions // New Route
         };
 
         function navigateTo(path) {
@@ -1338,7 +1406,7 @@
             });
         }
 
-        // --- 2. ORDERS (UPDATED INVOICE) ---
+        // --- 2. ORDERS (UPDATED INVOICE & SALES REP LINKING) ---
         function renderOrders() {
             document.getElementById('main').innerHTML = `
                 <div class="table-container">
@@ -1623,57 +1691,91 @@ Thank you! 🚀`;
             }
         }
 
-        function viewOrder(id) {
-            db.collection("orders").doc(id).get().then(doc => {
-                const d = doc.data();
-                const voucherDisplay = d.voucherCode 
-                    ? `<div class="mb-4"><label>Voucher Used</label><input readonly value="${d.voucherCode}" style="color:var(--warning); border-color:var(--warning)"></div>` 
-                    : '';
+        async function viewOrder(id) {
+            const doc = await db.collection("orders").doc(id).get();
+            const d = doc.data();
+            
+            // Fetch Sales Rep options for the new logic
+            let salesRepOptions = '<option value="">Unassigned</option>';
+            let currentSalesRepId = d.salesRepId || "";
+            
+            try {
+                const crewSnap = await db.collection("users").where("role", "in", ["admin", "crew"]).get();
+                crewSnap.forEach(c => {
+                    const cData = c.data();
+                    const selected = c.id === currentSalesRepId ? 'selected' : '';
+                    salesRepOptions += `<option value="${c.id}" ${selected}>${cData.name} (${cData.jobTitle || cData.role})</option>`;
+                });
+            } catch(e) { console.error(e); }
 
-                showModal(`Manage Order`, `
-                    ${voucherDisplay}
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div><label class="text-muted text-sm">Name</label><input id="o-name" value="${d.customerName}"></div>
-                        <div><label class="text-muted text-sm">Email</label><input id="o-email" value="${d.customerEmail}"></div>
-                        <div><label class="text-muted text-sm">Phone</label><input id="o-phone" value="${d.customerPhone||''}"></div>
-                        <div><label class="text-muted text-sm">Total</label><input id="o-total" value="${d.total}"></div>
-                    </div>
-                    
-                    <div class="mb-4 p-2" style="background:rgba(59,130,246,0.05); border-radius:6px; border:1px solid rgba(59,130,246,0.1);">
-                        <div class="flex justify-between items-center">
-                            <span style="font-size:0.8rem; color:var(--text-muted);">Billing Cycle</span>
-                            <span class="font-bold" style="color:var(--primary);">${d.billingCycle || '-'}</span>
-                        </div>
-                    </div>
+            const voucherDisplay = d.voucherCode 
+                ? `<div class="mb-4"><label>Voucher Used</label><input readonly value="${d.voucherCode}" style="color:var(--warning); border-color:var(--warning)"></div>` 
+                : '';
 
-                    <div class="mt-4">
-                        <label>Client Domain</label>
-                        <div style="display:flex; gap:10px;">
-                             <span style="padding:0.6rem; background:var(--bg-input); border:1px solid var(--border); border-radius:6px 0 0 6px 0; color:var(--text-muted);">https://</span>
-                             <input id="o-domain" value="${d.domain || ''}" placeholder="example.com" style="border-radius:0 6px 6px 0;">
-                        </div>
-                        <small class="text-muted">Leave empty if no domain yet.</small>
+            showModal(`Manage Order`, `
+                ${voucherDisplay}
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div><label class="text-muted text-sm">Name</label><input id="o-name" value="${d.customerName}"></div>
+                    <div><label class="text-muted text-sm">Email</label><input id="o-email" value="${d.customerEmail}"></div>
+                    <div><label class="text-muted text-sm">Phone</label><input id="o-phone" value="${d.customerPhone||''}"></div>
+                    <div><label class="text-muted text-sm">Total</label><input id="o-total" value="${d.total}"></div>
+                </div>
+                
+                <div class="mb-4 p-2" style="background:rgba(59,130,246,0.05); border-radius:6px; border:1px solid rgba(59,130,246,0.1);">
+                    <div class="flex justify-between items-center">
+                        <span style="font-size:0.8rem; color:var(--text-muted);">Billing Cycle</span>
+                        <span class="font-bold" style="color:var(--primary);">${d.billingCycle || '-'}</span>
                     </div>
-                    <label class="mt-4 mb-2 block">Update Status</label>
-                    <select id="upd-status">
-                        <option value="Pending" ${d.status=='Pending'?'selected':''}>Pending</option>
-                        <option value="Paid" ${d.status=='Paid'?'selected':''}>Paid</option>
-                        <option value="Completed" ${d.status=='Completed'?'selected':''}>Completed</option>
-                        <option value="Cancelled" ${d.status=='Cancelled'?'selected':''}>Cancelled</option>
-                    </select>
-                `, `<button class="btn btn-primary" onclick="updateOrderDetails('${id}')">Save Changes</button>`);
-            });
+                </div>
+
+                <div class="mb-4">
+                    <label>Sales Representative (For Commission)</label>
+                    <select id="o-sales-rep">${salesRepOptions}</select>
+                    <small class="text-muted">Assigns commission credit to this crew member.</small>
+                </div>
+
+                <div class="mt-4">
+                    <label>Client Domain</label>
+                    <div style="display:flex; gap:10px;">
+                         <span style="padding:0.6rem; background:var(--bg-input); border:1px solid var(--border); border-radius:6px 0 0 6px 0; color:var(--text-muted);">https://</span>
+                         <input id="o-domain" value="${d.domain || ''}" placeholder="example.com" style="border-radius:0 6px 6px 0;">
+                    </div>
+                    <small class="text-muted">Leave empty if no domain yet.</small>
+                </div>
+                <label class="mt-4 mb-2 block">Update Status</label>
+                <select id="upd-status">
+                    <option value="Pending" ${d.status=='Pending'?'selected':''}>Pending</option>
+                    <option value="Paid" ${d.status=='Paid'?'selected':''}>Paid</option>
+                    <option value="Completed" ${d.status=='Completed'?'selected':''}>Completed</option>
+                    <option value="Cancelled" ${d.status=='Cancelled'?'selected':''}>Cancelled</option>
+                </select>
+            `, `<button class="btn btn-primary" onclick="updateOrderDetails('${id}')">Save Changes</button>`);
         }
 
         function updateOrderDetails(id) {
-            db.collection("orders").doc(id).update({
+            // Update logic now includes Sales Rep
+            const updateData = {
                 customerName: document.getElementById('o-name').value,
                 customerEmail: document.getElementById('o-email').value,
                 customerPhone: document.getElementById('o-phone').value,
                 total: document.getElementById('o-total').value,
                 domain: document.getElementById('o-domain').value.replace(/^https?:\/\//, ''), 
                 status: document.getElementById('upd-status').value
-            }).then(() => { 
+            };
+
+            const salesRepSelect = document.getElementById('o-sales-rep');
+            if(salesRepSelect) {
+                if(salesRepSelect.value) {
+                    const repName = salesRepSelect.options[salesRepSelect.selectedIndex].text;
+                    updateData.salesRepId = salesRepSelect.value;
+                    updateData.salesRepName = repName;
+                } else {
+                    updateData.salesRepId = firebase.firestore.FieldValue.delete();
+                    updateData.salesRepName = firebase.firestore.FieldValue.delete();
+                }
+            }
+
+            db.collection("orders").doc(id).update(updateData).then(() => { 
                 closeModal(); showToast("Order Updated Successfully", "success"); logActivity(`Updated Order #${id.substr(0,6)}`);
             });
         }
@@ -1749,7 +1851,7 @@ Thank you! 🚀`;
             }
         }
 
-        // --- 4. CREW MANAGEMENT ---
+        // --- 4. CREW MANAGEMENT (UPDATED TITLES & COMMISSION RATE) ---
         function renderCrew() {
             if(!isAdmin()) return;
             document.getElementById('main').innerHTML = `
@@ -1759,8 +1861,8 @@ Thank you! 🚀`;
                 </div>
                 <div class="table-container">
                     <div class="table-responsive">
-                        <table><thead><tr><th>Crew ID</th><th>Name</th><th>Email</th><th>Role</th><th>Job Title</th><th>Actions</th></tr></thead><tbody id="crew-tbody">
-                        <tr><td colspan="6" class="text-center"><div class="loading-spinner"></div></td></tr>
+                        <table><thead><tr><th>Crew ID</th><th>Name</th><th>Email</th><th>Role</th><th>Job Title</th><th>Comm. Rate</th><th>Actions</th></tr></thead><tbody id="crew-tbody">
+                        <tr><td colspan="7" class="text-center"><div class="loading-spinner"></div></td></tr>
                         </tbody></table>
                     </div>
                 </div>`;
@@ -1769,12 +1871,14 @@ Thank you! 🚀`;
                 if(!tbody) return;
                 tbody.innerHTML = snap.docs.map(doc => {
                     const u = doc.data();
+                    const rate = u.commissionRate ? (u.commissionRate * 100).toFixed(1) + '%' : '0%';
                     return `<tr>
                         <td class="font-mono" style="color:var(--primary)">${u.crewId || 'N/A'}</td>
                         <td>${u.name}</td>
                         <td>${u.email}</td>
                         <td><span class="badge badge-${u.role}">${u.role}</span></td>
                         <td>${u.jobTitle||'-'}</td>
+                        <td><span class="badge" style="background:var(--success)15; color:var(--success)">${rate}</span></td>
                         <td>
                             <button class="btn btn-sm btn-secondary" onclick="editCrew('${doc.id}')"><i class="ri-pencil-line"></i></button>
                             <button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Crew')"><i class="ri-delete-bin-line"></i></button>
@@ -1786,21 +1890,52 @@ Thank you! 🚀`;
         
         async function openAddCrewModal() {
             const newCrewId = await getNextId('crew');
+            
+            // Generate Job Title Options
+            const jobOptions = JOB_TITLES.map(j => `<option value="${j}">${j}</option>`).join('');
+            
             showModal("Add New Crew", `
                 <div class="mb-4"><label>Crew ID</label><input id="c-id" value="${newCrewId}" readonly></div>
                 <div class="mb-4"><label>Full Name</label><input id="c-name"></div>
                 <div class="mb-4"><label>Email Address</label><input type="email" id="c-email"></div>
+                
                 <div class="flex gap-4 mb-4">
-                    <div style="flex:1"><label>Role</label>
-                        <select id="c-role">
+                    <div style="flex:1">
+                        <label>Role</label>
+                        <select id="c-role" onchange="updateCommissionRatePreview()">
                             <option value="crew">Crew</option>
                             <option value="admin">Admin</option>
                         </select>
                     </div>
-                    <div style="flex:1"><label>Job Title</label><input id="c-job"></div>
+                    <div style="flex:1">
+                        <label>Job Title</label>
+                        <select id="c-job" onchange="updateCommissionRatePreview()">
+                            ${jobOptions}
+                        </select>
+                    </div>
                 </div>
+
+                <div class="mb-4">
+                    <label>Commission Rate (%)</label>
+                    <div class="flex gap-2">
+                        <input type="number" step="0.1" id="c-rate" placeholder="e.g. 12.5">
+                        <span style="padding:0.65rem; background:var(--bg-sidebar); border:1px solid var(--border); border-radius:6px; color:var(--text-muted)">%</span>
+                    </div>
+                    <small class="text-muted" id="c-rate-hint">Auto-filled based on Job Title</small>
+                </div>
+
                 <div class="mb-4"><label>Temporary Password</label><input type="password" id="c-pass" placeholder="Set password"></div>
             `, `<button class="btn btn-primary" onclick="saveCrew('${newCrewId}')">Create Crew</button>`);
+            
+            // Initialize default rate
+            updateCommissionRatePreview();
+        }
+
+        function updateCommissionRatePreview() {
+            const title = document.getElementById('c-job').value;
+            const rateInput = document.getElementById('c-rate');
+            const defaultRate = getDefaultRate(title);
+            rateInput.value = (defaultRate * 100).toFixed(1);
         }
 
         async function saveCrew(newId) {
@@ -1809,6 +1944,7 @@ Thank you! 🚀`;
             const pass = document.getElementById('c-pass').value;
             const role = document.getElementById('c-role').value;
             const job = document.getElementById('c-job').value;
+            const rateVal = parseFloat(document.getElementById('c-rate').value);
 
             if(!name || !email || !pass) return showToast("Please fill all fields", "error");
 
@@ -1820,6 +1956,7 @@ Thank you! 🚀`;
                     email: email,
                     role: role,
                     jobTitle: job,
+                    commissionRate: isNaN(rateVal) ? 0.0 : (rateVal / 100),
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 closeModal();
@@ -1833,26 +1970,38 @@ Thank you! 🚀`;
         function editCrew(uid) {
             db.collection("users").doc(uid).get().then(doc => {
                 const u = doc.data();
+                const jobOptions = JOB_TITLES.map(j => `<option value="${j}" ${u.jobTitle===j?'selected':''}>${j}</option>`).join('');
+                
                 showModal("Edit Crew Member", `
                     <div class="mb-4"><label>Crew ID</label><input id="e-c-id" value="${u.crewId}"></div>
                     <div class="mb-4"><label>Full Name</label><input id="e-c-name" value="${u.name}"></div>
-                    <div class="mb-4"><label>Job Title</label><input id="e-c-job" value="${u.jobTitle||''}"></div>
+                    <div class="mb-4"><label>Job Title</label>
+                        <select id="e-c-job">
+                            ${jobOptions}
+                        </select>
+                    </div>
                     <div class="mb-4"><label>Role</label>
                         <select id="e-c-role">
                             <option value="crew" ${u.role==='crew'?'selected':''}>Crew</option>
                             <option value="admin" ${u.role==='admin'?'selected':''}>Admin</option>
                         </select>
                     </div>
+                     <div class="mb-4">
+                        <label>Commission Rate (%)</label>
+                        <input type="number" step="0.1" id="e-c-rate" value="${(u.commissionRate*100).toFixed(1)}">
+                    </div>
                 `, `<button class="btn btn-primary" onclick="updateCrewData('${uid}')">Save</button>`);
             });
         }
 
         function updateCrewData(uid) {
+            const rateVal = parseFloat(document.getElementById('e-c-rate').value);
             db.collection("users").doc(uid).update({
                 crewId: document.getElementById('e-c-id').value,
                 name: document.getElementById('e-c-name').value,
                 jobTitle: document.getElementById('e-c-job').value,
-                role: document.getElementById('e-c-role').value
+                role: document.getElementById('e-c-role').value,
+                commissionRate: isNaN(rateVal) ? 0.0 : (rateVal / 100)
             }).then(() => {
                 closeModal();
                 showToast("Crew details updated", "success");
@@ -2956,6 +3105,166 @@ Thank you! 🚀`;
             } catch(e) {
                 showToast("Error deleting: " + e.message, "error");
             }
+        }
+
+        // --- 13. COMMISSIONS (NEW TAB) ---
+        async function renderCommissions() {
+            if(!isAdmin()) return;
+            
+            document.getElementById('main').innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h2 style="font-size:1.25rem; font-weight:700;">Commission Calculator</h2>
+                    <button class="btn btn-secondary" onclick="renderCommissions()"><i class="ri-refresh-line"></i> Recalculate</button>
+                </div>
+
+                <div class="stats-grid" id="comm-stats">
+                    <div class="page-loader"><div class="loading-spinner"></div></div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Payout Ledger (Paid Orders Only)</h3>
+                        <small class="text-muted">Calculated based on Sales Rep assigned in Orders.</small>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Crew Member</th>
+                                    <th>Job Title</th>
+                                    <th>Rate</th>
+                                    <th>Total Earnings</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="comm-tbody">
+                                <tr><td colspan="5" class="text-center"><div class="loading-spinner"></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            // 1. Fetch Crew
+            const crewSnap = await db.collection("users").where("role", "in", ["admin", "crew"]).get();
+            const crewList = crewSnap.docs.map(d => ({id: d.id, ...d.data()}));
+
+            // 2. Fetch Paid Orders
+            const ordersSnap = await db.collection("orders").where("status", "==", "Paid").get();
+            const ordersList = ordersSnap.docs.map(d => ({id: d.id, ...d.data()}));
+
+            // 3. Calculate
+            const commMap = {}; // uid -> { total: 0, details: [] }
+            let totalPayout = 0;
+
+            ordersList.forEach(order => {
+                if(!order.salesRepId) return; // No one assigned
+
+                const amount = parseFloat(order.total.replace('RM ', '')) || 0;
+                const rep = crewList.find(c => c.id === order.salesRepId);
+                if(!rep) return;
+
+                const rate = rep.commissionRate || 0;
+                if(rate <= 0) return;
+
+                // LOGIC FROM PROMPT
+                let commission = 0;
+                const cycle = (order.billingCycle || 'One-Time').toLowerCase();
+
+                if(cycle === 'monthly') {
+                    // Monthly subscription - Commission paid monthly (we assume current snapshot is "this month")
+                    commission = amount * rate; 
+                } else if (cycle === 'yearly') {
+                    // Yearly - Paid once upfront
+                    commission = amount * rate;
+                } else {
+                    // One-time project
+                    commission = amount * rate;
+                }
+
+                if(!commMap[rep.id]) {
+                    commMap[rep.id] = {
+                        name: rep.name,
+                        job: rep.jobTitle || 'Crew',
+                        rate: rate,
+                        total: 0,
+                        details: []
+                    };
+                }
+
+                commMap[rep.id].total += commission;
+                commMap[rep.id].details.push({
+                    ref: order.id.substring(0,6),
+                    amt: amount,
+                    comm: commission,
+                    cycle: cycle
+                });
+            });
+
+            // 4. Render Stats
+            Object.values(commMap).forEach(c => totalPayout += c.total);
+
+            document.getElementById('comm-stats').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-icon" style="color:var(--success); background:var(--success)15"><i class="ri-wallet-3-line"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-val">RM ${totalPayout.toFixed(2)}</div>
+                        <div class="stat-label">Total Pending Payouts</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="color:var(--primary); background:var(--primary)15"><i class="ri-user-star-line"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-val">${Object.keys(commMap).length}</div>
+                        <div class="stat-label">Active Earners</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="color:var(--info); background:var(--info)15"><i class="ri-file-list-3-line"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-val">${ordersList.length}</div>
+                        <div class="stat-label">Paid Orders Analyzed</div>
+                    </div>
+                </div>
+            `;
+
+            // 5. Render Table
+            const tbody = document.getElementById('comm-tbody');
+            if(Object.keys(commMap).length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No commissions found. Ensure Sales Reps are assigned in Orders.</td></tr>';
+            } else {
+                tbody.innerHTML = Object.values(commMap).map(c => `
+                    <tr>
+                        <td><strong>${c.name}</strong></td>
+                        <td>${c.job}</td>
+                        <td><span class="badge" style="background:var(--primary)15; color:var(--primary)">${(c.rate*100).toFixed(1)}%</span></td>
+                        <td style="color:var(--success); font-weight:700;">RM ${c.total.toFixed(2)}</td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary" onclick="showCommDetails('${c.name.replace(/'/g, "\\'")}', ${JSON.stringify(c.details).replace(/"/g, '&quot;')})">View Breakdown</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        function showCommDetails(name, details) {
+            const rows = details.map(d => `
+                <tr>
+                    <td>${d.ref}</td>
+                    <td>RM ${d.amt}</td>
+                    <td style="text-transform:capitalize">${d.cycle}</td>
+                    <td style="color:var(--success)">+ RM ${d.comm.toFixed(2)}</td>
+                </tr>
+            `).join('');
+
+            showModal(`Commission Breakdown: ${name}`, `
+                <div style="max-height:300px; overflow-y:auto;">
+                    <table>
+                        <thead><tr><th>Order Ref</th><th>Order Amt</th><th>Type</th><th>Cut</th></tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+            `, `<button class="btn btn-primary" onclick="closeModal()">Close</button>`);
         }
 
     </script>
