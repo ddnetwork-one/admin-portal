@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Admin Portal v12.0</title>
+    <title>Admin Portal v12.1 (Approval Workflow)</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -720,7 +720,7 @@
     <div id="auth-screen">
         <div class="auth-card">
             <img src="https://raw.githubusercontent.com/ddnetwork-ent/ddnetwork/refs/heads/main/DDN%20Logo%20NoBG.png" alt="Logo">
-            <h2 class="mb-4" style="color:white; font-weight: 700; letter-spacing: -0.5px;">Admin Portal v12.0</h2>
+            <h2 class="mb-4" style="color:white; font-weight: 700; letter-spacing: -0.5px;">Admin Portal v12.1</h2>
             <form id="loginForm">
                 <input type="text" id="loginInput" class="mb-4" placeholder="Email or Crew ID" required>
                 <input type="password" id="loginPass" class="mb-4" placeholder="Password" required>
@@ -739,7 +739,7 @@
                 <button class="btn-icon" onclick="toggleSidebar()" title="Toggle Menu"><i class="ri-menu-line" style="font-size: 1.4rem;"></i></button>
                 <div class="header-brand">
                     <img src="https://raw.githubusercontent.com/ddnetwork-ent/ddnetwork/refs/heads/main/DDN%20Logo%20NoBG.png">
-                    <span>DDN v12.0</span>
+                    <span>DDN v12.1</span>
                 </div>
             </div>
             <div class="header-actions">
@@ -813,6 +813,11 @@
                 </div>
                 <div class="nav-item" onclick="navigateTo('/config')">
                     <i class="ri-settings-4-line"></i> <span class="nav-text">System Config</span>
+                </div>
+
+                <!-- APPROVALS (Admin Power) -->
+                <div class="nav-item hidden" id="nav-approvals" onclick="navigateTo('/approvals')">
+                    <i class="ri-shield-check-line" style="color: var(--warning)"></i> <span class="nav-text">Approval Tools</span>
                 </div>
                 
                 <!-- FINANCE -->
@@ -907,7 +912,7 @@
         };
 
         // PERMISSION KEYS
-        // These match the flags stored in Firestore under user.permissions
+        // These match flags stored in Firestore under user.permissions
         const PERMISSION_KEYS = {
             EDIT_ORDERS: 'edit_orders',
             EDIT_CLIENTS: 'edit_clients',
@@ -1068,6 +1073,13 @@
                         document.getElementById('side-avatar').innerText = (userData.name || 'A').charAt(0).toUpperCase();
                         document.getElementById('header-avatar').innerText = (userData.name || 'A').charAt(0).toUpperCase();
 
+                        // Show Approval Tab if user has Admin Power
+                        if(hasPermission(PERMISSION_KEYS.APPROVE_ACTIONS)) {
+                            document.getElementById('nav-approvals').classList.remove('hidden');
+                        } else {
+                            document.getElementById('nav-approvals').classList.add('hidden');
+                        }
+
                         // Notifications restricted to Admins
                         if(userData.role === 'crew') {
                             document.getElementById('notif-btn').style.display = 'none';
@@ -1139,18 +1151,12 @@
         }
 
         function checkAccessAndDeny(featureKey) {
-            if (!hasPermission(featureKey)) {
-                // If no permission, we don't block render, we just block write actions 
-                // OR if it's a restricted view like Finance
-                if(featureKey === PERMISSION_KEYS.VIEW_FINANCE) {
-                    return true; // Block view
-                }
-                
-                // For write actions, trigger approval workflow
-                requestApproval(featureKey);
-                return true; // Block direct action
-            }
-            return false; // Allowed
+            // If user has specific permission, allow action directly
+            if(hasPermission(featureKey)) return false; // Allowed
+
+            // If no direct permission, trigger approval workflow
+            requestApproval(featureKey);
+            return true; // Block direct action
         }
 
         function checkFinanceAccess() {
@@ -1165,14 +1171,13 @@
         async function requestApproval(permissionKey) {
             if(!currentUser) return;
             
-            // Check if this user has "approve_actions" (Founder/Super)
+            // If this user has "approve_actions", they just do it.
             if(hasPermission(PERMISSION_KEYS.APPROVE_ACTIONS)) {
-                // They can just do it
                 return; 
             }
 
             // Otherwise, create a request
-            const keyName = permissionKey.replace('edit_', '').replace('delete_', '').toUpperCase();
+            const keyName = permissionKey.replace('edit_', '').replace('delete_', '').replace('view_', '').toUpperCase();
             
             try {
                 await db.collection("approval_requests").add({
@@ -1205,7 +1210,8 @@
             '/requests': renderRequests,
             '/my-profile': renderMyProfile,
             '/public-promos': renderPublicPromos,
-            '/commissions': renderCommissions
+            '/commissions': renderCommissions,
+            '/approvals': renderApprovals
         };
 
         function navigateTo(path) {
@@ -2698,6 +2704,120 @@ Thank you for choosing DDNetwork.
                         <td style="color:var(--success); font-weight:700;">+ RM ${c.comm.toFixed(2)}</td>
                     </tr>
                 `).join('');
+            }
+        }
+
+        // --- 14. APPROVAL TOOLS (NEW) ---
+        function renderApprovals() {
+            if(!hasPermission(PERMISSION_KEYS.APPROVE_ACTIONS)) {
+                document.getElementById('main').innerHTML = `<div class="access-denied-container"><div class="access-denied-title">Access Denied</div><div class="access-denied-desc">You do not have permission to view this page.</div></div>`;
+                return;
+            }
+
+            document.getElementById('main').innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h2 style="font-size:1.5rem; font-weight:700; color: var(--warning);"><i class="ri-shield-check-line"></i> Approval Tools</h2>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="color:var(--warning); background:rgba(245,158,11,0.15)"><i class="ri-time-line"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-val" id="count-pending">0</div>
+                            <div class="stat-label">Pending Requests</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Pending Requests</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Requester</th>
+                                    <th>Action Requested</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="approvals-tbody">
+                                <tr><td colspan="5" class="text-center"><div class="loading-spinner"></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            // Listen for requests
+            db.collection("approval_requests").orderBy("timestamp", "desc").onSnapshot(snap => {
+                const tbody = document.getElementById('approvals-tbody');
+                const counter = document.getElementById('count-pending');
+                if(!tbody) return;
+
+                if(snap.empty) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No pending requests</td></tr>';
+                    if(counter) counter.innerText = "0";
+                    return;
+                }
+
+                let pendingCount = 0;
+                tbody.innerHTML = snap.docs.map(doc => {
+                    const r = doc.data();
+                    const isPending = r.status === 'Pending';
+                    if(isPending) pendingCount++;
+
+                    const keyName = r.permissionKey ? r.permissionKey.replace('edit_', '').replace('delete_', '').toUpperCase() : 'UNKNOWN';
+                    
+                    return `<tr>
+                        <td style="white-space:nowrap;">${formatDateTime(r.timestamp)}</td>
+                        <td>
+                            <strong>${r.requesterName}</strong><br>
+                            <small class="text-muted">${r.requesterEmail}</small>
+                        </td>
+                        <td>
+                            <div class="badge badge-warning" style="background:rgba(245,158,11,0.1); color:var(--warning); border:1px solid rgba(245,158,11,0.3); text-transform:none;">${keyName}</div>
+                            <div style="font-size:0.75rem; margin-top:4px;">${r.requestMessage}</div>
+                        </td>
+                        <td><span class="badge ${isPending?'badge-warning':'badge-success'}">${r.status}</span></td>
+                        <td>
+                            ${isPending ? `
+                            <div class="flex gap-2">
+                                <button class="btn btn-sm btn-success" onclick="processApproval('${doc.id}', 'Approved')">Approve</button>
+                                <button class="btn btn-sm btn-danger" onclick="processApproval('${doc.id}', 'Rejected')">Reject</button>
+                            </div>` : `<small class="text-muted">Processed</small>`}
+                        </td>
+                    </tr>`;
+                }).join('');
+
+                if(counter) counter.innerText = pendingCount;
+            });
+        }
+
+        async function processApproval(requestId, action) {
+            if(!confirm(`Are you sure you want to mark this request as ${action}?`)) return;
+
+            try {
+                // Update request status
+                await db.collection("approval_requests").doc(requestId).update({
+                    status: action,
+                    processedBy: userData.name,
+                    processedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Note: In a real app, here you would grant the permission 
+                // to the user based on requestId.permissionKey. 
+                // Since this is a single-file demo, we assume the manual 
+                // edit of the user in Crew > Edit > Permissions will happen 
+                // after this approval is given, or this action stands as the log.
+                
+                showToast(`Request ${action} successfully`, action==='Approved'?'success':'error');
+                logActivity(`Approval request ${action} by ${userData.name}`);
+            } catch(e) {
+                showToast("Error processing: " + e.message, "error");
             }
         }
     </script>
