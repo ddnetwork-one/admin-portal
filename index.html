@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Admin Portal v13.1 (Approval Workflow)</title>
+    <title>Admin Portal v13.2 (Professional Workflow)</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -58,7 +58,8 @@
             --z-modal-overlay: 1000;
             --z-modal-content: 1010;
             --z-toast: 2000;
-            --z-invoice: 3000;
+            --z-confirm: 3000;
+            --z-invoice: 4000;
         }
 
         /* RESET & BASE */
@@ -526,6 +527,50 @@
         .modal-body { padding: 1.5rem; overflow-y: auto; }
         .modal-footer { padding: 1.2rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; border-radius: 0 0 16px 16px; background: rgba(0,0,0,0.2); flex-shrink: 0; }
 
+        /* --- ACCESS LOCKED MODAL --- */
+        .locked-modal-icon {
+            font-size: 3rem; color: var(--danger); margin-bottom: 1rem;
+        }
+        .locked-details {
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.2);
+            color: #fca5a5;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin: 1rem 0;
+            text-align: left;
+        }
+
+        /* --- CONFIRMATION MODAL (New) --- */
+        #confirmModalOverlay {
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(2px);
+            z-index: var(--z-confirm);
+        }
+        .confirm-box {
+            background: #18181b;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            animation: fadeIn 0.2s ease-out;
+        }
+        .confirm-icon {
+            width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.05);
+            display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;
+            font-size: 1.5rem; color: var(--warning);
+        }
+        .confirm-title { font-size: 1.1rem; font-weight: 700; color: white; margin-bottom: 0.5rem; }
+        .confirm-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; line-height: 1.5; }
+        .confirm-actions { display: flex; gap: 10px; justify-content: center; }
+        .btn-cancel { flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
+        .btn-cancel:hover { background: var(--bg-surface); color: white; }
+        .btn-confirm { flex: 1; }
+
         /* --- INVOICE MODAL STYLES --- */
         #invoiceModalOverlay {
             z-index: var(--z-invoice);
@@ -627,26 +672,65 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .page-loader { display: flex; justify-content: center; align-items: center; height: 300px; width: 100%; }
 
-        /* TOAST */
-        .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: var(--z-toast); display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        /* --- PROFESSIONAL TOAST NOTIFICATIONS --- */
+        .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: var(--z-toast); display: flex; flex-direction: column; gap: 12px; pointer-events: none; }
+        
         .toast { 
-            background: var(--bg-surface); 
+            background: rgba(15, 15, 18, 0.95); 
+            backdrop-filter: blur(10px);
             color: white; 
-            padding:1rem 1.25rem; 
-            border-radius: 10px; 
+            min-width: 320px;
+            max-width: 400px;
+            border-radius: 12px; 
             border: 1px solid var(--border); 
             box-shadow: 0 15px 35px rgba(0,0,0,0.6); 
             display: flex; 
-            align-items: center; 
-            gap: 12px; 
+            align-items: flex-start; 
+            gap: 14px; 
+            padding: 16px;
+            position: relative;
+            overflow: hidden;
+            pointer-events: auto;
             transform: translateX(120%); 
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            min-width: 300px; pointer-events: auto;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
+            opacity: 0;
         }
-        .toast.show { transform: translateX(0); }
+        
+        .toast.show { transform: translateX(0); opacity: 1; }
+        
+        .toast-icon {
+            flex-shrink: 0;
+            width: 24px; height: 24px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            font-size: 1rem;
+        }
+        
         .toast.success { border-left: 4px solid var(--success); }
+        .toast.success .toast-icon { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        
         .toast.error { border-left: 4px solid var(--danger); }
+        .toast.error .toast-icon { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        
         .toast.warning { border-left: 4px solid var(--warning); }
+        .toast.warning .toast-icon { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        
+        .toast-content { flex: 1; }
+        .toast-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 2px; color: white; }
+        .toast-msg { font-size: 0.8rem; color: var(--text-muted); line-height: 1.3; }
+
+        .toast-progress {
+            position: absolute; bottom: 0; left: 0;
+            height: 3px;
+            background: rgba(255,255,255,0.1);
+            width: 100%;
+        }
+        .toast-progress-bar {
+            height: 100%;
+            background: currentColor;
+            width: 100%;
+            transform-origin: left;
+        }
 
         /* Approval Request Specifics */
         .req-approval-badge {
@@ -685,6 +769,27 @@
         .checkbox-item input { width: auto; margin: 0; }
         .checkbox-item span { font-size: 0.9rem; color: var(--text-main); }
 
+        /* PERMISSION MATRIX STYLES */
+        .perm-matrix-container {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+            background: var(--bg-surface-hover); border: 1px solid var(--border);
+            border-radius: 8px; padding: 1rem;
+        }
+        .perm-section h4 {
+            font-size: 0.75rem; text-transform: uppercase; color: var(--text-faint);
+            margin-bottom: 0.8rem; border-bottom: 1px solid var(--border); padding-bottom: 4px;
+        }
+        .perm-grid { display: grid; grid-template-columns: 1fr; gap: 0.5rem; }
+        .perm-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 0.5rem; border-radius: 6px;
+            background: rgba(255,255,255,0.02); border: 1px solid transparent;
+            transition: 0.2s;
+        }
+        .perm-item:hover { background: rgba(255,255,255,0.05); border-color: var(--border-light); }
+        .perm-item input[type="checkbox"] { width: auto; margin: 0; accent-color: var(--primary); }
+        .perm-item label { margin: 0; font-size: 0.8rem; color: var(--text-muted); cursor: pointer; text-transform: none; font-weight: 400; }
+
         /* RESPONSIVENESS */
         @media(max-width: 1024px) {
             aside { transform: translateX(-100%); width: 280px; box-shadow: 20px 0 40px rgba(0,0,0,0.5); }
@@ -718,7 +823,7 @@
     <!-- AUTH SCREEN -->
     <div id="auth-screen">
         <div class="auth-card">
-            <h2 class="mb-4" style="color:white; font-weight: 700; letter-spacing: -0.5px;">Admin Portal v13.1</h2>
+            <h2 class="mb-4" style="color:white; font-weight: 700; letter-spacing: -0.5px;">Admin Portal v13.2</h2>
             <form id="loginForm">
                 <input type="text" id="loginInput" class="mb-4" placeholder="Email or Crew ID" required>
                 <input type="password" id="loginPass" class="mb-4" placeholder="Password" required>
@@ -736,7 +841,7 @@
             <div class="header-left">
                 <button class="btn-icon" onclick="toggleSidebar()" title="Toggle Menu"><i class="ri-menu-line" style="font-size: 1.4rem;"></i></button>
                 <div class="header-brand">
-                    <span>DDN v13.1</span>
+                    <span>DDN v13.2</span>
                 </div>
             </div>
             <div class="header-actions">
@@ -755,7 +860,7 @@
             </div>
         </header>
 
-        <!-- SIDEBAR (All visible to all employees) -->
+        <!-- SIDEBAR -->
         <aside id="sidebar">
             <div class="user-mini-profile">
                 <div class="u-info">
@@ -812,7 +917,7 @@
                     <i class="ri-settings-4-line"></i> <span class="nav-text">System Config</span>
                 </div>
 
-                <!-- APPROVALS (Admin Power) -->
+                <!-- APPROVALS -->
                 <div class="nav-item hidden" id="nav-approvals" onclick="navigateTo('/approvals')">
                     <i class="ri-shield-check-line" style="color: var(--warning)"></i> <span class="nav-text">Approval Tools</span>
                 </div>
@@ -852,6 +957,41 @@
         </div>
     </div>
 
+    <!-- ACCESS LOCKED MODAL -->
+    <div class="modal-overlay" id="accessLockedOverlay">
+        <div class="modal" style="border-color: var(--danger);">
+            <div class="modal-header" style="border-color: rgba(239,68,68,0.2);">
+                <div class="modal-title" style="color:var(--danger)">Access Denied</div>
+                <button class="btn-icon" onclick="closeAccessLocked()"><i class="ri-close-line"></i></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="ri-shield-keyhole-line locked-modal-icon"></i>
+                <h3 style="margin-bottom: 0.5rem; color:white;">Permission Required</h3>
+                <p style="color:var(--text-muted); font-size:0.9rem;">You do not have the necessary clearance to perform this action.</p>
+                <div class="locked-details">
+                    <strong>Missing Permission:</strong> <span id="locked-perm-name">Unknown</span><br>
+                    <small style="color:var(--text-faint); margin-top:4px; display:block;">Contact a System Administrator to grant you access.</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeAccessLocked()">I Understand</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFIRMATION MODAL -->
+    <div class="modal-overlay" id="confirmModalOverlay">
+        <div class="confirm-box">
+            <div class="confirm-icon" id="confirmIcon"><i class="ri-alert-line"></i></div>
+            <div class="confirm-title" id="confirmTitle">Are you sure?</div>
+            <div class="confirm-desc" id="confirmDesc">This action cannot be undone.</div>
+            <div class="confirm-actions">
+                <button class="btn btn-cancel" onclick="closeConfirm(false)">Cancel</button>
+                <button class="btn btn-confirm btn-danger" id="confirmBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
     <!-- INVOICE MODAL -->
     <div class="modal-overlay" id="invoiceModalOverlay">
         <div class="invoice-modal-wrapper">
@@ -875,20 +1015,20 @@
         
         // Updated Job Titles & Rates
         const JOB_TITLES = [
-            "Founder & Managing Director", // Super Admin, 5%
-            "Project & Client Manager", // Admin, 3-5%
-            "Account / Operations / Marketing Manager", // Admin, 3-5%
-            "Finance / Billing Executive", // Admin, None
-            "People / Team Operations Executive", // Admin, None
-            "Business Development Executive", // Crew, 10-15%
-            "Sales Executive", // Crew, 10-15%
-            "Client Success Coordinator", // Crew, 2-3%
-            "Client Experience Executive", // Crew, 2-3%
-            "Technical Specialist", // Crew, 3-5%
-            "Web Developer", // Crew, 3-5%
-            "Full Stack Developer", // Crew, 3-5%
-            "Automation & AI Specialist", // Crew, 3-5%
-            "Support Operations Executive" // Crew, 2-3%
+            "Founder & Managing Director", 
+            "Project & Client Manager", 
+            "Account / Operations / Marketing Manager", 
+            "Finance / Billing Executive", 
+            "People / Team Operations Executive", 
+            "Business Development Executive", 
+            "Sales Executive", 
+            "Client Success Coordinator", 
+            "Client Experience Executive", 
+            "Technical Specialist", 
+            "Web Developer", 
+            "Full Stack Developer", 
+            "Automation & AI Specialist", 
+            "Support Operations Executive"
         ];
 
         const DEFAULT_COMMISSION_RATES = {
@@ -908,21 +1048,25 @@
             "Support Operations Executive": 0.025
         };
 
-        // PERMISSION KEYS
-        const PERMISSION_KEYS = {
-            EDIT_ORDERS: 'edit_orders',
-            EDIT_CLIENTS: 'edit_clients',
-            DELETE_REQUESTS: 'delete_requests',
-            DELETE_SUPPORT: 'delete_support',
-            EDIT_VOUCHERS: 'edit_vouchers',
-            EDIT_PORTFOLIO: 'edit_portfolio',
-            EDIT_CONTENT: 'edit_content',
-            EDIT_PROMOS: 'edit_promos',
-            EDIT_CREW: 'edit_crew',
-            EDIT_CONFIG: 'edit_config',
-            VIEW_FINANCE: 'view_finance',
-            EDIT_FINANCE: 'edit_finance',
-            APPROVE_ACTIONS: 'approve_actions' 
+        // PERMISSION KEYS & GROUPS FOR MATRIX
+        const PERMISSION_GROUPS = {
+            OPERATIONS: [
+                { key: 'edit_orders', label: 'Edit & Manage Orders' },
+                { key: 'edit_clients', label: 'Edit Client Details' },
+                { key: 'delete_requests', label: 'Delete Customer Requests' },
+                { key: 'delete_support', label: 'Delete Support Tickets' },
+                { key: 'edit_vouchers', label: 'Manage Vouchers' }
+            ],
+            MANAGEMENT: [
+                { key: 'edit_portfolio', label: 'Manage Portfolio' },
+                { key: 'edit_content', label: 'Edit Content & Packages' },
+                { key: 'edit_promos', label: 'Manage Public Promos' }
+            ],
+            SYSTEM: [
+                { key: 'edit_crew', label: 'Manage Internal Crew' },
+                { key: 'edit_config', label: 'System Configuration' },
+                { key: 'approve_actions', label: 'Approve Requests (Admin Power)' }
+            ]
         };
 
         function getDefaultRate(title) {
@@ -1070,7 +1214,7 @@
                         document.getElementById('header-avatar').innerText = (userData.name || 'A').charAt(0).toUpperCase();
 
                         // Show Approval Tab if user has Admin Power
-                        if(hasPermission(PERMISSION_KEYS.APPROVE_ACTIONS)) {
+                        if(hasPermission('approve_actions')) {
                             document.getElementById('nav-approvals').classList.remove('hidden');
                         } else {
                             document.getElementById('nav-approvals').classList.add('hidden');
@@ -1155,32 +1299,29 @@
             // User has direct permission? Allow.
             if(hasPermission(permissionKey)) return false;
 
-            // No permission? Submit Request
-            const collectionName = permissionKey.replace('edit_', '').replace('delete_', '').toUpperCase();
+            // No permission? Show Access Locked Modal
+            showAccessLockedModal(permissionKey);
             
-            try {
-                // Create request document
-                const requestRef = await db.collection("pending_edits").add({
-                    requesterId: currentUser.uid,
-                    requesterName: userData.name,
-                    requesterEmail: userData.email,
-                    permissionKey: permissionKey,
-                    targetCollection: targetCollection,
-                    targetId: targetId,
-                    payload: payload, // The data intended to be saved
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: 'Pending'
-                });
-                
-                if(modalClose) closeModal();
-                showToast("Edit Request Sent. Waiting for Approval.", "warning");
-                logActivity(`Submitted approval request for ${collectionName} (${targetId})`);
-                return true; // Blocked
-            } catch(e) {
-                console.error(e);
-                showToast("Error sending request: " + e.message, "error");
-                return true; // Blocked on error
-            }
+            // Optionally still submit request in background?
+            // For now, we just block UI. If you want auto-request logic, keep it here.
+            
+            return true; // Blocked
+        }
+
+        function showAccessLockedModal(permKey) {
+            // Find readable name
+            let label = permKey;
+            Object.values(PERMISSION_GROUPS).forEach(group => {
+                const found = group.find(p => p.key === permKey);
+                if(found) label = found.label;
+            });
+            
+            document.getElementById('locked-perm-name').innerText = label || permKey;
+            document.getElementById('accessLockedOverlay').classList.add('open');
+        }
+
+        function closeAccessLocked() {
+            document.getElementById('accessLockedOverlay').classList.remove('open');
         }
 
         function checkFinanceAccess() {
@@ -1265,26 +1406,90 @@
             document.getElementById('modalOverlay').classList.add('open');
         }
         function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+        
+        // --- NEW PROFESSIONAL TOAST ---
+        let confirmCallback = null;
+
         function showToast(msg, type='info') {
-            const t = document.createElement('div'); t.className = `toast ${type}`;
-            const icon = type=='success'?'ri-checkbox-circle-fill':(type=='error'?'ri-error-warning-fill':(type=='warning'?'ri-alert-fill':'ri-information-fill'));
-            t.innerHTML = `<i class="${icon}" style="font-size:1.2rem; color: ${type=='success'?'var(--success)':(type=='error'?'var(--danger)':(type=='warning'?'var(--warning)':'white'))}"></i> <span>${msg}</span>`;
+            const t = document.createElement('div'); 
+            t.className = `toast ${type}`;
+            
+            let iconClass = 'ri-information-fill';
+            let title = 'Info';
+            
+            if(type === 'success') { iconClass = 'ri-checkbox-circle-fill'; title = 'Success'; }
+            if(type === 'error') { iconClass = 'ri-error-warning-fill'; title = 'Error'; }
+            if(type === 'warning') { iconClass = 'ri-alert-fill'; title = 'Attention'; }
+
+            t.innerHTML = `
+                <div class="toast-icon"><i class="${iconClass}"></i></div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-msg">${msg}</div>
+                </div>
+                <div class="toast-progress"><div class="toast-progress-bar"></div></div>
+            `;
+            
             document.getElementById('toastContainer').appendChild(t);
-            setTimeout(()=>t.classList.add('show'), 10);
-            setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(), 400); }, 3500);
+            
+            // Animate In
+            requestAnimationFrame(() => {
+                t.classList.add('show');
+                // Animate Progress Bar
+                const bar = t.querySelector('.toast-progress-bar');
+                bar.style.transition = 'width 4s linear';
+                bar.style.width = '0%';
+            });
+
+            // Remove after 4s
+            setTimeout(() => {
+                t.classList.remove('show');
+                setTimeout(() => t.remove(), 400); 
+            }, 4000);
+        }
+
+        // --- NEW CONFIRM DIALOG ---
+        function openConfirm(title, desc, onConfirm, type = 'danger') {
+            document.getElementById('confirmTitle').innerText = title;
+            document.getElementById('confirmDesc').innerText = desc;
+            
+            const btn = document.getElementById('confirmBtn');
+            const icon = document.getElementById('confirmIcon');
+            
+            btn.className = 'btn btn-confirm'; // reset
+            btn.classList.add(type === 'danger' ? 'btn-danger' : 'btn-primary');
+            
+            if(type === 'danger') icon.innerHTML = '<i class="ri-alert-line" style="color:var(--danger)"></i>';
+            else icon.innerHTML = '<i class="ri-question-line" style="color:var(--primary)"></i>';
+
+            confirmCallback = onConfirm;
+            document.getElementById('confirmModalOverlay').classList.add('open');
+        }
+
+        function closeConfirm(result) {
+            document.getElementById('confirmModalOverlay').classList.remove('open');
+            if(result && confirmCallback) {
+                confirmCallback();
+            }
+            confirmCallback = null;
         }
 
         async function deleteUser(uid, name, type) {
             if(!isSuperAdmin()) return showToast("Access Denied", "error");
-            if(!confirm(`Are you sure you want to PERMANENTLY DELETE ${name}? This action cannot be undone.`)) return;
-            try {
-                await db.collection("users").doc(uid).delete();
-                logActivity(`Deleted user: ${name} (${type})`);
-                showToast("User deleted successfully", "success");
-            } catch (error) {
-                console.error("Delete error:", error);
-                showToast("Error deleting user: " + error.message, "error");
-            }
+            openConfirm(
+                `Delete ${type}?`, 
+                `Are you sure you want to PERMANENTLY DELETE ${name}? This action cannot be undone.`, 
+                async () => {
+                    try {
+                        await db.collection("users").doc(uid).delete();
+                        logActivity(`Deleted user: ${name} (${type})`);
+                        showToast("User deleted successfully", "success");
+                    } catch (error) {
+                        console.error("Delete error:", error);
+                        showToast("Error deleting user: " + error.message, "error");
+                    }
+                }
+            );
         }
 
         // ---1. OVERVIEW ---
@@ -1305,7 +1510,7 @@
                             <button class="btn btn-secondary" onclick="navigateTo('/orders')"><i class="ri-shopping-bag-line"></i> New Order</button>
                             <button class="btn btn-secondary" onclick="navigateTo('/support')"><i class="ri-ticket-line"></i> Check Tickets</button>
                             <button class="btn btn-secondary" onclick="navigateTo('/requests')"><i class="ri-database-2-line"></i> Requests</button>
-                            ${hasPermission(PERMISSION_KEYS.EDIT_CREW) ? `<button class="btn btn-secondary" onclick="navigateTo('/crew')"><i class="ri-user-add-line"></i> Add Crew</button>` : ''}
+                            ${hasPermission('edit_crew') ? `<button class="btn btn-secondary" onclick="navigateTo('/crew')"><i class="ri-user-add-line"></i> Add Crew</button>` : ''}
                         </div>
                     </div>
                     <div class="list-group">
@@ -1315,7 +1520,7 @@
                 </div>
             `;
             
-            if(hasPermission(PERMISSION_KEYS.VIEW_FINANCE)) {
+            if(hasPermission('view_finance')) {
                  // Add finance stats if visible
             }
 
@@ -1677,7 +1882,7 @@ Thank you for choosing DDNetwork.
             updateData.salesRepIds = selectedIds;
 
             // CHECK PERMISSION & WORKFLOW
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_ORDERS, 'orders', id, updateData);
+            const blocked = await checkAccessOrRequestApproval('edit_orders', 'orders', id, updateData);
             if(blocked) return; // Request sent, stop execution
 
             // Direct Update
@@ -1688,10 +1893,11 @@ Thank you for choosing DDNetwork.
 
         function deleteOrder(id) {
             if(!isSuperAdmin()) return;
-            if(!confirm("Delete this order?")) return;
-            db.collection("orders").doc(id).delete().then(() => {
-                showToast("Order Deleted", "success");
-                logActivity(`Deleted Order #${id.substr(0,6)}`);
+            openConfirm("Delete Order?", "Are you sure? This cannot be undone.", async () => {
+                db.collection("orders").doc(id).delete().then(() => {
+                    showToast("Order Deleted", "success");
+                    logActivity(`Deleted Order #${id.substr(0,6)}`);
+                });
             });
         }
 
@@ -1757,18 +1963,20 @@ Thank you for choosing DDNetwork.
                 company: document.getElementById('e-comp').value 
             };
             
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CLIENTS, 'users', uid, data);
+            const blocked = await checkAccessOrRequestApproval('edit_clients', 'users', uid, data);
             if(blocked) return;
 
             db.collection("users").doc(uid).update(data).then(() => { closeModal(); showToast("Client Updated", "success"); logActivity("Updated client details"); });
         }
         function resetPassword(email) {
-            if(confirm(`Send reset email to ${email}?`)) { auth.sendPasswordResetEmail(email).then(() => showToast("Reset email sent", "success")); }
+            openConfirm(`Reset Password for ${email}?`, "An email with a reset link will be sent.", () => {
+                auth.sendPasswordResetEmail(email).then(() => showToast("Reset email sent", "success"));
+            });
         }
 
         // --- 4. CREW MANAGEMENT ---
         function renderCrew() {
-            const canEdit = hasPermission(PERMISSION_KEYS.EDIT_CREW);
+            const canEdit = hasPermission('edit_crew');
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:700;">Internal Crew</h2>
@@ -1888,35 +2096,25 @@ Thank you for choosing DDNetwork.
                 const u = doc.data();
                 const jobOptions = JOB_TITLES.map(j => `<option value="${j}" ${u.jobTitle===j?'selected':''}>${j}</option>`).join('');
                 
-                // Generate Permission Toggles
-                let permsHTML = '<div style="margin-top:1rem; border-top:1px solid var(--border); padding-top:1rem;"><label style="margin-bottom:0.5rem; display:block;">Access Permissions</label><div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">';
-                const userPerms = u.permissions || {};
+                // Generate Permission Matrix
+                let permsHTML = '<div style="margin-top:1rem; border-top:1px solid var(--border); padding-top:1rem;"><label style="margin-bottom:0.5rem; display:block;">Access Permissions</label><div class="perm-matrix-container">';
                 
-                for (const [key, label] of Object.entries({
-                    [PERMISSION_KEYS.EDIT_ORDERS]: 'Edit Orders',
-                    [PERMISSION_KEYS.EDIT_CLIENTS]: 'Edit Clients',
-                    [PERMISSION_KEYS.DELETE_REQUESTS]: 'Delete Requests',
-                    [PERMISSION_KEYS.DELETE_SUPPORT]: 'Delete Tickets',
-                    [PERMISSION_KEYS.EDIT_VOUCHERS]: 'Edit Vouchers',
-                    [PERMISSION_KEYS.EDIT_PORTFOLIO]: 'Edit Portfolio',
-                    [PERMISSION_KEYS.EDIT_CONTENT]: 'Edit Content',
-                    [PERMISSION_KEYS.EDIT_PROMOS]: 'Edit Promos',
-                    [PERMISSION_KEYS.EDIT_CONFIG]: 'Edit Config'
-                })) {
-                    const isChecked = userPerms[key] ? 'checked' : '';
-                    permsHTML += `
-                    <label class="flex items-center gap-2" style="font-size:0.8rem; font-weight:400; color:var(--text-muted); text-transform:none;">
-                        <input type="checkbox" class="perm-toggle" value="${key}" ${isChecked} style="width:auto; margin:0;"> ${label}
-                    </label>`;
-                }
-                permsHTML += '</div></div>';
+                const userPerms = u.permissions || {};
 
-                // If Founder/SuperAdmin, show "Approve Actions" toggle too
-                if(isFounder() || isSuperAdmin()) {
-                    permsHTML += `<label class="flex items-center gap-2 mt-2" style="font-size:0.8rem; font-weight:400; color:var(--text-muted); text-transform:none;">
-                        <input type="checkbox" class="perm-toggle" value="${PERMISSION_KEYS.APPROVE_ACTIONS}" ${userPerms[PERMISSION_KEYS.APPROVE_ACTIONS]?'checked':''} style="width:auto; margin:0;"> Approve Actions (Admin Power)
-                    </label>`;
+                // Generate Sections
+                for (const [sectionName, items] of Object.entries(PERMISSION_GROUPS)) {
+                    permsHTML += `<div class="perm-section"><h4>${sectionName}</h4><div class="perm-grid">`;
+                    items.forEach(item => {
+                        const isChecked = userPerms[item.key] ? 'checked' : '';
+                        permsHTML += `
+                        <div class="perm-item">
+                            <input type="checkbox" class="perm-toggle" value="${item.key}" ${isChecked}>
+                            <label>${item.label}</label>
+                        </div>`;
+                    });
+                    permsHTML += `</div></div>`;
                 }
+                permsHTML += '</div>';
 
                 showModal("Edit Crew Member", `
                     <div class="mb-4"><label>Crew ID</label><input id="e-c-id" value="${u.crewId}"></div>
@@ -1951,7 +2149,7 @@ Thank you for choosing DDNetwork.
                 permissions: newPerms
             };
 
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CREW, 'users', uid, data);
+            const blocked = await checkAccessOrRequestApproval('edit_crew', 'users', uid, data);
             if(blocked) return;
 
             db.collection("users").doc(uid).update(data).then(() => { closeModal(); showToast("Crew details updated", "success"); logActivity(`Updated crew member details`); });
@@ -1959,7 +2157,7 @@ Thank you for choosing DDNetwork.
 
         // --- 5. SUPPORT ---
         function renderSupport() {
-            const canDelete = hasPermission(PERMISSION_KEYS.DELETE_SUPPORT);
+            const canDelete = hasPermission('delete_support');
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <button class="btn btn-secondary" onclick="openCreateTicket()"><i class="ri-add-line"></i> Create New Ticket</button>
@@ -2042,7 +2240,7 @@ Thank you for choosing DDNetwork.
                 assignedTo: document.getElementById('tk-assign').value || null,
                 assignedToName: document.getElementById('tk-assign').value ? document.getElementById('tk-assign').options[document.getElementById('tk-assign').selectedIndex].text : ""
             };
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_ORDERS, 'tickets', id, data);
+            const blocked = await checkAccessOrRequestApproval('edit_orders', 'tickets', id, data); // Reusing edit_orders permission for tickets simplicity
             if(blocked) return;
 
             db.collection("tickets").doc(id).update(data).then(() => { closeModal(); showToast("Ticket Updated", "success"); logActivity(`Updated Ticket #${id}`); });
@@ -2052,7 +2250,7 @@ Thank you for choosing DDNetwork.
         let currentVoucherFilter = 'All'; 
 
         async function renderVouchers() {
-            const canEdit = hasPermission(PERMISSION_KEYS.EDIT_VOUCHERS);
+            const canEdit = hasPermission('edit_vouchers');
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
                     <h3 style="font-size:1.25rem; font-weight:700;">Voucher Management</h3>
@@ -2171,7 +2369,7 @@ Thank you for choosing DDNetwork.
                 };
                 
                 // Workflow check
-                checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_VOUCHERS, 'users', uid, { personalVoucher: data })
+                checkAccessOrRequestApproval('edit_vouchers', 'users', uid, { personalVoucher: data })
                 .then(blocked => {
                     if(blocked) return;
                     db.collection("users").doc(uid).update({ personalVoucher: data }).then(() => { closeModal(); showToast("Voucher Updated", "success"); logActivity(`Edited voucher ${newCode}`); });
@@ -2179,24 +2377,26 @@ Thank you for choosing DDNetwork.
             });
         }
         async function markRedeem(uid, code) {
-            if(!confirm(`Mark voucher ${code} as Redeemed?`)) return;
-            const userDoc = await db.collection("users").doc(uid).get();
-            const uData = userDoc.data();
-            const vouch = uData.personalVoucher;
-            await db.collection("vouchers_history").doc(code).set({ ...vouch, ownerUid: uid, assignedToName: uData.name, status: "Redeemed", movedAt: firebase.firestore.FieldValue.serverTimestamp() });
-            await db.collection("users").doc(uid).update({ personalVoucher: firebase.firestore.FieldValue.delete() });
-            showToast("Voucher Redeemed", "success");
-            logActivity(`Marked voucher ${code} as Redeemed`);
+            openConfirm(`Mark ${code} as Redeemed?`, "This will move the voucher to history.", async () => {
+                const userDoc = await db.collection("users").doc(uid).get();
+                const uData = userDoc.data();
+                const vouch = uData.personalVoucher;
+                await db.collection("vouchers_history").doc(code).set({ ...vouch, ownerUid: uid, assignedToName: uData.name, status: "Redeemed", movedAt: firebase.firestore.FieldValue.serverTimestamp() });
+                await db.collection("users").doc(uid).update({ personalVoucher: firebase.firestore.FieldValue.delete() });
+                showToast("Voucher Redeemed", "success");
+                logActivity(`Marked voucher ${code} as Redeemed`);
+            });
         }
         async function disableVoucher(uid, code) {
-            if(!confirm(`Disable voucher ${code}?`)) return;
-            const userDoc = await db.collection("users").doc(uid).get();
-            const uData = userDoc.data();
-            const vouch = uData.personalVoucher;
-            await db.collection("vouchers_history").doc(code).set({ ...vouch, ownerUid: uid, assignedToName: uData.name, status: "Disabled", movedAt: firebase.firestore.FieldValue.serverTimestamp() });
-            await db.collection("users").doc(uid).update({ personalVoucher: firebase.firestore.FieldValue.delete() });
-            showToast("Voucher Disabled", "info");
-            logActivity(`Disabled voucher ${code}`);
+            openConfirm(`Disable ${code}?`, "This cannot be undone.", async () => {
+                const userDoc = await db.collection("users").doc(uid).get();
+                const uData = userDoc.data();
+                const vouch = uData.personalVoucher;
+                await db.collection("vouchers_history").doc(code).set({ ...vouch, ownerUid: uid, assignedToName: uData.name, status: "Disabled", movedAt: firebase.firestore.FieldValue.serverTimestamp() });
+                await db.collection("users").doc(uid).update({ personalVoucher: firebase.firestore.FieldValue.delete() });
+                showToast("Voucher Disabled", "info");
+                logActivity(`Disabled voucher ${code}`);
+            });
         }
         function openAssignVoucherModal(uid, userName) {
             const promise = uid ? Promise.resolve(null) : db.collection("users").where("role", "==", "user").get();
@@ -2229,7 +2429,7 @@ Thank you for choosing DDNetwork.
                 }
             };
             
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_VOUCHERS, 'users', uid, data);
+            const blocked = await checkAccessOrRequestApproval('edit_vouchers', 'users', uid, data);
             if(blocked) return;
 
             db.collection("users").doc(uid).update(data).then(() => { closeModal(); showToast(`Voucher ${code} Assigned!`, "success"); logActivity(`Assigned voucher ${code}`); });
@@ -2246,7 +2446,7 @@ Thank you for choosing DDNetwork.
 
         // --- 7. CONTENT & PACKAGES ---
         function renderContent() {
-            const canEdit = hasPermission(PERMISSION_KEYS.EDIT_CONTENT);
+            const canEdit = hasPermission('edit_content');
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:700;">Content & Packages</h2>
@@ -2282,7 +2482,7 @@ Thank you for choosing DDNetwork.
                 }
             };
             
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CONTENT, 'config', 'site_settings', data);
+            const blocked = await checkAccessOrRequestApproval('edit_content', 'config', 'site_settings', data);
             if(blocked) return;
 
             const btn = document.querySelector('button[onclick="saveContentChanges()"]');
@@ -2297,7 +2497,7 @@ Thank you for choosing DDNetwork.
 
         // --- 8. CONFIG ---
         function renderConfig() {
-            const canEdit = hasPermission(PERMISSION_KEYS.EDIT_CONFIG);
+            const canEdit = hasPermission('edit_config');
             document.getElementById('main').innerHTML = `
                 <h2 style="font-size:1.25rem; font-weight:700; margin-bottom:1.5rem;">System Configuration</h2>
                 <div class="config-section">
@@ -2371,14 +2571,14 @@ Thank you for choosing DDNetwork.
         async function toggleMaintenance() { 
             const isActive = document.getElementById('maint-toggle').checked;
             const data = { maintenance_active: isActive };
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CONFIG, 'config', 'site_settings', data);
+            const blocked = await checkAccessOrRequestApproval('edit_config', 'config', 'site_settings', data);
             if(blocked) return;
 
             db.collection("config").doc("site_settings").update(data).then(() => { showToast(`Maintenance Mode ${isActive ? 'Enabled' : 'Disabled'}`, isActive?'warning':'success'); logActivity(`Toggled maintenance mode to ${isActive}`); });
         }
         async function saveMaintMsg() { 
             const data = { maintenance_message: document.getElementById('maint-msg').value };
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CONFIG, 'config', 'site_settings', data);
+            const blocked = await checkAccessOrRequestApproval('edit_config', 'config', 'site_settings', data);
             if(blocked) return;
             db.collection("config").doc("site_settings").update(data).then(() => showToast("Message Saved", "success")); 
         }
@@ -2386,7 +2586,7 @@ Thank you for choosing DDNetwork.
             const theVal = parseFloat(document.getElementById(elemId).value);
             if(!theVal) return showToast("Invalid price", "error");
             const data = { [`prices.${key}`]:theVal };
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CONFIG, 'config', 'site_settings', data);
+            const blocked = await checkAccessOrRequestApproval('edit_config', 'config', 'site_settings', data);
             if(blocked) return;
             db.collection("config").doc("site_settings").update(data).then(() => showToast("Price Updated", "success"));
         }
@@ -2398,7 +2598,7 @@ Thank you for choosing DDNetwork.
             const link = document.getElementById('gw-link').value;
             const data = { name, link, active: true };
             
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CONFIG, 'payment_methods', null, data);
+            const blocked = await checkAccessOrRequestApproval('edit_config', 'payment_methods', null, data);
             if(blocked) return;
             
             await db.collection("payment_methods").add(data); 
@@ -2417,7 +2617,7 @@ Thank you for choosing DDNetwork.
             const link = document.getElementById('e-gw-link').value;
             const data = { name, link };
             
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CONFIG, 'payment_methods', docId, data);
+            const blocked = await checkAccessOrRequestApproval('edit_config', 'payment_methods', docId, data);
             if(blocked) return;
             
             await db.collection("payment_methods").doc(docId).update(data); 
@@ -2431,25 +2631,24 @@ Thank you for choosing DDNetwork.
             const currentStatus = docRef.data().active;
             const data = { active: !currentStatus };
             
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CONFIG, 'payment_methods', docId, data);
+            const blocked = await checkAccessOrRequestApproval('edit_config', 'payment_methods', docId, data);
             if(blocked) return;
             
             await db.collection("payment_methods").doc(docId).update(data); 
             renderConfig(); 
         }
         async function deleteGateway(docId) { 
-            if(!confirm("Delete gateway?")) return; 
-            
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CONFIG, 'payment_methods', docId, null, true);
-            if(blocked) return;
-
-            await db.collection("payment_methods").doc(docId).delete(); 
-            renderConfig(); 
+            openConfirm("Delete Gateway?", "Are you sure?", async () => {
+                const blocked = await checkAccessOrRequestApproval('edit_config', 'payment_methods', docId, null);
+                if(blocked) return;
+                await db.collection("payment_methods").doc(docId).delete(); 
+                renderConfig(); 
+            });
         }
 
         // --- 9. PORTFOLIO MANAGEMENT ---
         function renderPortfolio() {
-            const canEdit = hasPermission(PERMISSION_KEYS.EDIT_PORTFOLIO);
+            const canEdit = hasPermission('edit_portfolio');
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:700;">Client Portfolio</h2>
@@ -2504,7 +2703,7 @@ Thank you for choosing DDNetwork.
             
             const data = { name, img, link, status, timestamp: firebase.firestore.FieldValue.serverTimestamp() };
             
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_PORTFOLIO, 'clients_portfolio', customId, data);
+            const blocked = await checkAccessOrRequestApproval('edit_portfolio', 'clients_portfolio', customId, data);
             if(blocked) return;
 
             db.collection("clients_portfolio").doc(customId).set(data).then(() => { closeModal(); showToast("Project added successfully", "success"); logActivity(`Added portfolio project: ${name} (ID: ${customId})`); }).catch(err => { showToast("Error: " + err.message, "error"); }); 
@@ -2528,14 +2727,14 @@ Thank you for choosing DDNetwork.
                 status: document.getElementById('e-p-status').checked 
             };
             
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_PORTFOLIO, 'clients_portfolio', docId, updates);
+            const blocked = await checkAccessOrRequestApproval('edit_portfolio', 'clients_portfolio', docId, updates);
             if(blocked) return;
 
             db.collection("clients_portfolio").doc(docId).update(updates).then(() => { closeModal(); showToast("Project updated", "success"); logActivity(`Updated portfolio project: ${updates.name}`); }).catch(err => { showToast("Error updating: " + err.message, "error"); }); 
         }
         function togglePortfolioStatus(docId, newStatus) { 
             const data = { status: newStatus };
-            checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_PORTFOLIO, 'clients_portfolio', docId, data)
+            checkAccessOrRequestApproval('edit_portfolio', 'clients_portfolio', docId, data)
             .then(blocked => {
                 if(blocked) return;
                 const action = newStatus ? "Activated" : "Deactivated";
@@ -2543,18 +2742,18 @@ Thank you for choosing DDNetwork.
             });
         }
         function deletePortfolio(docId) { 
-            if(!confirm("Are you sure you want to delete this project? This cannot be undone.")) return; 
-            
-            checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_PORTFOLIO, 'clients_portfolio', docId, null)
-            .then(blocked => {
-                if(blocked) return;
-                db.collection("clients_portfolio").doc(docId).delete().then(() => { showToast("Project deleted", "success"); logActivity(`Deleted portfolio project`); }).catch(err => { showToast("Error deleting: " + err.message, "error"); }); 
+            openConfirm("Delete Project?", "Are you sure? This cannot be undone.", async () => {
+                checkAccessOrRequestApproval('edit_portfolio', 'clients_portfolio', docId, null)
+                .then(blocked => {
+                    if(blocked) return;
+                    db.collection("clients_portfolio").doc(docId).delete().then(() => { showToast("Project deleted", "success"); logActivity(`Deleted portfolio project`); }).catch(err => { showToast("Error deleting: " + err.message, "error"); }); 
+                });
             });
         }
 
         // --- 10. CUSTOMER REQUESTS ---
         function renderRequests() {
-            const canDelete = hasPermission(PERMISSION_KEYS.DELETE_REQUESTS);
+            const canDelete = hasPermission('delete_requests');
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:700;">Customer Requests</h2>
@@ -2620,7 +2819,7 @@ Thank you for choosing DDNetwork.
             const statusToSet = newStatus || document.getElementById('req-status-select').value;
             const data = { status: statusToSet };
             
-            checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_ORDERS, 'customer_requests', id, data)
+            checkAccessOrRequestApproval('edit_orders', 'customer_requests', id, data)
             .then(blocked => {
                 if(blocked) {
                     if(fromModal) closeModal();
@@ -2634,14 +2833,14 @@ Thank you for choosing DDNetwork.
             });
         }
         function deleteItem(collection, id) {
-            if(!hasPermission(PERMISSION_KEYS.APPROVE_ACTIONS)) return showToast("Access Denied. Only Founder/SuperAdmin can delete.", "error");
-            if(!confirm("Delete this item permanently?")) return;
-            db.collection(collection).doc(id).delete().then(() => { showToast("Item deleted", "success"); logActivity(`Deleted item from ${collection}`); });
+            openConfirm("Delete Item?", "This cannot be undone.", async () => {
+                db.collection(collection).doc(id).delete().then(() => { showToast("Item deleted", "success"); logActivity(`Deleted item from ${collection}`); });
+            });
         }
 
         // --- 11. PUBLIC PROMO CODES ---
         function renderPublicPromos() {
-            const canEdit = hasPermission(PERMISSION_KEYS.EDIT_PROMOS);
+            const canEdit = hasPermission('edit_promos');
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:700;">Public Promo Codes</h2>
@@ -2683,18 +2882,17 @@ Thank you for choosing DDNetwork.
             if(!code || isNaN(discount)) return showToast("Invalid Input", "error");
             
             const data = { discount: discount };
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_PROMOS, 'promo_codes', code, data);
+            const blocked = await checkAccessOrRequestApproval('edit_promos', 'promo_codes', code, data);
             if(blocked) return;
 
             try { await db.collection("promo_codes").doc(code).set(data); closeModal(); showToast("Promo Code Created", "success"); logActivity(`Created public promo code: ${code}`); } catch(e) { showToast("Error: " + e.message, "error"); } 
         }
         async function deletePublicPromo(code) { 
-            if(!confirm(`Delete promo code ${code}?`)) return; 
-            
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_PROMOS, 'promo_codes', code, null, true);
-            if(blocked) return;
-            
-            try { await db.collection("promo_codes").doc(code).delete(); showToast("Promo Code Deleted", "success"); logActivity(`Deleted public promo code: ${code}`); } catch(e) { showToast("Error deleting: " + e.message, "error"); } 
+            openConfirm("Delete Promo Code?", "Are you sure?", async () => {
+                const blocked = await checkAccessOrRequestApproval('edit_promos', 'promo_codes', code, null);
+                if(blocked) return;
+                try { await db.collection("promo_codes").doc(code).delete(); showToast("Promo Code Deleted", "success"); logActivity(`Deleted public promo code: ${code}`); } catch(e) { showToast("Error deleting: " + e.message, "error"); } 
+            });
         }
 
         // --- 12. COMMISSIONS (Finance) ---
@@ -2774,7 +2972,7 @@ Thank you for choosing DDNetwork.
 
         // --- 13. APPROVAL TOOLS (NEW) ---
         function renderApprovals() {
-            if(!hasPermission(PERMISSION_KEYS.APPROVE_ACTIONS)) {
+            if(!hasPermission('approve_actions')) {
                 document.getElementById('main').innerHTML = `<div class="access-denied-container"><div class="access-denied-title">Access Denied</div><div class="access-denied-desc">You do not have permission to view this page.</div></div>`;
                 return;
             }
