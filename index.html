@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Admin Portal v12.2 (Edit Workflow)</title>
+    <title>Admin Portal v12.2 (Pending Edits Workflow)</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -626,6 +626,45 @@
             font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(245, 158, 11, 0.2);
             margin-left: 8px;
         }
+        
+        /* DIFF VIEWER (For Approvals) */
+        .diff-viewer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .diff-col {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .diff-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-faint);
+            margin-bottom: 0.5rem;
+        }
+        .diff-field {
+            font-size: 0.85rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+        .diff-field.old {
+            background: rgba(239, 68, 68, 0.1);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        .diff-field.new {
+            background: rgba(16, 185, 129, 0.1);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
 
         /* RESPONSIVENESS */
         @media(max-width: 1024px) {
@@ -645,6 +684,8 @@
             .inv-table th:nth-child(1), .inv-table td:nth-child(1) { width: 50%; }
             .inv-table th:nth-child(2), .inv-table td:nth-child(2) { width: 20%; }
             .inv-table th:nth-child(3), .inv-table td:nth-child(3) { width: 30%; }
+            
+            .diff-viewer { grid-template-columns: 1fr; }
         }
         
         @media(min-width: 1025px) and (max-width: 1440px) {
@@ -696,7 +737,7 @@
         .badge-remove { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
 
         /* CONFIG TAB SPECIFICS */
-        .config-section { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom:1.5rem; }
+        .config-section { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
         .config-header { font-size: 0.95rem; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); color: var(--text-main); display: flex; justify-content: space-between; align-items: center; }
         .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .toggle-switch input { opacity: 0; width: 0; height: 0; }
@@ -876,22 +917,22 @@
     <script>
         // --- CONSTANTS & CONFIG ---
         
-        // Updated Job Titles & Rates based on Prompt
+        // Updated Job Titles & Rates
         const JOB_TITLES = [
-            "Founder & Managing Director", // Super Admin, 5%
-            "Project & Client Manager", // Admin, 3-5%
-            "Account / Operations / Marketing Manager", // Admin, 3-5%
-            "Finance / Billing Executive", // Admin, None
-            "People / Team Operations Executive", // Admin, None
-            "Business Development Executive", // Crew, 10-15%
-            "Sales Executive", // Crew, 10-15%
-            "Client Success Coordinator", // Crew, 2-3%
-            "Client Experience Executive", // Crew, 2-3%
-            "Technical Specialist", // Crew, 3-5%
-            "Web Developer", // Crew, 3-5%
-            "Full Stack Developer", // Crew, 3-5%
-            "Automation & AI Specialist", // Crew, 3-5%
-            "Support Operations Executive" // Crew, 2-3%
+            "Founder & Managing Director", 
+            "Project & Client Manager", 
+            "Account / Operations / Marketing Manager", 
+            "Finance / Billing Executive", 
+            "People / Team Operations Executive", 
+            "Business Development Executive", 
+            "Sales Executive", 
+            "Client Success Coordinator", 
+            "Client Experience Executive", 
+            "Technical Specialist", 
+            "Web Developer", 
+            "Full Stack Developer", 
+            "Automation & AI Specialist", 
+            "Support Operations Executive" 
         ];
 
         const DEFAULT_COMMISSION_RATES = {
@@ -912,7 +953,6 @@
         };
 
         // PERMISSION KEYS
-        // These match flags stored in Firestore under user.permissions
         const PERMISSION_KEYS = {
             EDIT_ORDERS: 'edit_orders',
             EDIT_CLIENTS: 'edit_clients',
@@ -925,8 +965,8 @@
             EDIT_CREW: 'edit_crew',
             EDIT_CONFIG: 'edit_config',
             VIEW_FINANCE: 'view_finance',
-            EDIT_FINANCE: 'edit_finance', // Only Founder/Super/Finance
-            APPROVE_ACTIONS: 'approve_actions' // Only Founder/Super
+            EDIT_FINANCE: 'edit_finance', 
+            APPROVE_ACTIONS: 'approve_actions' 
         };
 
         function getDefaultRate(title) {
@@ -1143,58 +1183,67 @@
         
         function hasPermission(key) {
             if(!userData) return false;
-            // SuperAdmin and Founder have everything
             if(isSuperAdmin() || isFounder()) return true;
-            
-            // Check specific permission flag
             return userData.permissions && userData.permissions[key] === true;
         }
 
-        // --- NEW EDIT WORKFLOW ---
-        // If user has direct permission, they can update. If not, we STAGE the change for approval.
-        // IMPORTANT: This function does NOT return true/false. It executes the flow.
-        async function checkAccessAndStageAction(collection, docId, updateData, successMsg) {
-            const permissionKey = `edit_${collection}`;
-            
-            if (hasPermission(permissionKey)) {
-                // 1. Direct Update
+        // --- APPROVAL WORKFLOW CORE ---
+        
+        // Check if User has "Auto-Approve" permissions (Approve Actions)
+        function canAutoApprove() {
+            return hasPermission(PERMISSION_KEYS.APPROVE_ACTIONS);
+        }
+
+        // Generic function to save data either directly or to pending
+        async function saveDataWithApproval(collection, docId, newData, originalData, contextMsg) {
+            const isAutoApprover = canAutoApprove();
+
+            if (isAutoApprover) {
+                // Direct Save
                 try {
-                    await db.collection(collection).doc(docId).update(updateData);
-                    showToast(successMsg, "success");
-                    logActivity(`Updated ${collection} item: ${docId}`);
-                } catch (e) {
-                    showToast("Error updating: " + e.message, "error");
+                    await db.collection(collection).doc(docId).update(newData);
+                    showToast("Changes saved successfully", "success");
+                    logActivity(`${contextMsg} (Direct Save)`);
+                    return true;
+                } catch(e) {
+                    showToast("Error saving: " + e.message, "error");
+                    return false;
                 }
             } else {
-                // 2. Stage for Approval
+                // Pending Workflow
                 try {
-                    await db.collection("staged_changes").add({
-                        collection: collection,
-                        docId: docId,
-                        updateData: updateData,
-                        requestedBy: currentUser.uid,
-                        requestedByName: userData.name,
-                        requestedByEmail: userData.email,
-                        permissionKey: permissionKey,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                        status: 'Pending'
+                    // Check for existing pending edit for this doc
+                    const existingSnap = await db.collection("pending_edits")
+                        .where("targetCollection", "==", collection)
+                        .where("targetDocId", "==", docId)
+                        .where("status", "==", "Pending")
+                        .get();
+                    
+                    if (!existingSnap.empty) {
+                        return showToast("A request for this item is already pending approval.", "warning");
+                    }
+
+                    await db.collection("pending_edits").add({
+                        targetCollection: collection,
+                        targetDocId: docId,
+                        originalData: originalData,
+                        newData: newData,
+                        requesterId: currentUser.uid,
+                        requesterName: userData.name,
+                        requesterEmail: userData.email,
+                        context: contextMsg,
+                        status: 'Pending',
+                        requestedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
-                    showToast("Changes submitted for Approval.", "warning");
-                    logActivity(`Staged update for ${collection} ${docId} (Pending Approval)`);
-                    // Close modal if open to indicate success of staging
-                    closeModal(); 
-                } catch (e) {
-                    showToast("Error staging changes: " + e.message, "error");
+                    showToast("Request sent for approval.", "warning");
+                    logActivity(`Requested approval for: ${contextMsg}`);
+                    closeModal();
+                    return true;
+                } catch(e) {
+                    showToast("Error creating request: " + e.message, "error");
+                    return false;
                 }
             }
-        }
-        
-        function checkFinanceAccess() {
-            const isFinanceRole = userData.jobTitle && userData.jobTitle.includes("Finance");
-            if(!isFinanceRole && !isFounder() && !isSuperAdmin()) {
-                return true; // Deny access
-            }
-            return false; // Allow
         }
 
         // --- ROUTING SYSTEM ---
@@ -1322,10 +1371,6 @@
                 </div>
             `;
             
-            if(hasPermission(PERMISSION_KEYS.VIEW_FINANCE)) {
-                 // Add finance stats if visible
-            }
-
             db.collection("activity_logs").orderBy("timestamp", "desc").limit(5).onSnapshot(snap => {
                 const feed = document.getElementById('activity-feed');
                 if(feed) {
@@ -1382,7 +1427,7 @@
                     <div class="table-header">
                         <h3>Order Management</h3>
                         <div class="flex items-center gap-2">
-                            ${!canEdit ? '<span class="req-approval-badge">Edit Requires Approval</span>' : ''}
+                            ${!canAutoApprove() ? '<span class="req-approval-badge">Edit Requires Approval</span>' : ''}
                             <input type="text" id="orderSearch" placeholder="Search ID, Name, Domain..." style="width:250px;" onkeyup="filterTable('orders-tbody', this.value)">
                         </div>
                     </div>
@@ -1399,7 +1444,7 @@
                                 </tr>
                             </thead>
                             <tbody id="orders-tbody">
-                                <tr><td colspan="7" class="text-center"><div class="loading-spinner"></div></td></tr>
+                                <tr><td colspan="6" class="text-center"><div class="loading-spinner"></div></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1409,7 +1454,7 @@
                 const tbody = document.getElementById('orders-tbody');
                 if(!tbody) return;
                 if(snap.empty) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No orders found</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No orders found</td></tr>';
                     return;
                 }
 
@@ -1634,6 +1679,10 @@ Thank you for choosing DDNetwork.
             salesRepHTML += '</div>';
 
             const voucherDisplay = d.voucherCode ? `<div class="mb-4"><label>Voucher Used</label><input readonly value="${d.voucherCode}" style="color:var(--warning); border-color:var(--warning)"></div>` : '';
+            
+            const isAuto = canAutoApprove();
+            const footerNote = isAuto ? '' : `<small style="color:var(--warning); display:block; margin-top:0.5rem; text-align:center;"><i class="ri-alert-line"></i> Changes require approval.</small>`;
+
             showModal(`Manage Order`, `
                 ${voucherDisplay}
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -1668,10 +1717,13 @@ Thank you for choosing DDNetwork.
                     <option value="Completed" ${d.status=='Completed'?'selected':''}>Completed</option>
                     <option value="Cancelled" ${d.status=='Cancelled'?'selected':''}>Cancelled</option>
                 </select>
+                ${footerNote}
             `, `<button class="btn btn-primary" onclick="updateOrderDetails('${id}')">Save Changes</button>`);
         }
 
-        async function updateOrderDetails(id) {
+        function updateOrderDetails(id) {
+            if(!hasPermission(PERMISSION_KEYS.EDIT_ORDERS)) return showToast("Access Denied", "error");
+
             const updateData = {
                 customerName: document.getElementById('o-name').value,
                 customerEmail: document.getElementById('o-email').value,
@@ -1690,8 +1742,11 @@ Thank you for choosing DDNetwork.
             updateData.salesRepId = firebase.firestore.FieldValue.delete();
             updateData.salesRepName = firebase.firestore.FieldValue.delete();
 
-            // STAGE OR DIRECT UPDATE
-            await checkAccessAndStageAction('orders', id, updateData, "Order Updated Successfully");
+            // Fetch current data for comparison
+            db.collection("orders").doc(id).get().then(doc => {
+                const original = doc.data();
+                saveDataWithApproval("orders", id, updateData, original, `Updated Order #${id.substr(0,6)}`);
+            });
         }
 
         function deleteOrder(id) {
@@ -1711,7 +1766,7 @@ Thank you for choosing DDNetwork.
                     <div class="table-header">
                         <h3>Client Directory</h3>
                         <div class="flex items-center gap-2">
-                            ${!canEdit ? '<span class="req-approval-badge">Edit Requires Approval</span>' : ''}
+                            ${!canAutoApprove() ? '<span class="req-approval-badge">Edit Requires Approval</span>' : ''}
                             <input type="text" id="clientSearch" placeholder="Search..." style="width:200px;" onkeyup="filterTable('client-tbody', this.value)">
                         </div>
                     </div>
@@ -1752,20 +1807,36 @@ Thank you for choosing DDNetwork.
         function editClient(uid) {
             db.collection("users").doc(uid).get().then(doc => {
                 const u = doc.data();
+                const isAuto = canAutoApprove();
+                const footerNote = isAuto ? '' : `<small style="color:var(--warning); display:block; margin-top:0.5rem; text-align:center;"><i class="ri-alert-line"></i> Changes require approval.</small>`;
+                
                 showModal("Edit Client", `
                     <label>Name</label><input id="e-name" class="mb-4" value="${u.name}">
                     <label>Email</label><input readonly id="e-email" class="mb-4" value="${u.email}">
                     <label>Phone</label><input id="e-phone" class="mb-4" value="${u.phone||''}">
                     <label>Company</label><input id="e-comp" class="mb-4" value="${u.company||''}">
+                    ${footerNote}
                 `, `<button class="btn btn-primary" onclick="saveClient('${uid}')">Update</button>`);
             });
         }
-        async function saveClient(uid) {
-            const updateData = { name: document.getElementById('e-name').value, phone: document.getElementById('e-phone').value, company: document.getElementById('e-comp').value };
-            await checkAccessAndStageAction('users', uid, updateData, "Client Updated Successfully");
+        function saveClient(uid) {
+            if(!hasPermission(PERMISSION_KEYS.EDIT_CLIENTS)) return showToast("Access Denied", "error");
+
+            const updateData = {
+                name: document.getElementById('e-name').value,
+                phone: document.getElementById('e-phone').value,
+                company: document.getElementById('e-comp').value
+            };
+
+            db.collection("users").doc(uid).get().then(doc => {
+                const original = doc.data();
+                saveDataWithApproval("users", uid, updateData, original, `Updated Client ${original.name}`);
+            });
         }
         function resetPassword(email) {
-            if(!hasPermission(PERMISSION_KEYS.EDIT_CLIENTS)) return showToast("Access Denied", "error");
+            // Reset password is usually instant action or needs special approval. 
+            // For now, let's keep it instant as it's helpful ops.
+            if(!hasPermission(PERMISSION_KEYS.EDIT_CLIENTS)) return;
             if(confirm(`Send reset email to ${email}?`)) { auth.sendPasswordResetEmail(email).then(() => showToast("Reset email sent", "success")); }
         }
 
@@ -1844,11 +1915,14 @@ Thank you for choosing DDNetwork.
             const roleInput = document.getElementById('c-role');
             const rateInput = document.getElementById('c-rate');
             
+            // Auto Role Mapping
             let dbRole = 'crew'; 
             if(title === "Founder & Managing Director") dbRole = 'super_admin';
             else if (["Project & Client Manager", "Account / Operations / Marketing Manager", "Finance / Billing Executive", "People / Team Operations Executive"].includes(title)) dbRole = 'admin';
 
             roleInput.value = dbRole.toUpperCase();
+
+            // Auto Rate
             const defaultRate = getDefaultRate(title);
             rateInput.value = (defaultRate * 100).toFixed(1);
         }
@@ -1864,13 +1938,21 @@ Thank you for choosing DDNetwork.
 
             try {
                 const userCredential = await auth.createUserWithEmailAndPassword(email, pass);
+                
+                // Determine DB Role
                 let dbRole = 'crew';
                 if(job === "Founder & Managing Director") dbRole = 'super_admin';
                 else if (["Project & Client Manager", "Account / Operations / Marketing Manager", "Finance / Billing Executive", "People / Team Operations Executive"].includes(job)) dbRole = 'admin';
 
+                // Create Permissions Object (Empty for new users, filled by Founder later)
                 const initialPerms = {};
+
                 await db.collection("users").doc(userCredential.user.uid).set({
-                    crewId: newId, name: name, email: email, role: dbRole, jobTitle: job,
+                    crewId: newId,
+                    name: name,
+                    email: email,
+                    role: dbRole,
+                    jobTitle: job,
                     commissionRate: isNaN(rateVal) ? 0.0 : (rateVal / 100),
                     permissions: initialPerms,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -1888,6 +1970,7 @@ Thank you for choosing DDNetwork.
                 const u = doc.data();
                 const jobOptions = JOB_TITLES.map(j => `<option value="${j}" ${u.jobTitle===j?'selected':''}>${j}</option>`).join('');
                 
+                // Generate Permission Toggles
                 let permsHTML = '<div style="margin-top:1rem; border-top:1px solid var(--border); padding-top:1rem;"><label style="margin-bottom:0.5rem; display:block;">Access Permissions</label><div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">';
                 const userPerms = u.permissions || {};
                 
@@ -1910,11 +1993,15 @@ Thank you for choosing DDNetwork.
                 }
                 permsHTML += '</div></div>';
 
+                // If Founder/SuperAdmin, show "Approve Actions" toggle too
                 if(isFounder() || isSuperAdmin()) {
                     permsHTML += `<label class="flex items-center gap-2 mt-2" style="font-size:0.8rem; font-weight:400; color:var(--text-muted); text-transform:none;">
                         <input type="checkbox" class="perm-toggle" value="${PERMISSION_KEYS.APPROVE_ACTIONS}" ${userPerms[PERMISSION_KEYS.APPROVE_ACTIONS]?'checked':''} style="width:auto; margin:0;"> Approve Actions (Admin Power)
                     </label>`;
                 }
+
+                const isAuto = canAutoApprove();
+                const footerNote = isAuto ? '' : `<small style="color:var(--warning); display:block; margin-top:0.5rem; text-align:center;"><i class="ri-alert-line"></i> Changes require approval.</small>`;
 
                 showModal("Edit Crew Member", `
                     <div class="mb-4"><label>Crew ID</label><input id="e-c-id" value="${u.crewId}"></div>
@@ -1927,14 +2014,20 @@ Thank you for choosing DDNetwork.
                     </select></div>
                      <div class="mb-4"><label>Commission Rate (%)</label><input type="number" step="0.1" id="e-c-rate" value="${(u.commissionRate*100).toFixed(1)}"></div>
                      ${permsHTML}
+                     ${footerNote}
                 `, `<button class="btn btn-primary" onclick="updateCrewData('${uid}')">Save</button>`);
             });
         }
 
         function updateCrewData(uid) {
+            if(!hasPermission(PERMISSION_KEYS.EDIT_CREW)) return showToast("Access Denied", "error");
             const rateVal = parseFloat(document.getElementById('e-c-rate').value);
+            
+            // Gather Permissions
             const newPerms = {};
-            document.querySelectorAll('.perm-toggle:checked').forEach(cb => { newPerms[cb.value] = true; });
+            document.querySelectorAll('.perm-toggle:checked').forEach(cb => {
+                newPerms[cb.value] = true;
+            });
 
             const updateData = {
                 crewId: document.getElementById('e-c-id').value,
@@ -1944,7 +2037,11 @@ Thank you for choosing DDNetwork.
                 commissionRate: isNaN(rateVal) ? 0.0 : (rateVal / 100),
                 permissions: newPerms
             };
-            checkAccessAndStageAction('users', uid, updateData, "Crew details updated");
+
+            db.collection("users").doc(uid).get().then(doc => {
+                const original = doc.data();
+                saveDataWithApproval("users", uid, updateData, original, `Updated Crew ${updateData.name}`);
+            });
         }
 
         // --- 5. SUPPORT ---
@@ -1988,7 +2085,6 @@ Thank you for choosing DDNetwork.
         }
 
         async function openCreateTicket() {
-            if(!hasPermission(PERMISSION_KEYS.EDIT_ORDERS)) return showToast("Access Denied", "error");
             const newId = await getNextId('ticket');
             showModal("Create Support Ticket", `
                 <div class="mb-4"><label>Generated ID</label><input value="${newId}" readonly class="font-mono" style="color:var(--ticket)"></div>
@@ -1999,33 +2095,43 @@ Thank you for choosing DDNetwork.
         }
 
         function saveNewTicket(id) {
-            if(!hasPermission(PERMISSION_KEYS.EDIT_ORDERS)) return;
             db.collection("tickets").add({ ticketId: id, name: document.getElementById('tk-name').value, type: document.getElementById('tk-type').value, message: document.getElementById('tk-msg').value, status: 'Open', timestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { closeModal(); showToast("Ticket Created Successfully", "success"); logActivity(`Created new support ticket ${id}`); });
         }
 
         function viewTicket(id) {
-            if(!hasPermission(PERMISSION_KEYS.EDIT_ORDERS)) return;
             db.collection("tickets").doc(id).get().then(doc => {
                 const d = doc.data();
                 db.collection("users").where("role", "in", ["super_admin", "admin", "crew"]).get().then(snap => {
                     const crewOpts = snap.docs.map(c => `<option value="${c.id}" ${d.assignedTo===c.id?'selected':''}>${c.data().name}</option>`).join('');
+                    const isAuto = canAutoApprove();
+                    const footerNote = isAuto ? '' : `<small style="color:var(--warning); display:block; margin-top:0.5rem; text-align:center;"><i class="ri-alert-line"></i> Changes require approval.</small>`;
+
                     showModal(`Ticket: ${d.ticketId || id}`, `
                         <p class="mb-4 p-4" style="background:var(--bg-sidebar); border-radius:8px; border:1px solid var(--border)">${d.message}</p>
                         <div class="flex gap-4 mb-4">
                             <div style="flex:1"><label>Status</label><select id="tk-status"><option value="Open" ${d.status=='Open'?'selected':''}>Open</option><option value="In Progress" ${d.status=='In Progress'?'selected':''}>In Progress</option><option value="Closed" ${d.status=='Closed'?'selected':''}>Closed</option></select></div>
                             <div style="flex:1"><label>Assign To Crew</label><select id="tk-assign"><option value="">Unassigned</option>${crewOpts}</select></div>
                         </div>
+                        ${footerNote}
                     `, `<button class="btn btn-primary" onclick="saveTicketDetails('${id}')">Save Changes</button>`);
                 });
             });
         }
         function saveTicketDetails(id) {
-            if(!hasPermission(PERMISSION_KEYS.EDIT_ORDERS)) return;
             const newStatus = document.getElementById('tk-status').value;
             const newAssignId = document.getElementById('tk-assign').value;
             const newAssignName = newAssignId ? document.getElementById('tk-assign').options[document.getElementById('tk-assign').selectedIndex].text : "";
-            const updateData = { status: newStatus, assignedTo: newAssignId || null, assignedToName: newAssignName };
-            checkAccessAndStageAction('tickets', id, updateData, "Ticket Updated Successfully");
+            
+            const updateData = {
+                status: newStatus, 
+                assignedTo: newAssignId || null, 
+                assignedToName: newAssignName
+            };
+
+            db.collection("tickets").doc(id).get().then(doc => {
+                const original = doc.data();
+                saveDataWithApproval("tickets", id, updateData, original, `Updated Ticket #${id}`);
+            });
         }
 
         // --- 6. VOUCHERS ---
@@ -2129,25 +2235,30 @@ Thank you for choosing DDNetwork.
                 const v = doc.data().personalVoucher;
                 const exp = v.expiryDate ? new Date(v.expiryDate.seconds*1000).toISOString().split('T')[0] : '';
                 const currentStatus = v.status ? v.status : 'Active';
+                
+                const isAuto = canAutoApprove();
+                const footerNote = isAuto ? '' : `<small style="color:var(--warning); display:block; margin-top:0.5rem; text-align:center;"><i class="ri-alert-line"></i> Changes require approval.</small>`;
+
                 showModal(`Edit Voucher ${code}`, `
                     <label>Code</label><input id="e-v-code" value="${v.code}" class="mb-4">
                     <label>Status</label><select id="e-v-status" class="mb-4"><option value="Active" ${currentStatus==='Active'?'selected':''}>Active</option><option value="Suspended" ${currentStatus==='Suspended'?'selected':''}>Suspended</option></select>
                     <label>Value</label><input type="number" id="e-v-val" value="${v.value}" class="mb-4">
                     <label>Expiry Date</label><input type="date" id="e-v-exp" value="${exp}" class="mb-4">
+                    ${footerNote}
                 `, `<button class="btn btn-primary" onclick="saveEditVoucher('${uid}')">Save</button>`);
             });
         }
-        async function saveEditVoucher(uid) {
+        function saveEditVoucher(uid) {
             const newCode = document.getElementById('e-v-code').value.toUpperCase();
-            const newStatus = document.getElementById('e-v-status').value;
-            const newVoucherData = { code: newCode, value: parseFloat(document.getElementById('e-v-val').value), expiryDate: document.getElementById('e-v-exp').value ? new Date(document.getElementById('e-v-exp').value) : null, status: newStatus };
-            
-            // We update the nested object in the user doc
+            const newStatus = document.getElementById('e-v-status').value;            
             db.collection("users").doc(uid).get().then(doc => {
-                const current = doc.data().personalVoucher || {};
-                const mergedVoucher = { ...current, ...newVoucherData };
-                const updatePayload = { personalVoucher: mergedVoucher };
-                checkAccessAndStageAction('users', uid, updatePayload, "Voucher Updated Successfully");
+                const v = doc.data().personalVoucher;
+                const newVouch = { ...v, code: newCode, value: parseFloat(document.getElementById('e-v-val').value), expiryDate: document.getElementById('e-v-exp').value ? new Date(document.getElementById('e-v-exp').value) : null, status: newStatus };
+                
+                // We are updating a nested field. The logic for approval handles the full object update usually, 
+                // but here we need to construct the update data specifically.
+                const updateData = { personalVoucher: newVouch };
+                saveDataWithApproval("users", uid, updateData, { personalVoucher: v }, `Edited voucher ${newCode}`);
             });
         }
         async function markRedeem(uid, code) {
@@ -2190,10 +2301,7 @@ Thank you for choosing DDNetwork.
         function submitAssignVoucher() {
             const uid = document.getElementById('v-user').value;
             const code = document.getElementById('v-code').value.toUpperCase();
-            const newVoucher = { code: code, type: document.getElementById('v-val-type').value, value: parseFloat(document.getElementById('v-val').value), expiryDate: document.getElementById('v-exp').value ? new Date(document.getElementById('v-exp').value) : null, status: 'active' };
-            
-            const updatePayload = { personalVoucher: newVoucher };
-            checkAccessAndStageAction('users', uid, updatePayload, `Voucher ${code} Assigned!`);
+            db.collection("users").doc(uid).update({ personalVoucher: { code: code, type: document.getElementById('v-val-type').value, value: parseFloat(document.getElementById('v-val').value), expiryDate: document.getElementById('v-exp').value ? new Date(document.getElementById('v-exp').value) : null, status: 'active', auditLog: [{ action: 'Created', by: userData.email, date: new Date().toISOString() }] }}).then(() => { closeModal(); showToast(`Voucher ${code} Assigned!`, "success"); logActivity(`Assigned voucher ${code}`); });
         }
         function restoreVoucher(code, ownerUid) {
             if(!confirm("Restore this voucher?")) return;
@@ -2237,9 +2345,22 @@ Thank you for choosing DDNetwork.
         function saveContentChanges() {
             const frontendLines = document.getElementById('content-frontend').value.split('\n').filter(l => l.trim() !== '');
             const aiLines = document.getElementById('content-ai').value.split('\n').filter(l => l.trim() !== '');
-            const updateData = { packageDetails: { frontend: { features: frontendLines }, ai: { features: aiLines } } };
+            const btn = document.querySelector('button[onclick="saveContentChanges()"]');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<div class="loading-spinner" style="width:16px; height:16px; border-width:2px;"></div> Saving...`;
             
-            checkAccessAndStageAction('site_settings', 'site_settings', updateData, "Content updated successfully!");
+            // Config is usually global, so auto-approve if admin
+            db.collection("config").doc("site_settings").get().then(doc => {
+                const data = doc.exists ? doc.data() : {};
+                const newPkgDetails = data.packageDetails || {};
+                newPkgDetails.frontend = { features: frontendLines };
+                newPkgDetails.ai = { features: aiLines };
+                
+                const updateData = { packageDetails: newPkgDetails };
+                saveDataWithApproval("config", "site_settings", updateData, { packageDetails: data.packageDetails }, "Updated Website Content").then(() => {
+                     btn.innerHTML = originalHTML;
+                });
+            }).catch(err => { showToast("Error updating: " + err.message, "error"); btn.innerHTML = originalHTML; });
         }
 
         // --- 8. CONFIG ---
@@ -2316,35 +2437,45 @@ Thank you for choosing DDNetwork.
             });
         }
         function toggleMaintenance() { 
-            const isActive = document.getElementById('maint-toggle').checked;
-            checkAccessAndStageAction('site_settings', 'site_settings', { maintenance_active: isActive }, `Maintenance Mode ${isActive ? 'Enabled' : 'Disabled'}`);
+             const isActive = document.getElementById('maint-toggle').checked;
+             saveDataWithApproval("config", "site_settings", { maintenance_active: isActive }, { maintenance_active: !isActive }, `Toggled Maintenance to ${isActive ? 'On' : 'Off'}`).then(() => {
+                 showToast(`Maintenance Mode ${isActive ? 'Enabled' : 'Disabled'}`, isActive?'warning':'success'); 
+             });
         }
-        function saveMaintMsg() { checkAccessAndStageAction('site_settings', 'site_settings', { maintenance_message: document.getElementById('maint-msg').value }, "Message Saved"); }
+        function saveMaintMsg() { 
+            const msg = document.getElementById('maint-msg').value;
+            saveDataWithApproval("config", "site_settings", { maintenance_message: msg }, { maintenance_message: "" }, "Updated Maintenance Message").then(() => showToast("Message Saved", "success"));
+        }
         function savePrice(key, elemId) { 
             const theVal = parseFloat(document.getElementById(elemId).value);
             if(!theVal) return showToast("Invalid price", "error");
-            checkAccessAndStageAction('site_settings', 'site_settings', { [`prices.${key}`]: theVal }, "Price Updated");
+            const updateObj = {}; updateObj[`prices.${key}`] = theVal;
+            saveDataWithApproval("config", "site_settings", updateObj, { prices: {} }, `Updated Price for ${key}`).then(() => showToast("Price Updated", "success"));
         }
-        function addGateway() { showModal("Add Payment Gateway", `<label>Gateway Name</label><input id="gw-name" class="mb-4"><label>Payment Link / URL</label><input id="gw-link" class="mb-4">`, `<button class="btn btn-primary" onclick="saveNewGateway()">Add</button>`); }
+        function addGateway() { 
+            showModal("Add Payment Gateway", `<label>Gateway Name</label><input id="gw-name" class="mb-4"><label>Payment Link / URL</label><input id="gw-link" class="mb-4">`, `<button class="btn btn-primary" onclick="saveNewGateway()">Add</button>`); 
+        }
         async function saveNewGateway() { 
             const name = document.getElementById('gw-name').value; const link = document.getElementById('gw-link').value;
-            const newGateway = { name, link, active: true };
-            // Special handling for array in config
-            // Since staging works on Doc Updates, we add to array here directly.
-            // But staging a whole array update is tricky. 
-            // For simplicity in this file, we just add the doc and the listener updates the UI.
-            await db.collection("payment_methods").add(newGateway); closeModal(); showToast("Gateway Added", "success"); logActivity(`Added payment gateway: ${name}`);
+            await db.collection("payment_methods").add({ name, link, active: true }); closeModal(); showToast("Gateway Added", "success"); logActivity(`Added payment gateway: ${name}`);
         }
-        function editGateway(docId) { db.collection("payment_methods").doc(docId).get().then(doc => { const gw = doc.data(); showModal("Edit Payment Gateway", `<label>Gateway Name</label><input id="e-gw-name" value="${gw.name}" class="mb-4"><label>Payment Link / URL</label><input id="e-gw-link" value="${gw.link}" class="mb-4">`, `<button class="btn btn-primary" onclick="saveEditedGateway('${docId}')">Save</button>`); }); }
+        function editGateway(docId) { 
+            db.collection("payment_methods").doc(docId).get().then(doc => { const gw = doc.data(); showModal("Edit Payment Gateway", `<label>Gateway Name</label><input id="e-gw-name" value="${gw.name}" class="mb-4"><label>Payment Link / URL</label><input id="e-gw-link" value="${gw.link}" class="mb-4">`, `<button class="btn btn-primary" onclick="saveEditedGateway('${docId}')">Save</button>`); }); 
+        }
         async function saveEditedGateway(docId) { 
             const name = document.getElementById('e-gw-name').value; const link = document.getElementById('e-gw-link').value;
-            await db.collection("payment_methods").doc(docId).update({ name, link }); closeModal(); renderConfig(); showToast("Gateway Updated", "success"); logActivity(`Edited payment gateway: ${name}`);
+            const newData = { name, link };
+            const oldData = (await db.collection("payment_methods").doc(docId).get()).data();
+            saveDataWithApproval("payment_methods", docId, newData, oldData, `Edited Gateway ${name}`).then(() => { renderConfig(); });
         }
         async function toggleGatewayStatus(docId) { 
             const docRef = await db.collection("payment_methods").doc(docId).get(); const currentStatus = docRef.data().active;
-            await db.collection("payment_methods").doc(docId).update({ active: !currentStatus }); renderConfig();
+            saveDataWithApproval("payment_methods", docId, { active: !currentStatus }, { active: currentStatus }, `Toggled Gateway Status`).then(() => { renderConfig(); });
         }
-        async function deleteGateway(docId) { if(!confirm("Delete gateway?")) return; await db.collection("payment_methods").doc(docId).delete(); renderConfig(); }
+        async function deleteGateway(docId) { 
+            if(!confirm("Delete gateway?")) return; 
+            await db.collection("payment_methods").doc(docId).delete(); renderConfig(); 
+        }
 
         // --- 9. PORTFOLIO MANAGEMENT ---
         function renderPortfolio() {
@@ -2395,24 +2526,32 @@ Thank you for choosing DDNetwork.
         function saveNewPortfolio() { 
             const name = document.getElementById('p-name').value; const img = document.getElementById('p-img').value; const link = document.getElementById('p-link').value; const status = document.getElementById('p-status').checked; const customId = document.getElementById('p-doc-id').value;
             if(!name || !img || !link) return showToast("Please fill in all fields.", "error");
-            checkAccessAndStageAction('clients_portfolio', customId, { name, img, link, status, timestamp: firebase.firestore.FieldValue.serverTimestamp() }, "Project added successfully");
+            db.collection("clients_portfolio").doc(customId).set({ name, img, link, status, timestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { closeModal(); showToast("Project added successfully", "success"); logActivity(`Added portfolio project: ${name} (ID: ${customId})`); }).catch(err => { showToast("Error: " + err.message, "error"); });
         }
         function editPortfolio(docId) { 
             db.collection("clients_portfolio").doc(docId).get().then(doc => {
                 const p = doc.data();
+                const isAuto = canAutoApprove();
+                const footerNote = isAuto ? '' : `<small style="color:var(--warning); display:block; margin-top:0.5rem; text-align:center;"><i class="ri-alert-line"></i> Changes require approval.</small>`;
                 showModal("Edit Project", `
                     <div class="mb-4"><label>Project Name</label><input type="text" id="e-p-name" value="${p.name}"><small style="color:var(--text-faint)">Editing name does not change ID</small></div>
                     <div class="mb-4"><label>Image URL</label><input type="text" id="e-p-img" value="${p.img}"></div>
                     <div class="mb-4"><label>Website Link</label><input type="text" id="e-p-link" value="${p.link}"></div>
                     <div class="flex items-center gap-4"><label class="toggle-switch"><input type="checkbox" id="e-p-status" ${p.status ? 'checked' : ''}><span class="slider"></span></label><span style="font-size:0.9rem; color:var(--text-main);">Visible on Main Site</span></div>
+                    ${footerNote}
                 `, `<button class="btn btn-primary" onclick="updatePortfolio('${docId}')">Save Changes</button>`);
             });
         }
         function updatePortfolio(docId) { 
             const updates = { name: document.getElementById('e-p-name').value, img: document.getElementById('e-p-img').value, link: document.getElementById('e-p-link').value, status: document.getElementById('e-p-status').checked };
-            checkAccessAndStageAction('clients_portfolio', docId, updates, "Project updated");
+            db.collection("clients_portfolio").doc(docId).get().then(doc => {
+                const original = doc.data();
+                saveDataWithApproval("clients_portfolio", docId, updates, original, `Updated Portfolio ${updates.name}`);
+            });
         }
-        function togglePortfolioStatus(docId, newStatus) { checkAccessAndStageAction('clients_portfolio', docId, { status: newStatus }, `Project ${newStatus ? "Activated" : "Deactivated"}`); }
+        function togglePortfolioStatus(docId, newStatus) { 
+            saveDataWithApproval("clients_portfolio", docId, { status: newStatus }, { status: !newStatus }, `${newStatus ? 'Activated' : 'Deactivated'} Project`).then(() => { showToast(`Project ${newStatus ? 'Activated' : 'Deactivated'}`, "info"); });
+        }
         function deletePortfolio(docId) { if(!confirm("Are you sure you want to delete this project? This cannot be undone.")) return; db.collection("clients_portfolio").doc(docId).delete().then(() => { showToast("Project deleted", "success"); logActivity(`Deleted portfolio project`); }).catch(err => { showToast("Error deleting: " + err.message, "error"); }); }
 
         // --- 10. PROFILE ---
@@ -2493,6 +2632,10 @@ Thank you for choosing DDNetwork.
                 else if (type === 'upgrade') { detailsHTML = `<div class="flex gap-4 mb-4"><div style="flex:1"><label>Current Plan</label><input value="${d.currentPlan || '-'}" readonly></div><div style="flex:1"><label>New Plan</label><input value="${d.newPlan || '-'}" readonly></div></div><div class="mb-4"><label>Additional Notes</label><textarea readonly rows="3">${d.details || '-'}</textarea></div>`; } 
                 else if (type === 'renew') { detailsHTML = `<div class="flex gap-4 mb-4"><div style="flex:1"><label>Plan to Renew</label><input value="${d.plan || '-'}" readonly></div><div style="flex:1"><label>Duration</label><input value="${d.duration || '-'}" readonly></div></div>`; } 
                 else if (type === 'remove') { detailsHTML = `<div class="mb-4"><label>Items to Remove</label><textarea readonly rows="3">${d.details || '-'}</textarea></div>`; }
+                
+                const isAuto = canAutoApprove();
+                const footerNote = isAuto ? '' : `<small style="color:var(--warning); display:block; margin-top:0.5rem; text-align:center;"><i class="ri-alert-line"></i> Changes require approval.</small>`;
+
                 showModal(`Request Details (${type.toUpperCase()})`, `
                     <div class="mb-4 p-4" style="background:var(--bg-sidebar); border-radius:8px; border:1px solid var(--border)">
                         <div class="text-sm text-muted mb-1">Client Info</div>
@@ -2500,13 +2643,20 @@ Thank you for choosing DDNetwork.
                     </div>
                     ${detailsHTML}
                     <div class="mt-4"><label>Update Status</label><select id="req-status-select"><option value="Pending" ${d.status==='Pending'?'selected':''}>Pending</option><option value="Completed" ${d.status==='Completed'?'selected':''}>Completed</option></select></div>
+                    ${footerNote}
                 `, `<button class="btn btn-primary" onclick="updateRequestStatus('${id}', null, true)">Save Status</button>`);
             });
         }
         function updateRequestStatus(id, newStatus = null, fromModal = false) {
             const statusToSet = newStatus || document.getElementById('req-status-select').value;
-            checkAccessAndStageAction('customer_requests', id, { status: statusToSet }, "Request Status Updated");
-            if(fromModal) closeModal();
+            db.collection("customer_requests").doc(id).get().then(doc => {
+                const original = doc.data();
+                saveDataWithApproval("customer_requests", id, { status: statusToSet }, { status: original.status }, `Updated Request Status to ${statusToSet}`).then(() => {
+                    if(fromModal) closeModal();
+                    showToast("Request Status Updated", "success");
+                    logActivity(`Updated request status to ${statusToSet}`);
+                });
+            });
         }
         function deleteItem(collection, id) {
             if(!hasPermission(PERMISSION_KEYS.APPROVE_ACTIONS)) return showToast("Access Denied. Only Founder/SuperAdmin can delete.", "error");
@@ -2549,17 +2699,24 @@ Thank you for choosing DDNetwork.
                 }).join('');
             });
         }
-        function addPublicPromo() { showModal("Add Public Promo Code", `<div class="mb-4"><label>Promo Code (ID)</label><input type="text" id="pub-promo-code" placeholder="e.g. WELCOME10" style="text-transform:uppercase;"><small class="text-muted">Users will enter this exact code.</small></div><div class="mb-4"><label>Discount Percentage</label><input type="number" id="pub-promo-discount" placeholder="0.1 for 10%"><small class="text-muted">Decimal (e.g., 0.10 = 10%)</small></div>`, `<button class="btn btn-primary" onclick="savePublicPromo()">Create Code</button>`); }
+        function addPublicPromo() { 
+            showModal("Add Public Promo Code", `<div class="mb-4"><label>Promo Code (ID)</label><input type="text" id="pub-promo-code" placeholder="e.g. WELCOME10" style="text-transform:uppercase;"><small class="text-muted">Users will enter this exact code.</small></div><div class="mb-4"><label>Discount Percentage</label><input type="number" id="pub-promo-discount" placeholder="0.1 for 10%"><small class="text-muted">Decimal (e.g., 0.10 = 10%)</small></div>`, `<button class="btn btn-primary" onclick="savePublicPromo()">Create Code</button>`); 
+        }
         async function savePublicPromo() { 
             const code = document.getElementById('pub-promo-code').value.trim().toUpperCase(); const discount = parseFloat(document.getElementById('pub-promo-discount').value);
             if(!code || isNaN(discount)) return showToast("Invalid Input", "error");
-            checkAccessAndStageAction('promo_codes', code, { discount: discount }, "Promo Code Created");
+            try { await db.collection("promo_codes").doc(code).set({ discount: discount }); closeModal(); showToast("Promo Code Created", "success"); logActivity(`Created public promo code: ${code}`); } catch(e) { showToast("Error: " + e.message, "error"); }
         }
-        async function deletePublicPromo(code) { if(!confirm(`Delete promo code ${code}?`)) return; db.collection("promo_codes").doc(code).delete().then(() => { showToast("Promo Code Deleted", "success"); logActivity(`Deleted public promo code: ${code}`); }); }
+        async function deletePublicPromo(code) { 
+            if(!confirm(`Delete promo code ${code}?`)) return; 
+            try { await db.collection("promo_codes").doc(code).delete(); showToast("Promo Code Deleted", "success"); logActivity(`Deleted public promo code: ${code}`); } catch(e) { showToast("Error deleting: " + e.message, "error"); } 
+        }
 
         // --- 13. COMMISSIONS (Finance) ---
         async function renderCommissions() {
-            if(checkFinanceAccess()) {
+            // Check specific Finance access
+            const isFinance = userData.jobTitle && userData.jobTitle.includes("Finance");
+            if(!isFinance && !isFounder() && !isSuperAdmin()) {
                 document.getElementById('main').innerHTML = `
                     <div class="access-denied-container">
                         <div class="access-denied-icon"><i class="ri-lock-2-line"></i></div>
@@ -2569,7 +2726,7 @@ Thank you for choosing DDNetwork.
                 return;
             }
 
-            const canEditFinance = hasPermission(PERMISSION_KEYS.EDIT_FINANCE); 
+            const canEditFinance = hasPermission(PERMISSION_KEYS.EDIT_FINANCE);
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:700;">My Commissions</h2>
@@ -2588,7 +2745,6 @@ Thank you for choosing DDNetwork.
                     </div>
                 </div>
             `;
-            const isFounder = userData.jobTitle && userData.jobTitle.includes("Founder");
             const myUid = currentUser.uid;
             const ordersSnap = await db.collection("orders").where("status", "==", "Paid").get();
             const ordersList = ordersSnap.docs.map(d => ({id: d.id, ...d.data()}));
@@ -2598,7 +2754,7 @@ Thank you for choosing DDNetwork.
                 let commission = 0;
                 const amount = parseFloat(order.total.replace('RM ', '')) || 0;
                 const cycle = (order.billingCycle || 'One-Time').toLowerCase();
-                if (isFounder || canEditFinance) {
+                if (isSuperAdmin() || canEditFinance) {
                     commission = amount * 0.05; 
                     commDetails.push({ ref: order.id.substring(0,6), pkg: order.package, amt: amount, cycle: cycle, comm: commission });
                 } else {
@@ -2627,7 +2783,7 @@ Thank you for choosing DDNetwork.
                         <div class="stat-label">Eligible Transactions</div>
                     </div>
                 </div>
-                ${isFounder || canEditFinance ? `
+                ${isSuperAdmin() || canEditFinance ? `
                 <div class="stat-card">
                     <div class="stat-icon" style="color:var(--warning); background:var(--warning)15"><i class="ri-vip-crown-line"></i></div>
                     <div class="stat-info">
@@ -2659,7 +2815,7 @@ Thank you for choosing DDNetwork.
             }
         }
 
-        // --- 14. APPROVAL TOOLS (NEW) ---
+        // --- 14. APPROVAL TOOLS (NEW & UPDATED) ---
         function renderApprovals() {
             if(!hasPermission(PERMISSION_KEYS.APPROVE_ACTIONS)) {
                 document.getElementById('main').innerHTML = `<div class="access-denied-container"><div class="access-denied-title">Access Denied</div><div class="access-denied-desc">You do not have permission to view this page.</div></div>`;
@@ -2676,14 +2832,14 @@ Thank you for choosing DDNetwork.
                         <div class="stat-icon" style="color:var(--warning); background:rgba(245,158,11,0.15)"><i class="ri-time-line"></i></div>
                         <div class="stat-info">
                             <div class="stat-val" id="count-pending">0</div>
-                            <div class="stat-label">Pending Changes</div>
+                            <div class="stat-label">Pending Edits</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="table-container">
                     <div class="table-header">
-                        <h3>Pending Change Requests</h3>
+                        <h3>Pending Approvals</h3>
                     </div>
                     <div class="table-responsive">
                         <table>
@@ -2691,114 +2847,142 @@ Thank you for choosing DDNetwork.
                                 <tr>
                                     <th>Time</th>
                                     <th>Requester</th>
-                                    <th>Item</th>
                                     <th>Target</th>
-                                    <th>Changes Preview</th>
-                                    <th>Status</th>
+                                    <th>Context</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="approvals-tbody">
-                                <tr><td colspan="7" class="text-center"><div class="loading-spinner"></div></td></tr>
+                                <tr><td colspan="5" class="text-center"><div class="loading-spinner"></div></td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             `;
 
-            // Listen for staged changes
-            db.collection("staged_changes").orderBy("timestamp", "desc").onSnapshot(snap => {
+            // Listen for PENDING_EDITS
+            db.collection("pending_edits").where("status", "==", "Pending").orderBy("requestedAt", "desc").onSnapshot(snap => {
                 const tbody = document.getElementById('approvals-tbody');
                 const counter = document.getElementById('count-pending');
                 if(!tbody) return;
 
                 if(snap.empty) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No pending change requests</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No pending requests</td></tr>';
                     if(counter) counter.innerText = "0";
                     return;
                 }
 
-                let pendingCount = 0;
+                if(counter) counter.innerText = snap.size;
+
                 tbody.innerHTML = snap.docs.map(doc => {
                     const r = doc.data();
-                    const isPending = r.status === 'Pending';
-                    if(isPending) pendingCount++;
+                    
+                    // Create a human readable target name
+                    let targetName = `${r.targetCollection}/${r.targetDocId}`;
+                    if(r.targetCollection === 'users' && r.originalData) targetName = `User: ${r.originalData.name || r.originalData.email || r.targetDocId}`;
+                    if(r.targetCollection === 'orders' && r.originalData) targetName = `Order: #${r.targetDocId.substr(0,6)}`;
+                    if(r.targetCollection === 'tickets' && r.originalData) targetName = `Ticket: ${r.originalData.ticketId || r.targetDocId}`;
 
                     return `<tr>
-                        <td style="white-space:nowrap;">${formatDateTime(r.timestamp)}</td>
+                        <td style="white-space:nowrap;">${formatDateTime(r.requestedAt)}</td>
                         <td>
-                            <strong>${r.requestedByName}</strong><br>
-                            <small class="text-muted">${r.requestedByEmail}</small>
+                            <strong>${r.requesterName}</strong><br>
+                            <small class="text-muted">${r.requesterEmail}</small>
+                        </td>
+                        <td class="text-sm font-mono" style="color:var(--text-muted);">${targetName}</td>
+                        <td>
+                            <div class="text-sm font-bold" style="color:var(--primary);">${r.context}</div>
                         </td>
                         <td>
-                            <div class="badge badge-warning" style="background:rgba(245,158,11,0.1); color:var(--warning); border:1px solid rgba(245,158,11,0.3); text-transform:none;">${r.collection}</div>
-                            <div style="font-size:0.75rem; margin-top:4px; color:var(--text-muted)">${r.docId}</div>
-                        </td>
-                        <td>
-                            <div class="badge badge-info" style="background:rgba(14,165,233,0.1); color:var(--info); border:1px solid rgba(14,165,233,0.2); text-transform:none;">Edit</div>
-                        </td>
-                        <td style="font-size:0.75rem; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title='${JSON.stringify(r.updateData)}'>
-                            ${Object.keys(r.updateData).slice(0, 2).map(k => `${k} changed`).join(', ')}...
-                        </td>
-                        <td><span class="badge ${isPending?'badge-warning':'badge-success'}">${r.status}</span></td>
-                        <td>
-                            ${isPending ? `
-                            <div class="flex flex-col gap-2">
-                                ${r.status === 'Rejected' ? `<div style="font-size:0.75rem; color:var(--text-muted); font-style:italic;">"${r.rejectionRemark}"</div>` : ''}
-                                <div class="flex gap-2">
-                                    <button class="btn btn-sm btn-success" onclick="processStagedChange('${doc.id}', 'Approved')">Approve</button>
-                                    <button class="btn btn-sm btn-danger" onclick="openRejectModal('${doc.id}')">Reject</button>
-                                </div>
-                            </div>` : `<small class="text-muted">Processed</small>`}
+                            <div class="flex gap-2">
+                                <button class="btn btn-sm btn-primary" onclick="reviewApproval('${doc.id}')">Review</button>
+                            </div>
                         </td>
                     </tr>`;
                 }).join('');
-
-                if(counter) counter.innerText = pendingCount;
             });
         }
 
-        async function processStagedChange(requestId, action) {
-            if(action === 'Approved') {
-                if(!confirm(`Are you sure you want to Approve these changes? This will update the database.`)) return;
-                try {
-                    const reqDoc = await db.collection("staged_changes").doc(requestId).get();
-                    const reqData = reqDoc.data();
-                    
-                    // 1. Apply Changes to Real DB
-                    await db.collection(reqData.collection).doc(reqData.docId).update(reqData.updateData);
-                    
-                    // 2. Mark Request as Approved
-                    await db.collection("staged_changes").doc(requestId).update({
-                        status: 'Approved',
-                        processedBy: userData.name,
-                        processedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
+        // Review Modal
+        async function reviewApproval(requestId) {
+            const doc = await db.collection("pending_edits").doc(requestId).get();
+            if(!doc.exists) return;
+            const r = doc.data();
 
-                    showToast("Changes Approved & Applied Successfully", "success");
-                    logActivity(`Approved staged changes for ${reqData.collection}`);
-                } catch(e) {
-                    showToast("Error approving: " + e.message, "error");
-                }
+            // Generate Diff View
+            let diffHTML = '<div class="diff-viewer">';
+            for (const key in r.newData) {
+                const oldVal = r.originalData[key];
+                const newVal = r.newData[key];
+                
+                // Simple JSON stringify for objects, simple string for others
+                const oldStr = (typeof oldVal === 'object') ? JSON.stringify(oldVal) : String(oldVal);
+                const newStr = (typeof newVal === 'object') ? JSON.stringify(newVal) : String(newVal);
+
+                diffHTML += `
+                    <div class="diff-label">${key}</div>
+                    <div class="diff-field old">${oldStr || '<em>(empty)</em>'}</div>
+                    <div class="diff-field new">${newStr || '<em>(empty)</em>'}</div>
+                `;
             }
+            diffHTML += '</div>';
+
+            showModal(`Review: ${r.context}`, `
+                <div class="mb-4 text-sm text-muted">
+                    Requested by <strong>${r.requesterName}</strong> on ${formatDateTime(r.requestedAt)}.
+                </div>
+                <h4 style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.5rem; text-transform:uppercase;">Changes Preview</h4>
+                ${diffHTML}
+            `, `
+                <button class="btn btn-danger" onclick="rejectApproval('${requestId}')">Reject</button>
+                <button class="btn btn-success" onclick="approveApproval('${requestId}')">Approve</button>
+            `);
         }
 
-        async function openRejectModal(requestId) {
-             const remark = prompt("Please enter a reason for rejection (Required):");
-             if (!remark) return;
-             
-             try {
-                await db.collection("staged_changes").doc(requestId).update({
-                    status: 'Rejected',
-                    rejectionRemark: remark,
+        async function approveApproval(requestId) {
+            if(!confirm("Are you sure you want to approve these changes? The database will be updated immediately.")) return;
+
+            try {
+                const doc = await db.collection("pending_edits").doc(requestId).get();
+                const r = doc.data();
+
+                // 1. Execute the update on the real collection
+                await db.collection(r.targetCollection).doc(r.targetDocId).update(r.newData);
+
+                // 2. Mark the request as Approved
+                await db.collection("pending_edits").doc(requestId).update({
+                    status: 'Approved',
                     processedBy: userData.name,
                     processedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
+
+                closeModal();
+                showToast("Changes Approved & Saved", "success");
+                logActivity(`Approved request: ${r.context} by ${r.requesterName}`);
+            } catch(e) {
+                console.error(e);
+                showToast("Error approving: " + e.message, "error");
+            }
+        }
+
+        async function rejectApproval(requestId) {
+            // Prompt for reason
+            const reason = prompt("Please provide a reason for rejection (optional):");
+            
+            try {
+                await db.collection("pending_edits").doc(requestId).update({
+                    status: 'Rejected',
+                    rejectionReason: reason || "No reason provided",
+                    processedBy: userData.name,
+                    processedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                closeModal();
                 showToast("Request Rejected", "warning");
-                logActivity(`Rejected staged changes for ${requestId}`);
-             } catch(e) {
-                 showToast("Error: " + e.message, "error");
-             }
+                logActivity(`Rejected request from user`);
+            } catch(e) {
+                showToast("Error rejecting: " + e.message, "error");
+            }
         }
 
     </script>
