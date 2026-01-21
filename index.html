@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Admin Portal v11.5(ddn)</title>
+    <title>Admin Portal v11.6(ddn)</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -619,6 +619,38 @@
         .checkbox-item input { width: auto; margin: 0; }
         .checkbox-item span { font-size: 0.9rem; color: var(--text-main); }
 
+        /* --- Permission Grid Styles --- */
+        .perm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .perm-card {
+            background: var(--bg-input);
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .perm-card span { font-size: 0.8rem; color: var(--text-muted); }
+
+        /* --- Approval Badge --- */
+        .approval-badge {
+            background: var(--warning);
+            color: black;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
         /* RESPONSIVENESS */
         @media(max-width: 1024px) {
             aside { transform: translateX(-100%); width: 280px; box-shadow: 20px 0 40px rgba(0,0,0,0.5); }
@@ -711,7 +743,7 @@
     <div id="auth-screen">
         <div class="auth-card">
             <img src="https://raw.githubusercontent.com/ddnetwork-ent/ddnetwork/refs/heads/main/DDN%20Logo%20NoBG.png" alt="Logo">
-            <h2 class="mb-4" style="color:white; font-weight: 700; letter-spacing: -0.5px;">Admin Portal v11.5</h2>
+            <h2 class="mb-4" style="color:white; font-weight: 700; letter-spacing: -0.5px;">Admin Portal v11.6</h2>
             <form id="loginForm">
                 <input type="text" id="loginInput" class="mb-4" placeholder="Email or Crew ID" required>
                 <input type="password" id="loginPass" class="mb-4" placeholder="Password" required>
@@ -730,7 +762,7 @@
                 <button class="btn-icon" onclick="toggleSidebar()" title="Toggle Menu"><i class="ri-menu-line" style="font-size: 1.4rem;"></i></button>
                 <div class="header-brand">
                     <img src="https://raw.githubusercontent.com/ddnetwork-ent/ddnetwork/refs/heads/main/DDN%20Logo%20NoBG.png">
-                    <span>DDN v11.5</span>
+                    <span>DDN v11.6</span>
                 </div>
             </div>
             <div class="header-actions">
@@ -749,7 +781,7 @@
             </div>
         </header>
 
-        <!-- SIDEBAR (All visible to all employees) -->
+        <!-- SIDEBAR -->
         <aside id="sidebar">
             <div class="user-mini-profile">
                 <div class="u-info">
@@ -812,6 +844,15 @@
                     <i class="ri-money-dollar-circle-line"></i> <span class="nav-text">Commissions</span>
                 </div>
                 
+                <!-- FOUNDER TOOLS (Dynamic) -->
+                <div class="nav-section-title hidden" id="founder-section-title"><span class="nav-text">Founder Tools</span></div>
+                <div class="nav-item hidden" id="nav-founder-perms" onclick="navigateTo('/founder-permissions')">
+                    <i class="ri-vip-diamond-line"></i> <span class="nav-text">Manage Permissions</span>
+                </div>
+                <div class="nav-item hidden" id="nav-founder-approve" onclick="navigateTo('/approvals')">
+                    <i class="ri-shield-check-line"></i> <span class="nav-text">Approvals</span>
+                </div>
+                
                 <!-- PERSONAL -->
                 <div class="nav-section-title"><span class="nav-text">Personal</span></div>
                 <div class="nav-item" onclick="navigateTo('/my-profile')">
@@ -862,7 +903,22 @@
     <script>
         // --- CONSTANTS & CONFIG ---
         
-        // Updated Job Titles & Rates based on Prompt
+        // Granular Permissions Map
+        const PERMISSIONS = {
+            'orders': 'Manage Orders',
+            'crew': 'Manage Internal Crew',
+            'clients': 'Manage Clients',
+            'config': 'System Config',
+            'portfolio': 'Portfolio',
+            'content': 'Content & Pkg',
+            'vouchers': 'Vouchers',
+            'requests': 'Customer Requests',
+            'support': 'Support Tickets',
+            'finance': 'Finance & Commissions',
+            'promos': 'Public Promos'
+        };
+
+        // Updated Job Titles & Rates
         const JOB_TITLES = [
             "Founder & Managing Director", // Super Admin, 5%
             "Project & Client Manager", // Admin, 3-5%
@@ -1038,13 +1094,20 @@
                         document.getElementById('side-avatar').innerText = (userData.name || 'A').charAt(0).toUpperCase();
                         document.getElementById('header-avatar').innerText = (userData.name || 'A').charAt(0).toUpperCase();
 
-                        // All employees can see sidebar
-                        // Notifications restricted to Admins
-                        if(userData.role === 'crew') {
-                            document.getElementById('notif-btn').style.display = 'none';
-                        } else {
-                            document.getElementById('notif-btn').style.display = 'flex'; 
+                        // Founder Tools Visibility
+                        const isFounder = userData.jobTitle && userData.jobTitle.includes("Founder");
+                        const isSuperAdmin = userData.role === 'super_admin';
+                        
+                        if (isFounder || isSuperAdmin) {
+                            document.getElementById('founder-section-title').classList.remove('hidden');
+                            document.getElementById('nav-founder-perms').classList.remove('hidden');
+                            document.getElementById('nav-founder-approve').classList.remove('hidden');
+                            
+                            // Notifications for Admin/SuperAdmin/Founder
+                            document.getElementById('notif-btn').style.display = 'flex';
                             listenForNotifications(); 
+                        } else {
+                            document.getElementById('notif-btn').style.display = 'none';
                         }
 
                         initRouter();
@@ -1095,28 +1158,114 @@
             });
         }
 
-        // --- ACCESS CONTROL HELPERS ---
-        // Internal Crew (role: 'crew') has LIMITED WRITE ACCESS.
-        // Write Access: Overview, Orders, Requests, Support
-        // Read Only: Clients, Vouchers, Portfolio, Content, Promos, Crew, Config, Commissions, Profile
-        function canWrite(resource) {
-            if (!userData) return false;
-            // Admin and Super Admin have write access to everything
-            if (userData.role === 'admin' || userData.role === 'super_admin') return true;
-            // Internal Crew
+        // --- ACCESS CONTROL & APPROVAL SYSTEM ---
+        
+        function isFounder() { return userData && userData.jobTitle && userData.jobTitle.includes("Founder"); }
+        function isAdmin() { return userData && userData.role === 'admin'; }
+        function isSuperAdmin() { return userData && userData.role === 'super_admin'; }
+        
+        // Check if user has specific permission (Direct or Role-based)
+        function hasPermission(resource) {
+            if (isSuperAdmin() || isFounder()) return true; // Super admins and Founders have god mode
+            
+            // Check Granular Permissions if they exist
+            const userPerms = userData.permissions || {};
+            if (userPerms[resource] === true) return true;
+
+            // Fallback to Role Logic
             if (userData.role === 'crew') {
                 const allowedResources = ['orders', 'requests', 'support', 'overview'];
                 return allowedResources.includes(resource);
+            } else if (userData.role === 'admin') {
+                // Admins typically have access to everything except maybe sensitive crew/founder settings
+                return resource !== 'crew'; 
             }
             return false;
         }
 
-        function checkAccessAndDeny(resource) {
-            if (!canWrite(resource)) {
-                showToast("Access denied, please contact IT or your superior.", "error");
-                return true; // Access Denied
+        /**
+         * INTERCEPTOR FUNCTION
+         * Returns true if access is denied.
+         * If user is Admin/Crew, this triggers the Approval Workflow instead of Denying.
+         */
+        function checkWritePermissions(resource) {
+            if (hasPermission(resource)) return false; // Allowed
+
+            // If not allowed, check if they can request approval
+            if (isAdmin() || userData.role === 'crew') {
+                return 'request_approval'; 
             }
-            return false; // Access Granted
+            
+            showToast("Access denied, please contact IT or your superior.", "error");
+            return true; // Denied completely
+        }
+
+        // Wrapper to save/update data that handles approvals
+        async function safeUpdate(collection, docId, data, actionType = 'update', successMsg = 'Updated') {
+            const permCheck = checkWritePermissions(collection.replace('_history','').replace('payment_methods','')); // normalize key
+            
+            if (permCheck === true) return; // Hard deny
+            if (permCheck === 'request_approval') {
+                // CREATE APPROVAL REQUEST
+                const reqData = {
+                    targetCollection: collection,
+                    targetDocId: docId,
+                    actionType: actionType,
+                    proposedData: data,
+                    requestedBy: currentUser.uid,
+                    requestedByName: userData.name,
+                    requestedByEmail: userData.email,
+                    status: 'pending',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                try {
+                    await db.collection("approval_requests").add(reqData);
+                    showToast("Change Requested! Pending SuperAdmin Approval.", "info");
+                    logActivity(`Requested approval for ${actionType} on ${collection}/${docId}`);
+                    closeModal(); // Close modal if open
+                    return;
+                } catch(e) {
+                    showToast("Error creating request: " + e.message, "error");
+                }
+                return;
+            }
+
+            // Direct Execution (SuperAdmin/Founder)
+            try {
+                if (actionType === 'delete') {
+                    await db.collection(collection).doc(docId).delete();
+                } else {
+                    await db.collection(collection).doc(docId).update(data);
+                }
+                showToast(successMsg, "success");
+                logActivity(`Executed ${actionType} on ${collection}/${docId}`);
+                if(document.querySelector('.modal-overlay.open')) closeModal();
+            } catch (err) {
+                showToast("Error: " + err.message, "error");
+            }
+        }
+
+        function showModal(title, body, footer='') {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalBody').innerHTML = body;
+            document.getElementById('modalFooter').innerHTML = footer;
+            document.getElementById('modalOverlay').classList.add('open');
+        }
+        function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+        function showToast(msg, type='info') {
+            const t = document.createElement('div'); t.className = `toast ${type}`;
+            const icon = type=='success'?'ri-checkbox-circle-fill':(type=='error'?'ri-error-warning-fill':'ri-information-fill');
+            t.innerHTML = `<i class="${icon}" style="font-size:1.2rem; color: ${type=='success'?'var(--success)':(type=='error'?'var(--danger)':'white')}"></i> <span>${msg}</span>`;
+            document.getElementById('toastContainer').appendChild(t);
+            setTimeout(()=>t.classList.add('show'), 10);
+            setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(), 400); }, 3500);
+        }
+
+        async function deleteUser(uid, name, type) {
+            if(!isSuperAdmin() && !isFounder()) return showToast("Access Denied", "error");
+            if(!confirm(`Are you sure you want to PERMANENTLY DELETE ${name}? This action cannot be undone.`)) return;
+            safeUpdate("users", uid, {}, "delete", "User deleted");
         }
 
         // --- ROUTING SYSTEM ---
@@ -1133,7 +1282,9 @@
             '/requests': renderRequests,
             '/my-profile': renderMyProfile,
             '/public-promos': renderPublicPromos,
-            '/commissions': renderCommissions
+            '/commissions': renderCommissions,
+            '/founder-permissions': renderFounderPermissions,
+            '/approvals': renderApprovals
         };
 
         function navigateTo(path) {
@@ -1184,39 +1335,6 @@
             }
         }
 
-        // --- UTILS ---
-        function isAdmin() { return userData && (userData.role === 'admin' || userData.role === 'super_admin'); }
-        function isSuperAdmin() { return userData && userData.role === 'super_admin'; }
-        
-        function showModal(title, body, footer='') {
-            document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalBody').innerHTML = body;
-            document.getElementById('modalFooter').innerHTML = footer;
-            document.getElementById('modalOverlay').classList.add('open');
-        }
-        function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
-        function showToast(msg, type='info') {
-            const t = document.createElement('div'); t.className = `toast ${type}`;
-            const icon = type=='success'?'ri-checkbox-circle-fill':(type=='error'?'ri-error-warning-fill':'ri-information-fill');
-            t.innerHTML = `<i class="${icon}" style="font-size:1.2rem; color: ${type=='success'?'var(--success)':(type=='error'?'var(--danger)':'white')}"></i> <span>${msg}</span>`;
-            document.getElementById('toastContainer').appendChild(t);
-            setTimeout(()=>t.classList.add('show'), 10);
-            setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(), 400); }, 3500);
-        }
-
-        async function deleteUser(uid, name, type) {
-            if(!isSuperAdmin()) return showToast("Access Denied", "error");
-            if(!confirm(`Are you sure you want to PERMANENTLY DELETE ${name}? This action cannot be undone.`)) return;
-            try {
-                await db.collection("users").doc(uid).delete();
-                logActivity(`Deleted user: ${name} (${type})`);
-                showToast("User deleted successfully", "success");
-            } catch (error) {
-                console.error("Delete error:", error);
-                showToast("Error deleting user: " + error.message, "error");
-            }
-        }
-
         // ---1. OVERVIEW ---
         function renderOverview() {
             const main = document.getElementById('main');
@@ -1236,7 +1354,8 @@
                             <button class="btn btn-secondary" onclick="navigateTo('/orders')"><i class="ri-shopping-bag-line"></i> New Order</button>
                             <button class="btn btn-secondary" onclick="navigateTo('/support')"><i class="ri-ticket-line"></i> Check Tickets</button>
                             <button class="btn btn-secondary" onclick="navigateTo('/requests')"><i class="ri-database-2-line"></i> Requests</button>
-                            ${isSuperAdmin() ? `<button class="btn btn-secondary" onclick="navigateTo('/crew')"><i class="ri-user-add-line"></i> Add Crew</button>` : ''}
+                            ${(isSuperAdmin() || isFounder()) ? `<button class="btn btn-secondary" onclick="navigateTo('/crew')"><i class="ri-user-add-line"></i> Add Crew</button>` : ''}
+                            ${(isSuperAdmin() || isFounder()) ? `<button class="btn btn-secondary" onclick="navigateTo('/approvals')"><i class="ri-shield-check-line"></i> Approvals</button>` : ''}
                         </div>
                     </div>
                     <div class="list-group">
@@ -1247,7 +1366,6 @@
             `;
             
             if(isAdmin()) {
-                listenForNotifications();
                 db.collection("activity_logs").orderBy("timestamp", "desc").limit(5).onSnapshot(snap => {
                     const feed = document.getElementById('activity-feed');
                     if(feed) {
@@ -1274,15 +1392,17 @@
                 db.collection("users").where("role", "==", "user").get(),
                 db.collection("orders").where("status", "==", "Pending").get(),
                 db.collection("orders").where("status", "==", "Paid").get(),
-                db.collection("customer_requests").where("status", "==", "Pending").get()
+                db.collection("customer_requests").where("status", "==", "Pending").get(),
+                db.collection("approval_requests").where("status", "==", "pending").get()
             ];
 
-            Promise.all(promises).then(([tSnap, uSnap, oSnapP, oSnapPaid, rSnapP]) => {
+            Promise.all(promises).then(([tSnap, uSnap, oSnapP, oSnapPaid, rSnapP, aSnap]) => {
                 const stats = [
                     { label: "Active Cases", val: tSnap.size, icon: "ri-customer-service-2-line", color: "var(--ticket)" },
                     { label: "Total Clients", val: uSnap.size, icon: "ri-user-smile-line", color: "var(--primary)" },
                     { label: "Pending Orders", val: oSnapP.size, icon: "ri-shopping-basket-2-line", color: "var(--text-muted)" },
-                    { label: "Revenue (Est.)", val: `RM ${oSnapPaid.size * 300}`, icon: "ri-wallet-3-line", color: "var(--success)" }
+                    { label: "Revenue (Est.)", val: `RM ${oSnapPaid.size * 300}`, icon: "ri-wallet-3-line", color: "var(--success)" },
+                    { label: "Pending Approvals", val: aSnap.size, icon: "ri-shield-keyhole-line", color: "var(--warning)" }
                 ];
                 const grid = document.getElementById('stats-grid');
                 if(grid) {
@@ -1346,9 +1466,6 @@
                     if(d.status === 'Paid') statusColor = 'var(--primary)';
                     if(d.status === 'Cancelled') statusColor = 'var(--danger)';
                     
-                    // Crew can see Manage/PDF/WA. Admin can see Delete.
-                    // Internal Crew CAN Edit Orders based on Prompt ("Orders - All employees")
-                    
                     return `<tr>
                         <td style="white-space:nowrap;">${formatDateTime(d.timestamp)}</td>
                         <td><strong>${d.customerName}</strong></td>
@@ -1360,7 +1477,7 @@
                                 <button class="btn btn-sm btn-secondary" onclick="viewOrder('${doc.id}')">Manage</button>
                                 <button class="btn btn-sm btn-info" title="Generate Invoice" onclick="generateInvoice('${doc.id}')"><i class="ri-file-list-2-line"></i> PDF</button>
                                 <button class="btn btn-sm btn-success" title="Send WhatsApp Remainder" onclick="sendPaymentReminder('${doc.id}')"><i class="ri-whatsapp-line"></i> WA</button>
-                                ${isSuperAdmin() ? `<button class="btn btn-sm btn-danger" onclick="deleteOrder('${doc.id}')"><i class="ri-delete-bin-line"></i></button>` : ''}
+                                ${isSuperAdmin() ? `<button class="btn btn-sm btn-danger" onclick="safeUpdate('orders', '${doc.id}', {}, 'delete', 'Order Deleted')"><i class="ri-delete-bin-line"></i></button>` : ''}
                             </div>
                         </td>
                     </tr>`;
@@ -1491,7 +1608,7 @@
         }
 
         async function sendPaymentReminder(id) {
-            if(checkAccessAndDeny('orders')) return; // Write check
+            if(checkWritePermissions('orders')) return;
 
             try {
                 const doc = await db.collection("orders").doc(id).get();
@@ -1504,10 +1621,8 @@
                 } catch(e) {}
                 const orderRef = id.substring(0,6).toUpperCase();
 
-                // OWA Logic based on status
                 let msg = "";
                 if (d.status === "Pending" || d.status === "Cancelled" || !d.status) {
-                    // Incomplete/Pending Template
                     msg = `Hi ${d.customerName},
 This is ${userData.name} from DDNetwork.
 
@@ -1519,7 +1634,6 @@ Thank you for choosing DDNetwork.
 
 – DDNetwork Team`;
                 } else {
-                    // Paid/Completed (Generic Thank you or Receipt)
                     msg = `👋 Hi ${d.customerName},\n\nReminder regarding your order with DDNetwork One.\n\n📄 *Invoice:* #${orderRef}\n📦 *Package:* ${d.package}\n💰 *Total:* ${d.total}\n\n💳 *Payment Link:* ${payLink}\n\nThank you! 🚀`;
                 }
                 
@@ -1535,17 +1649,14 @@ Thank you for choosing DDNetwork.
         }
 
         async function viewOrder(id) {
-            // Crew can view and edit order details? Prompt: "Orders - All employees". 
-            // Internal Crew has Write Access to Orders.
-            
-            if(checkAccessAndDeny('orders')) return;
+            if(checkWritePermissions('orders')) return;
 
             const doc = await db.collection("orders").doc(id).get();
             const d = doc.data();
             
             // Multi-select Sales Rep Logic
             let salesRepHTML = '<div class="multi-select-container">';
-            const currentReps = d.salesRepIds || []; // Array of IDs
+            const currentReps = d.salesRepIds || []; 
             
             try {
                 const crewSnap = await db.collection("users").where("role", "in", ["super_admin", "admin", "crew"]).get();
@@ -1604,7 +1715,7 @@ Thank you for choosing DDNetwork.
         }
 
         function updateOrderDetails(id) {
-            if(checkAccessAndDeny('orders')) return;
+            if(checkWritePermissions('orders')) return;
 
             const updateData = {
                 customerName: document.getElementById('o-name').value,
@@ -1615,38 +1726,19 @@ Thank you for choosing DDNetwork.
                 status: document.getElementById('upd-status').value
             };
             
-            // Handle Multi-select Reps
             const checkboxes = document.querySelectorAll('.rep-checkbox:checked');
             const selectedIds = Array.from(checkboxes).map(cb => cb.value);
-            const selectedNames = [];
-
-            // Need to fetch names for logging/display if possible, or just store IDs. 
-            // For simplicity in this snippet, we just store IDs. 
-            // A robust system would store {id, name} objects.
             
             updateData.salesRepIds = selectedIds;
-            // Clear old single fields if they exist
             updateData.salesRepId = firebase.firestore.FieldValue.delete();
             updateData.salesRepName = firebase.firestore.FieldValue.delete();
 
-            db.collection("orders").doc(id).update(updateData).then(() => { 
-                closeModal(); showToast("Order Updated Successfully", "success"); logActivity(`Updated Order #${id.substr(0,6)}`);
-            });
-        }
-
-        function deleteOrder(id) {
-            if(!isSuperAdmin()) return;
-            if(!confirm("Delete this order?")) return;
-            db.collection("orders").doc(id).delete().then(() => {
-                showToast("Order Deleted", "success");
-                logActivity(`Deleted Order #${id.substr(0,6)}`);
-            });
+            safeUpdate("orders", id, updateData, 'update', "Order Updated");
         }
 
         // --- 3. CLIENTS ---
         function renderClients() {
-            // Crew Read Only
-            const canEdit = canWrite('clients');
+            const canEdit = hasPermission('clients');
             document.getElementById('main').innerHTML = `
                 <div class="table-container">
                     <div class="table-header">
@@ -1672,7 +1764,7 @@ Thank you for choosing DDNetwork.
                         ${canEdit ? `<button class="btn btn-sm btn-secondary" onclick="editClient('${doc.id}')">Edit</button>` : ''}
                         ${canEdit ? `<button class="btn btn-sm btn-secondary" onclick="resetPassword('${u.email}')">Reset PW</button>` : ''}
                         ${canEdit ? `<button class="btn btn-sm btn-primary" onclick="openAssignVoucherModal('${doc.id}', '${u.name}')">Assign Voucher</button>` : ''}
-                        ${isSuperAdmin() ? `<button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Client')"><i class="ri-delete-bin-line"></i></button>` : ''}
+                        ${isSuperAdmin() ? `<button class="btn btn-sm btn-danger" onclick="safeUpdate('users', '${doc.id}', {}, 'delete', 'Client Deleted')"><i class="ri-delete-bin-line"></i></button>` : ''}
                     `;
 
                     return `<tr>
@@ -1688,7 +1780,7 @@ Thank you for choosing DDNetwork.
             });
         }
         function editClient(uid) {
-            if(checkAccessAndDeny('clients')) return;
+            if(checkWritePermissions('clients')) return;
             db.collection("users").doc(uid).get().then(doc => {
                 const u = doc.data();
                 showModal("Edit Client", `
@@ -1700,22 +1792,26 @@ Thank you for choosing DDNetwork.
             });
         }
         function saveClient(uid) {
-            if(checkAccessAndDeny('clients')) return;
-            db.collection("users").doc(uid).update({ name: document.getElementById('e-name').value, phone: document.getElementById('e-phone').value, company: document.getElementById('e-comp').value }).then(() => { closeModal(); showToast("Client Updated", "success"); logActivity("Updated client details"); });
+            if(checkWritePermissions('clients')) return;
+            const data = { 
+                name: document.getElementById('e-name').value, 
+                phone: document.getElementById('e-phone').value, 
+                company: document.getElementById('e-comp').value 
+            };
+            safeUpdate("users", uid, data, "update", "Client Updated");
         }
         function resetPassword(email) {
-            if(checkAccessAndDeny('clients')) return;
+            if(checkWritePermissions('clients')) return;
             if(confirm(`Send reset email to ${email}?`)) { auth.sendPasswordResetEmail(email).then(() => showToast("Reset email sent", "success")); }
         }
 
         // --- 4. CREW MANAGEMENT ---
         function renderCrew() {
-            // Crew Read Only
-            const canEdit = canWrite('crew');
+            const canEdit = hasPermission('crew');
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:700;">Internal Crew</h2>
-                    ${canEdit && isSuperAdmin() ? `<button class="btn btn-primary" onclick="openAddCrewModal()"><i class="ri-add-line"></i> Add Crew</button>` : ''}
+                    ${(canEdit && (isSuperAdmin() || isFounder())) ? `<button class="btn btn-primary" onclick="openAddCrewModal()"><i class="ri-add-line"></i> Add Crew</button>` : ''}
                 </div>
                 <div class="table-container">
                     <div class="table-responsive">
@@ -1734,7 +1830,7 @@ Thank you for choosing DDNetwork.
                     if (canEdit) {
                         buttons = `<button class="btn btn-sm btn-secondary" onclick="editCrew('${doc.id}')"><i class="ri-pencil-line"></i></button>`;
                         if (isSuperAdmin()) {
-                            buttons += `<button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Crew')"><i class="ri-delete-bin-line"></i></button>`;
+                            buttons += `<button class="btn btn-sm btn-danger" onclick="safeUpdate('users', '${doc.id}', {}, 'delete', 'Crew Deleted')"><i class="ri-delete-bin-line"></i></button>`;
                         }
                     }
                     return `<tr>
@@ -1751,7 +1847,7 @@ Thank you for choosing DDNetwork.
         }
         
         async function openAddCrewModal() {
-            if(checkAccessAndDeny('crew')) return;
+            if(checkWritePermissions('crew')) return;
             const newCrewId = await getNextId('crew');
             const jobOptions = JOB_TITLES.map(j => `<option value="${j}">${j}</option>`).join('');
             
@@ -1785,20 +1881,18 @@ Thank you for choosing DDNetwork.
             const roleInput = document.getElementById('c-role');
             const rateInput = document.getElementById('c-rate');
             
-            // Auto Role Mapping based on Prompt
-            let dbRole = 'crew'; // Default
+            let dbRole = 'crew';
             if(title === "Founder & Managing Director") dbRole = 'super_admin';
             else if (["Project & Client Manager", "Account / Operations / Marketing Manager", "Finance / Billing Executive", "People / Team Operations Executive"].includes(title)) dbRole = 'admin';
 
             roleInput.value = dbRole.toUpperCase();
 
-            // Auto Rate
             const defaultRate = getDefaultRate(title);
             rateInput.value = (defaultRate * 100).toFixed(1);
         }
 
         async function saveCrew(newId) {
-            if(checkAccessAndDeny('crew')) return;
+            if(checkWritePermissions('crew')) return;
             const name = document.getElementById('c-name').value;
             const email = document.getElementById('c-email').value;
             const pass = document.getElementById('c-pass').value;
@@ -1810,7 +1904,6 @@ Thank you for choosing DDNetwork.
             try {
                 const userCredential = await auth.createUserWithEmailAndPassword(email, pass);
                 
-                // Determine DB Role again to be safe
                 let dbRole = 'crew';
                 if(job === "Founder & Managing Director") dbRole = 'super_admin';
                 else if (["Project & Client Manager", "Account / Operations / Marketing Manager", "Finance / Billing Executive", "People / Team Operations Executive"].includes(job)) dbRole = 'admin';
@@ -1833,7 +1926,7 @@ Thank you for choosing DDNetwork.
         }
 
         function editCrew(uid) {
-            if(checkAccessAndDeny('crew')) return;
+            if(checkWritePermissions('crew')) return;
             db.collection("users").doc(uid).get().then(doc => {
                 const u = doc.data();
                 const jobOptions = JOB_TITLES.map(j => `<option value="${j}" ${u.jobTitle===j?'selected':''}>${j}</option>`).join('');
@@ -1852,20 +1945,21 @@ Thank you for choosing DDNetwork.
         }
 
         function updateCrewData(uid) {
-            if(checkAccessAndDeny('crew')) return;
+            if(checkWritePermissions('crew')) return;
             const rateVal = parseFloat(document.getElementById('e-c-rate').value);
-            db.collection("users").doc(uid).update({
+            const data = {
                 crewId: document.getElementById('e-c-id').value,
                 name: document.getElementById('e-c-name').value,
                 jobTitle: document.getElementById('e-c-job').value,
                 role: document.getElementById('e-c-role').value,
                 commissionRate: isNaN(rateVal) ? 0.0 : (rateVal / 100)
-            }).then(() => { closeModal(); showToast("Crew details updated", "success"); logActivity(`Updated crew member details`); });
+            };
+            safeUpdate("users", uid, data, "update", "Crew Updated");
         }
 
         // --- 5. SUPPORT ---
         function renderSupport() {
-            // Crew can edit (Prompt: All employees)
+            const canEdit = hasPermission('support');
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <button class="btn btn-secondary" onclick="openCreateTicket()"><i class="ri-add-line"></i> Create New Ticket</button>
@@ -1896,7 +1990,7 @@ Thank you for choosing DDNetwork.
                         <td><span class="badge" style="background:${statusBadge}15; color:${statusBadge}">${d.status}</span></td>
                         <td>
                             <button class="btn btn-sm btn-secondary" onclick="viewTicket('${doc.id}')">Manage</button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteItem('ticket','${doc.id}')"><i class="ri-delete-bin-line"></i></button>
+                            <button class="btn btn-sm btn-danger" onclick="safeUpdate('tickets', '${doc.id}', {}, 'delete', 'Ticket Deleted')"><i class="ri-delete-bin-line"></i></button>
                         </td>
                     </tr>`;
                 }).join('');
@@ -1904,7 +1998,7 @@ Thank you for choosing DDNetwork.
         }
 
         async function openCreateTicket() {
-            if(checkAccessAndDeny('support')) return;
+            if(checkWritePermissions('support')) return;
             const newId = await getNextId('ticket');
             showModal("Create Support Ticket", `
                 <div class="mb-4"><label>Generated ID</label><input value="${newId}" readonly class="font-mono" style="color:var(--ticket)"></div>
@@ -1915,12 +2009,23 @@ Thank you for choosing DDNetwork.
         }
 
         function saveNewTicket(id) {
-            if(checkAccessAndDeny('support')) return;
-            db.collection("tickets").add({ ticketId: id, name: document.getElementById('tk-name').value, type: document.getElementById('tk-type').value, message: document.getElementById('tk-msg').value, status: 'Open', timestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { closeModal(); showToast("Ticket Created Successfully", "success"); logActivity(`Created new support ticket ${id}`); });
+            if(checkWritePermissions('support')) return;
+            const data = { 
+                ticketId: id, 
+                name: document.getElementById('tk-name').value, 
+                type: document.getElementById('tk-type').value, 
+                message: document.getElementById('tk-msg').value, 
+                status: 'Open', 
+                timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+            };
+            // Direct add, not update
+            if (checkWritePermissions('support') !== true) { // If allowed direct
+                db.collection("tickets").add(data).then(() => { closeModal(); showToast("Ticket Created Successfully", "success"); logActivity(`Created new support ticket ${id}`); });
+            }
         }
 
         function viewTicket(id) {
-            if(checkAccessAndDeny('support')) return;
+            if(checkWritePermissions('support')) return;
             db.collection("tickets").doc(id).get().then(doc => {
                 const d = doc.data();
                 db.collection("users").where("role", "in", ["super_admin", "admin", "crew"]).get().then(snap => {
@@ -1936,18 +2041,19 @@ Thank you for choosing DDNetwork.
             });
         }
         function saveTicketDetails(id) {
-            if(checkAccessAndDeny('support')) return;
+            if(checkWritePermissions('support')) return;
             const newStatus = document.getElementById('tk-status').value;
             const newAssignId = document.getElementById('tk-assign').value;
             const newAssignName = newAssignId ? document.getElementById('tk-assign').options[document.getElementById('tk-assign').selectedIndex].text : "";
-            db.collection("tickets").doc(id).update({ status: newStatus, assignedTo: newAssignId || null, assignedToName: newAssignName }).then(() => { closeModal(); showToast("Ticket Updated", "success"); logActivity(`Updated Ticket #${id}`); });
+            const data = { status: newStatus, assignedTo: newAssignId || null, assignedToName: newAssignName };
+            safeUpdate("tickets", id, data, "update", "Ticket Updated");
         }
 
         // --- 6. VOUCHERS ---
         let currentVoucherFilter = 'All'; 
 
         async function renderVouchers() {
-            const canEdit = canWrite('vouchers');
+            const canEdit = hasPermission('vouchers');
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
                     <h3 style="font-size:1.25rem; font-weight:700;">Voucher Management</h3>
@@ -2040,7 +2146,7 @@ Thank you for choosing DDNetwork.
             if(movedCount > 0) showToast(`Synced ${movedCount} vouchers to history`, "success");
         }
         function editVoucher(uid, code) {
-            if(checkAccessAndDeny('vouchers')) return;
+            if(checkWritePermissions('vouchers')) return;
             db.collection("users").doc(uid).get().then(doc => {
                 const v = doc.data().personalVoucher;
                 const exp = v.expiryDate ? new Date(v.expiryDate.seconds*1000).toISOString().split('T')[0] : '';
@@ -2054,16 +2160,17 @@ Thank you for choosing DDNetwork.
             });
         }
         function saveEditVoucher(uid) {
-            if(checkAccessAndDeny('vouchers')) return;
+            if(checkWritePermissions('vouchers')) return;
             const newCode = document.getElementById('e-v-code').value.toUpperCase();
             const newStatus = document.getElementById('e-v-status').value;            
             db.collection("users").doc(uid).get().then(doc => {
                 const v = doc.data().personalVoucher;
-                db.collection("users").doc(uid).update({ personalVoucher: { ...v, code: newCode, value: parseFloat(document.getElementById('e-v-val').value), expiryDate: document.getElementById('e-v-exp').value ? new Date(document.getElementById('e-v-exp').value) : null, status: newStatus } }).then(() => { closeModal(); showToast("Voucher Updated", "success"); logActivity(`Edited voucher ${newCode}`); });
+                const data = { ...v, code: newCode, value: parseFloat(document.getElementById('e-v-val').value), expiryDate: document.getElementById('e-v-exp').value ? new Date(document.getElementById('e-v-exp').value) : null, status: newStatus };
+                safeUpdate("users", uid, { personalVoucher: data }, "update", "Voucher Updated");
             });
         }
         async function markRedeem(uid, code) {
-            if(checkAccessAndDeny('vouchers')) return;
+            if(checkWritePermissions('vouchers')) return;
             if(!confirm(`Mark voucher ${code} as Redeemed?`)) return;
             const userDoc = await db.collection("users").doc(uid).get();
             const uData = userDoc.data();
@@ -2074,7 +2181,7 @@ Thank you for choosing DDNetwork.
             logActivity(`Marked voucher ${code} as Redeemed`);
         }
         async function disableVoucher(uid, code) {
-            if(checkAccessAndDeny('vouchers')) return;
+            if(checkWritePermissions('vouchers')) return;
             if(!confirm(`Disable voucher ${code}?`)) return;
             const userDoc = await db.collection("users").doc(uid).get();
             const uData = userDoc.data();
@@ -2085,7 +2192,7 @@ Thank you for choosing DDNetwork.
             logActivity(`Disabled voucher ${code}`);
         }
         function openAssignVoucherModal(uid, userName) {
-            if(checkAccessAndDeny('vouchers')) return;
+            if(checkWritePermissions('vouchers')) return;
             const promise = uid ? Promise.resolve(null) : db.collection("users").where("role", "==", "user").get();
             promise.then(snap => {
                 let userSelect = '';
@@ -2103,26 +2210,36 @@ Thank you for choosing DDNetwork.
             });
         }
         function submitAssignVoucher() {
-            if(checkAccessAndDeny('vouchers')) return;
+            if(checkWritePermissions('vouchers')) return;
             const uid = document.getElementById('v-user').value;
             const code = document.getElementById('v-code').value.toUpperCase();
-            db.collection("users").doc(uid).update({ personalVoucher: { code: code, type: document.getElementById('v-val-type').value, value: parseFloat(document.getElementById('v-val').value), expiryDate: document.getElementById('v-exp').value ? new Date(document.getElementById('v-exp').value) : null, status: 'active', auditLog: [{ action: 'Created', by: userData.email, date: new Date().toISOString() }] }}).then(() => { closeModal(); showToast(`Voucher ${code} Assigned!`, "success"); logActivity(`Assigned voucher ${code}`); });
+            const data = { 
+                code: code, 
+                type: document.getElementById('v-val-type').value, 
+                value: parseFloat(document.getElementById('v-val').value), 
+                expiryDate: document.getElementById('v-exp').value ? new Date(document.getElementById('v-exp').value) : null, 
+                status: 'active', 
+                auditLog: [{ action: 'Created', by: userData.email, date: new Date().toISOString() }] 
+            };
+            safeUpdate("users", uid, { personalVoucher: data }, "update", `Voucher ${code} Assigned`);
         }
         function restoreVoucher(code, ownerUid) {
-            if(checkAccessAndDeny('vouchers')) return;
+            if(checkWritePermissions('vouchers')) return;
             if(!confirm("Restore this voucher?")) return;
             db.collection("vouchers_history").doc(code).get().then(hist => {
                 if(!hist.exists) return showToast("Error", "error");
                 const v = hist.data();
-                db.collection("users").doc(ownerUid).update({ personalVoucher: { ...v, status: 'active' } }).then(() => {
-                    db.collection("vouchers_history").doc(code).delete().then(() => { showToast("Voucher Restored", "success"); logActivity(`Restored voucher ${code}`); });
+                const data = { ...v, status: 'active' };
+                safeUpdate("users", ownerUid, { personalVoucher: data }, "update", "Voucher Restored").then(() => {
+                     // Logic for deleting history is complex inside safeUpdate, so we handle delete separately after success or manually
+                     db.collection("vouchers_history").doc(code).delete();
                 });
             });
         }
 
         // --- 7. CONTENT & PACKAGES ---
         function renderContent() {
-            const canEdit = canWrite('content');
+            const canEdit = hasPermission('content');
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:700;">Content & Packages</h2>
@@ -2149,7 +2266,7 @@ Thank you for choosing DDNetwork.
             });
         }
         function saveContentChanges() {
-            if(checkAccessAndDeny('content')) return;
+            if(checkWritePermissions('content')) return;
             const frontendLines = document.getElementById('content-frontend').value.split('\n').filter(l => l.trim() !== '');
             const aiLines = document.getElementById('content-ai').value.split('\n').filter(l => l.trim() !== '');
             const btn = document.querySelector('button[onclick="saveContentChanges()"]');
@@ -2160,9 +2277,7 @@ Thank you for choosing DDNetwork.
                 const newPkgDetails = data.packageDetails || {};
                 newPkgDetails.frontend = { features: frontendLines };
                 newPkgDetails.ai = { features: aiLines };
-                db.collection("config").doc("site_settings").update({ packageDetails: newPkgDetails }).then(() => {
-                    showToast("Content updated successfully!", "success");
-                    logActivity("Updated website content features");
+                safeUpdate("config", "site_settings", { packageDetails: newPkgDetails }, "update", "Content Updated").then(() => {
                     btn.innerHTML = originalHTML;
                 });
             }).catch(err => { showToast("Error updating: " + err.message, "error"); btn.innerHTML = originalHTML; });
@@ -2170,8 +2285,7 @@ Thank you for choosing DDNetwork.
 
         // --- 8. CONFIG ---
         function renderConfig() {
-            // Crew Read Only
-            const canEdit = canWrite('config');
+            const canEdit = hasPermission('config');
             document.getElementById('main').innerHTML = `
                 <h2 style="font-size:1.25rem; font-weight:700; margin-bottom:1.5rem;">System Configuration</h2>
                 <div class="config-section">
@@ -2242,39 +2356,41 @@ Thank you for choosing DDNetwork.
                 });
             });
         }
-        function toggleMaintenance() { if(checkAccessAndDeny('config')) return;
+        function toggleMaintenance() { if(checkWritePermissions('config')) return;
             const isActive = document.getElementById('maint-toggle').checked;
-            db.collection("config").doc("site_settings").update({ maintenance_active: isActive }).then(() => { showToast(`Maintenance Mode ${isActive ? 'Enabled' : 'Disabled'}`, isActive?'warning':'success'); logActivity(`Toggled maintenance mode to ${isActive}`); });
+            safeUpdate("config", "site_settings", { maintenance_active: isActive }, "update", `Maintenance ${isActive ? 'Enabled' : 'Disabled'}`);
         }
-        function saveMaintMsg() { if(checkAccessAndDeny('config')) return; db.collection("config").doc("site_settings").update({ maintenance_message: document.getElementById('maint-msg').value }).then(() => showToast("Message Saved", "success")); }
-        function savePrice(key, elemId) { if(checkAccessAndDeny('config')) return;
+        function saveMaintMsg() { if(checkWritePermissions('config')) return; 
+            safeUpdate("config", "site_settings", { maintenance_message: document.getElementById('maint-msg').value }, "update", "Message Saved");
+        }
+        function savePrice(key, elemId) { if(checkWritePermissions('config')) return;
             const theVal = parseFloat(document.getElementById(elemId).value);
             if(!theVal) return showToast("Invalid price", "error");
-            db.collection("config").doc("site_settings").update({ [`prices.${key}`]:theVal }).then(() => showToast("Price Updated", "success"));
+            safeUpdate("config", "site_settings", { [`prices.${key}`]:theVal }, "update", "Price Updated");
         }
-        function addGateway() { if(checkAccessAndDeny('config')) return;
+        function addGateway() { if(checkWritePermissions('config')) return;
             showModal("Add Payment Gateway", `<label>Gateway Name</label><input id="gw-name" class="mb-4"><label>Payment Link / URL</label><input id="gw-link" class="mb-4">`, `<button class="btn btn-primary" onclick="saveNewGateway()">Add</button>`);
         }
-        async function saveNewGateway() { if(checkAccessAndDeny('config')) return;
+        async function saveNewGateway() { if(checkWritePermissions('config')) return;
             const name = document.getElementById('gw-name').value; const link = document.getElementById('gw-link').value;
-            await db.collection("payment_methods").add({ name, link, active: true }); closeModal(); showToast("Gateway Added", "success"); logActivity(`Added payment gateway: ${name}`);
+            await db.collection("payment_methods").add({ name, link, active: true }).then(() => { closeModal(); showToast("Gateway Added", "success"); logActivity(`Added payment gateway: ${name}`); });
         }
-        function editGateway(docId) { if(checkAccessAndDeny('config')) return;
+        function editGateway(docId) { if(checkWritePermissions('config')) return;
             db.collection("payment_methods").doc(docId).get().then(doc => { const gw = doc.data(); showModal("Edit Payment Gateway", `<label>Gateway Name</label><input id="e-gw-name" value="${gw.name}" class="mb-4"><label>Payment Link / URL</label><input id="e-gw-link" value="${gw.link}" class="mb-4">`, `<button class="btn btn-primary" onclick="saveEditedGateway('${docId}')">Save</button>`); });
         }
-        async function saveEditedGateway(docId) { if(checkAccessAndDeny('config')) return;
+        async function saveEditedGateway(docId) { if(checkWritePermissions('config')) return;
             const name = document.getElementById('e-gw-name').value; const link = document.getElementById('e-gw-link').value;
-            await db.collection("payment_methods").doc(docId).update({ name, link }); closeModal(); renderConfig(); showToast("Gateway Updated", "success"); logActivity(`Edited payment gateway: ${name}`);
+            safeUpdate("payment_methods", docId, { name, link }, "update", "Gateway Updated").then(()=>renderConfig());
         }
-        async function toggleGatewayStatus(docId) { if(checkAccessAndDeny('config')) return;
+        async function toggleGatewayStatus(docId) { if(checkWritePermissions('config')) return;
             const docRef = await db.collection("payment_methods").doc(docId).get(); const currentStatus = docRef.data().active;
-            await db.collection("payment_methods").doc(docId).update({ active: !currentStatus }); renderConfig();
+            safeUpdate("payment_methods", docId, { active: !currentStatus }, "update", "Status Toggled").then(()=>renderConfig());
         }
-        async function deleteGateway(docId) { if(checkAccessAndDeny('config')) return; if(!confirm("Delete gateway?")) return; await db.collection("payment_methods").doc(docId).delete(); renderConfig(); }
+        async function deleteGateway(docId) { if(checkWritePermissions('config')) return; if(!confirm("Delete gateway?")) return; safeUpdate("payment_methods", docId, {}, "delete", "Gateway Deleted").then(()=>renderConfig()); }
 
         // --- 9. PORTFOLIO MANAGEMENT ---
         function renderPortfolio() {
-            const canEdit = canWrite('portfolio');
+            const canEdit = hasPermission('portfolio');
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:700;">Client Portfolio</h2>
@@ -2296,7 +2412,7 @@ Thank you for choosing DDNetwork.
                     const statusBadge = p.status ? `<span class="badge" style="background:var(--success)15; color:var(--success); border:1px solid var(--success)25">Active</span>` : `<span class="badge" style="background:var(--text-faint); color:var(--text-muted); border:1px solid var(--border)">Inactive</span>`;
                     let actions = '';
                     if (canEdit) {
-                        actions = `<button class="btn btn-sm btn-secondary" onclick="editPortfolio('${doc.id}')"><i class="ri-pencil-line"></i></button><button class="btn ${p.status ? 'btn-danger' : 'btn-success'}" onclick="togglePortfolioStatus('${doc.id}', ${!p.status})"><i class="${p.status ? 'ri-eye-off-line' : 'ri-eye-line'}"></i></button><button class="btn btn-sm btn-danger" onclick="deletePortfolio('${doc.id}')"><i class="ri-delete-bin-line"></i></button>`;
+                        actions = `<button class="btn btn-sm btn-secondary" onclick="editPortfolio('${doc.id}')"><i class="ri-pencil-line"></i></button><button class="btn ${p.status ? 'btn-danger' : 'btn-success'}" onclick="togglePortfolioStatus('${doc.id}', ${!p.status})"><i class="${p.status ? 'ri-eye-off-line' : 'ri-eye-line'}"></i></button><button class="btn btn-sm btn-danger" onclick="safeUpdate('clients_portfolio', '${doc.id}', {}, 'delete', 'Project Deleted')"><i class="ri-delete-bin-line"></i></button>`;
                     }
                     return `<tr>
                         <td><img src="${p.img}" alt="thumb" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border);" onerror="this.src='https://placehold.co/50?text=No+Img'"></td>
@@ -2308,7 +2424,7 @@ Thank you for choosing DDNetwork.
                 }).join('');
             });
         }
-        function openAddPortfolioModal() { if(checkAccessAndDeny('portfolio')) return;
+        function openAddPortfolioModal() { if(checkWritePermissions('portfolio')) return;
             const initialId = generateDocIdFromName('');
             showModal("Add New Project", `
                 <div class="mb-4"><label>Project Name</label><input type="text" id="p-name" placeholder="e.g. Clinic Azam" oninput="updateDocIdPreview()"><small style="color:var(--text-faint)">ID will be generated from name</small></div>
@@ -2318,12 +2434,13 @@ Thank you for choosing DDNetwork.
                 <div class="flex items-center gap-4"><label class="toggle-switch"><input type="checkbox" id="p-status" checked><span class="slider"></span></label><span style="font-size:0.9rem; color:var(--text-main);">Visible on Main Site</span></div>
             `, `<button class="btn btn-primary" onclick="saveNewPortfolio()">Create Project</button>`);
         }
-        function saveNewPortfolio() { if(checkAccessAndDeny('portfolio')) return;
+        function saveNewPortfolio() { if(checkWritePermissions('portfolio')) return;
             const name = document.getElementById('p-name').value; const img = document.getElementById('p-img').value; const link = document.getElementById('p-link').value; const status = document.getElementById('p-status').checked; const customId = document.getElementById('p-doc-id').value;
             if(!name || !img || !link) return showToast("Please fill in all fields.", "error");
-            db.collection("clients_portfolio").doc(customId).set({ name, img, link, status, timestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { closeModal(); showToast("Project added successfully", "success"); logActivity(`Added portfolio project: ${name} (ID: ${customId})`); }).catch(err => { showToast("Error: " + err.message, "error"); });
+            const data = { name, img, link, status, timestamp: firebase.firestore.FieldValue.serverTimestamp() };
+            db.collection("clients_portfolio").doc(customId).set(data).then(() => { closeModal(); showToast("Project added successfully", "success"); logActivity(`Added portfolio project: ${name}`); }).catch(err => { showToast("Error: " + err.message, "error"); });
         }
-        function editPortfolio(docId) { if(checkAccessAndDeny('portfolio')) return;
+        function editPortfolio(docId) { if(checkWritePermissions('portfolio')) return;
             db.collection("clients_portfolio").doc(docId).get().then(doc => {
                 const p = doc.data();
                 showModal("Edit Project", `
@@ -2334,20 +2451,17 @@ Thank you for choosing DDNetwork.
                 `, `<button class="btn btn-primary" onclick="updatePortfolio('${docId}')">Save Changes</button>`);
             });
         }
-        function updatePortfolio(docId) { if(checkAccessAndDeny('portfolio')) return;
+        function updatePortfolio(docId) { if(checkWritePermissions('portfolio')) return;
             const updates = { name: document.getElementById('e-p-name').value, img: document.getElementById('e-p-img').value, link: document.getElementById('e-p-link').value, status: document.getElementById('e-p-status').checked };
-            db.collection("clients_portfolio").doc(docId).update(updates).then(() => { closeModal(); showToast("Project updated", "success"); logActivity(`Updated portfolio project: ${updates.name}`); }).catch(err => { showToast("Error updating: " + err.message, "error"); });
+            safeUpdate("clients_portfolio", docId, updates, "update", "Project Updated");
         }
-        function togglePortfolioStatus(docId, newStatus) { if(checkAccessAndDeny('portfolio')) return;
-            const action = newStatus ? "Activated" : "Deactivated";
-            db.collection("clients_portfolio").doc(docId).update({ status: newStatus }).then(() => { showToast(`Project ${action}`, "info"); logActivity(`${action} portfolio project`); });
+        function togglePortfolioStatus(docId, newStatus) { if(checkWritePermissions('portfolio')) return;
+            safeUpdate("clients_portfolio", docId, { status: newStatus }, "update", `Project ${newStatus ? 'Activated' : 'Deactivated'}`);
         }
-        function deletePortfolio(docId) { if(checkAccessAndDeny('portfolio')) return; if(!confirm("Are you sure you want to delete this project? This cannot be undone.")) return; db.collection("clients_portfolio").doc(docId).delete().then(() => { showToast("Project deleted", "success"); logActivity(`Deleted portfolio project`); }).catch(err => { showToast("Error deleting: " + err.message, "error"); }); }
 
         // --- 10. PROFILE ---
         function renderMyProfile() {
-            // Crew Read Only
-            const canEdit = canWrite('profile');
+            const canEdit = hasPermission('profile');
             document.getElementById('main').innerHTML = `
                 <div class="p-4" style="background:var(--bg-surface); border:1px solid var(--border); border-radius:12px; max-width:500px; margin:0 auto;">
                     <div class="flex items-center gap-4 mb-6">
@@ -2372,7 +2486,7 @@ Thank you for choosing DDNetwork.
 
         // --- 11. CUSTOMER REQUESTS ---
         function renderRequests() {
-            const canEdit = canWrite('requests');
+            const canEdit = hasPermission('requests');
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:700;">Customer Requests</h2>
@@ -2402,7 +2516,7 @@ Thank you for choosing DDNetwork.
                     let actions = `<button class="btn btn-sm btn-secondary" onclick="viewRequestDetails('${doc.id}')">View</button>`;
                     if (canEdit) {
                         actions += `<button class="btn btn-sm btn-success" onclick="updateRequestStatus('${doc.id}', 'Completed')">Done</button>`;
-                        actions += `<button class="btn btn-sm btn-danger" onclick="deleteItem('request','${doc.id}')"><i class="ri-delete-bin-line"></i></button>`;
+                        actions += `<button class="btn btn-sm btn-danger" onclick="safeUpdate('customer_requests', '${doc.id}', {}, 'delete', 'Request Deleted')"><i class="ri-delete-bin-line"></i></button>`;
                     }
 
                     return `<tr>
@@ -2417,7 +2531,7 @@ Thank you for choosing DDNetwork.
             });
         }
         function viewRequestDetails(id) {
-            if(checkAccessAndDeny('requests')) return;
+            if(checkWritePermissions('requests')) return;
             db.collection("customer_requests").doc(id).get().then(doc => {
                 const d = doc.data();
                 const type = d.type;
@@ -2437,26 +2551,16 @@ Thank you for choosing DDNetwork.
             });
         }
         function updateRequestStatus(id, newStatus = null, fromModal = false) {
-            if(checkAccessAndDeny('requests')) return;
+            if(checkWritePermissions('requests')) return;
             const statusToSet = newStatus || document.getElementById('req-status-select').value;
-            db.collection("customer_requests").doc(id).update({ status: statusToSet }).then(() => {
-                if(fromModal) closeModal();
-                showToast("Request Status Updated", "success");
-                logActivity(`Updated request status to ${statusToSet}`);
-            }).catch(err => { showToast("Error updating: " + err.message, "error"); });
-        }
-        function deleteItem(collection, id) {
-            // This is generic, but let's check permission based on context if possible.
-            // For now, rely on specific checks in calling functions or a generic 'system' check.
-            // Deleting items usually requires higher access. Let's assume Admin/SuperAdmin for generic delete unless specific override.
-            if(!isAdmin()) return showToast("Access Denied", "error");
-            if(!confirm("Delete this item permanently?")) return;
-            db.collection(collection).doc(id).delete().then(() => { showToast("Item deleted", "success"); logActivity(`Deleted item from ${collection}`); });
+            safeUpdate("customer_requests", id, { status: statusToSet }, "update", "Status Updated").then(()=>{
+                 if(fromModal) closeModal();
+            });
         }
 
         // --- 12. PUBLIC PROMO CODES ---
         function renderPublicPromos() {
-            const canEdit = canWrite('promos');
+            const canEdit = hasPermission('promos');
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:700;">Public Promo Codes</h2>
@@ -2479,7 +2583,7 @@ Thank you for choosing DDNetwork.
                     const discountPercent = (data.discount * 100) + '%';
                     let actions = '';
                     if (canEdit) {
-                        actions = `<button class="btn btn-sm btn-danger" onclick="deletePublicPromo('${code}')"><i class="ri-delete-bin-line"></i> Delete</button>`;
+                        actions = `<button class="btn btn-sm btn-danger" onclick="safeUpdate('promo_codes', '${code}', {}, 'delete', 'Code Deleted')"><i class="ri-delete-bin-line"></i> Delete</button>`;
                     }
                     return `<tr>
                         <td class="font-mono" style="color:var(--warning); font-weight:700;">${code}</td>
@@ -2489,20 +2593,18 @@ Thank you for choosing DDNetwork.
                 }).join('');
             });
         }
-        function addPublicPromo() { if(checkAccessAndDeny('promos')) return;
+        function addPublicPromo() { if(checkWritePermissions('promos')) return;
             showModal("Add Public Promo Code", `<div class="mb-4"><label>Promo Code (ID)</label><input type="text" id="pub-promo-code" placeholder="e.g. WELCOME10" style="text-transform:uppercase;"><small class="text-muted">Users will enter this exact code.</small></div><div class="mb-4"><label>Discount Percentage</label><input type="number" id="pub-promo-discount" placeholder="0.1 for 10%"><small class="text-muted">Decimal (e.g., 0.10 = 10%)</small></div>`, `<button class="btn btn-primary" onclick="savePublicPromo()">Create Code</button>`);
         }
-        async function savePublicPromo() { if(checkAccessAndDeny('promos')) return;
+        async function savePublicPromo() { if(checkWritePermissions('promos')) return;
             const code = document.getElementById('pub-promo-code').value.trim().toUpperCase(); const discount = parseFloat(document.getElementById('pub-promo-discount').value);
             if(!code || isNaN(discount)) return showToast("Invalid Input", "error");
             try { await db.collection("promo_codes").doc(code).set({ discount: discount }); closeModal(); showToast("Promo Code Created", "success"); logActivity(`Created public promo code: ${code}`); } catch(e) { showToast("Error: " + e.message, "error"); }
         }
-        async function deletePublicPromo(code) { if(checkAccessAndDeny('promos')) return; if(!confirm(`Delete promo code ${code}?`)) return; try { await db.collection("promo_codes").doc(code).delete(); showToast("Promo Code Deleted", "success"); logActivity(`Deleted public promo code: ${code}`); } catch(e) { showToast("Error deleting: " + e.message, "error"); } }
 
         // --- 13. COMMISSIONS ---
         async function renderCommissions() {
-            // Crew Read Only
-            const canEdit = canWrite('commissions');
+            const canEdit = hasPermission('finance');
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:700;">My Commissions</h2>
@@ -2514,14 +2616,14 @@ Thank you for choosing DDNetwork.
                 <div class="table-container">
                     <div class="table-header">
                         <h3>Payout Ledger (Paid Orders Only)</h3>
-                        ${isSuperAdmin() ? '<small class="text-muted">Admin View: Seeing all commissions.</small>' : '<small class="text-muted">Viewing your assigned sales only.</small>'}
+                        ${isFounder() ? '<small class="text-muted">Founder View: 5% of ALL Revenue</small>' : '<small class="text-muted">Viewing your assigned sales only.</small>'}
                     </div>
                     <div class="table-responsive">
                         <table><thead><tr><th>Order Ref</th><th>Package</th><th>Amount</th><th>Type</th><th>My Cut</th></tr></thead><tbody id="comm-tbody"><tr><td colspan="5" class="text-center"><div class="loading-spinner"></div></td></tr></tbody></table>
                     </div>
                 </div>
             `;
-            const isFounder = userData.jobTitle && userData.jobTitle.includes("Founder");
+            const isFounderUser = isFounder();
             const myUid = currentUser.uid;
             const ordersSnap = await db.collection("orders").where("status", "==", "Paid").get();
             const ordersList = ordersSnap.docs.map(d => ({id: d.id, ...d.data()}));
@@ -2531,11 +2633,10 @@ Thank you for choosing DDNetwork.
                 let commission = 0;
                 const amount = parseFloat(order.total.replace('RM ', '')) || 0;
                 const cycle = (order.billingCycle || 'One-Time').toLowerCase();
-                if (isFounder) {
+                if (isFounderUser) {
                     commission = amount * 0.05;
                     commDetails.push({ ref: order.id.substring(0,6), pkg: order.package, amt: amount, cycle: cycle, comm: commission });
                 } else {
-                    // Check if my ID is in the new array OR the old single ID field
                     const reps = order.salesRepIds || [];
                     const oldRep = order.salesRepId;
                     if(reps.includes(myUid) || oldRep === myUid) {
@@ -2561,7 +2662,7 @@ Thank you for choosing DDNetwork.
                         <div class="stat-label">Eligible Transactions</div>
                     </div>
                 </div>
-                ${isFounder ? `
+                ${isFounderUser ? `
                 <div class="stat-card">
                     <div class="stat-icon" style="color:var(--warning); background:var(--warning)15"><i class="ri-vip-crown-line"></i></div>
                     <div class="stat-info">
@@ -2592,6 +2693,165 @@ Thank you for choosing DDNetwork.
                 `).join('');
             }
         }
+
+        // --- 14. FOUNDER TOOLS: PERMISSIONS ---
+        function renderFounderPermissions() {
+            if(!isFounder() && !isSuperAdmin()) return;
+            
+            document.getElementById('main').innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h2 style="font-size:1.25rem; font-weight:700;">Manage User Permissions</h2>
+                </div>
+                <div class="config-section">
+                    <div class="mb-4">
+                        <label>Select Employee</label>
+                        <select id="perm-user-select" onchange="loadUserPermissions()">
+                            <option value="">-- Choose Employee --</option>
+                        </select>
+                    </div>
+                    <div id="perm-editor" class="hidden">
+                        <h4 class="mb-4" style="color:white;">Granular Access Control</h4>
+                        <div class="perm-grid" id="perm-toggles"></div>
+                        <div class="mt-4">
+                             <button class="btn btn-primary" onclick="saveUserPermissions()">Update Permissions</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Populate Users
+            db.collection("users").where("role", "in", ["admin", "crew"]).get().then(snap => {
+                const sel = document.getElementById('perm-user-select');
+                snap.forEach(doc => {
+                    const u = doc.data();
+                    const opt = document.createElement('option');
+                    opt.value = doc.id;
+                    opt.innerText = `${u.name} (${u.jobTitle})`;
+                    sel.appendChild(opt);
+                });
+            });
+        }
+
+        function loadUserPermissions() {
+            const uid = document.getElementById('perm-user-select').value;
+            const container = document.getElementById('perm-editor');
+            const grid = document.getElementById('perm-toggles');
+            
+            if(!uid) { container.classList.add('hidden'); return; }
+            container.classList.remove('hidden');
+            
+            db.collection("users").doc(uid).get().then(doc => {
+                const u = doc.data();
+                const currentPerms = u.permissions || {};
+                
+                grid.innerHTML = Object.keys(PERMISSIONS).map(key => {
+                    const label = PERMISSIONS[key];
+                    const isChecked = currentPerms[key] === true ? 'checked' : '';
+                    return `
+                    <div class="perm-card">
+                        <span>${label}</span>
+                        <label class="toggle-switch" style="transform:scale(0.8);">
+                            <input type="checkbox" class="perm-checkbox" value="${key}" ${isChecked}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>`;
+                }).join('');
+            });
+        }
+
+        function saveUserPermissions() {
+            if(!isFounder() && !isSuperAdmin()) return;
+            const uid = document.getElementById('perm-user-select').value;
+            const checkboxes = document.querySelectorAll('.perm-checkbox:checked');
+            const newPerms = {};
+            
+            checkboxes.forEach(cb => {
+                newPerms[cb.value] = true;
+            });
+
+            safeUpdate("users", uid, { permissions: newPerms }, "update", "Permissions Updated");
+        }
+
+        // --- 15. FOUNDER TOOLS: APPROVALS ---
+        function renderApprovals() {
+            if(!isFounder() && !isSuperAdmin()) return;
+
+            document.getElementById('main').innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h2 style="font-size:1.25rem; font-weight:700;">Pending Approvals</h2>
+                    <button class="btn btn-secondary" onclick="renderApprovals()"><i class="ri-refresh-line"></i> Refresh</button>
+                </div>
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table><thead><tr><th>Time</th><th>Requested By</th><th>Action</th><th>Target</th><th>Status</th><th>Actions</th></tr></thead><tbody id="approvals-tbody"><tr><td colspan="6" class="text-center"><div class="loading-spinner"></div></td></tr></tbody></table>
+                    </div>
+                </div>
+            `;
+            
+            db.collection("approval_requests").orderBy("createdAt", "desc").limit(50).onSnapshot(snap => {
+                const tbody = document.getElementById('approvals-tbody');
+                if(!tbody) return;
+                if(snap.empty) { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No pending approvals.</td></tr>'; return; }
+                
+                tbody.innerHTML = snap.docs.map(doc => {
+                    const r = doc.data();
+                    const isPending = r.status === 'pending';
+                    const statusBadge = isPending ? '<span class="badge" style="background:var(--warning)15; color:var(--warning)">Pending</span>' : '<span class="badge" style="background:var(--success)15; color:var(--success)">Processed</span>';
+                    
+                    let summary = '';
+                    if(r.actionType === 'delete') summary = `<span class="text-danger">Delete Item</span>`;
+                    else summary = `<span class="text-success">Update Item</span>`;
+                    
+                    let actions = '';
+                    if(isPending) {
+                        actions = `
+                            <button class="btn btn-sm btn-success" onclick="processApproval('${doc.id}', true)"><i class="ri-check-line"></i> Approve</button>
+                            <button class="btn btn-sm btn-danger" onclick="processApproval('${doc.id}', false)"><i class="ri-close-line"></i> Reject</button>
+                        `;
+                    } else {
+                        actions = `<small class="text-muted">Completed</small>`;
+                    }
+
+                    return `<tr>
+                        <td style="white-space:nowrap;">${formatDateTime(r.createdAt)}</td>
+                        <td><strong>${r.requestedByName}</strong><br><small>${r.requestedByEmail}</small></td>
+                        <td>${summary}</td>
+                        <td class="font-mono text-muted" style="font-size:0.75rem;">${r.targetCollection}/${r.targetDocId.substring(0,6)}</td>
+                        <td>${statusBadge}</td>
+                        <td>${actions}</td>
+                    </tr>`;
+                }).join('');
+            });
+        }
+
+        async function processApproval(reqId, approved) {
+            if(!isSuperAdmin() && !isFounder()) return;
+            
+            const reqDoc = await db.collection("approval_requests").doc(reqId).get();
+            if(!reqDoc.exists) return;
+            const r = reqDoc.data();
+
+            // Update Request Status first to prevent double processing
+            await db.collection("approval_requests").doc(reqId).update({ status: approved ? 'approved' : 'rejected', processedBy: userData.name, processedAt: firebase.firestore.FieldValue.serverTimestamp() });
+
+            if(approved) {
+                try {
+                    if(r.actionType === 'delete') {
+                        await db.collection(r.targetCollection).doc(r.targetDocId).delete();
+                    } else {
+                        await db.collection(r.targetCollection).doc(r.targetDocId).update(r.proposedData);
+                    }
+                    showToast("Action Approved & Executed", "success");
+                    logActivity(`Approved request by ${r.requestedByName} on ${r.targetCollection}`);
+                } catch(e) {
+                    showToast("Error executing approval: " + e.message, "error");
+                }
+            } else {
+                showToast("Action Rejected", "info");
+                logActivity(`Rejected request by ${r.requestedByName}`);
+            }
+        }
+
     </script>
 </body>
 </html>
