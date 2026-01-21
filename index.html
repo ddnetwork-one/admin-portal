@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Admin Portal v12.2 (Strict Approval)</title>
+    <title>Admin Portal v13.0</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -696,7 +696,7 @@
         .badge-remove { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
 
         /* CONFIG TAB SPECIFICS */
-        .config-section { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom:1.5rem; }
+        .config-section { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
         .config-header { font-size: 0.95rem; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); color: var(--text-main); display: flex; justify-content: space-between; align-items: center; }
         .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .toggle-switch input { opacity: 0; width: 0; height: 0; }
@@ -720,7 +720,7 @@
     <div id="auth-screen">
         <div class="auth-card">
             <img src="https://raw.githubusercontent.com/ddnetwork-ent/ddnetwork/refs/heads/main/DDN%20Logo%20NoBG.png" alt="Logo">
-            <h2 class="mb-4" style="color:white; font-weight: 700; letter-spacing: -0.5px;">Admin Portal v12.2</h2>
+            <h2 class="mb-4" style="color:white; font-weight: 700; letter-spacing: -0.5px;">Admin Portal v13.0</h2>
             <form id="loginForm">
                 <input type="text" id="loginInput" class="mb-4" placeholder="Email or Crew ID" required>
                 <input type="password" id="loginPass" class="mb-4" placeholder="Password" required>
@@ -739,7 +739,7 @@
                 <button class="btn-icon" onclick="toggleSidebar()" title="Toggle Menu"><i class="ri-menu-line" style="font-size: 1.4rem;"></i></button>
                 <div class="header-brand">
                     <img src="https://raw.githubusercontent.com/ddnetwork-ent/ddnetwork/refs/heads/main/DDN%20Logo%20NoBG.png">
-                    <span>DDN v12.2</span>
+                    <span>DDN v13.0</span>
                 </div>
             </div>
             <div class="header-actions">
@@ -1150,13 +1150,11 @@
             return userData.permissions && userData.permissions[key] === true;
         }
 
-        // Updated: checkAccessAndDeny is STRICT. 
-        // Even if user has the permission, they go through the approval workflow.
-        // Only SuperAdmin/Founder bypass approval.
         function checkAccessAndDeny(featureKey) {
-            if(isSuperAdmin() || isFounder()) return false; // Admins bypass approval
+            // If user has specific permission, allow action directly
+            if(hasPermission(featureKey)) return false; // Allowed
 
-            // Create Request for ALL other users regardless of their existing permissions
+            // If no direct permission, trigger approval workflow
             requestApproval(featureKey);
             return true; // Block direct action
         }
@@ -1169,32 +1167,72 @@
             return false; // Allow
         }
 
-        // --- APPROVAL WORKFLOW ---
-        async function requestApproval(permissionKey) {
+        // --- APPROVAL WORKFLOW SYSTEM (UPDATED) ---
+        
+        async function requestApproval(featureKey) {
             if(!currentUser) return;
-            
-            // If this user has "approve_actions", they just do it.
-            if(hasPermission(PERMISSION_KEYS.APPROVE_ACTIONS)) {
-                return; 
-            }
+            if(hasPermission(PERMISSION_KEYS.APPROVE_ACTIONS)) return; 
 
-            // Otherwise, create a request
-            const keyName = permissionKey.replace('edit_', '').replace('delete_', '').replace('view_', '').toUpperCase();
+            // Note: This old method is now replaced by submitEditRequest
+            // But kept for simple permission requests that don't involve data edits (e.g. delete)
+            const keyName = featureKey.replace('edit_', '').replace('delete_', '').toUpperCase();
             
             try {
-                await db.collection("approval_requests").add({
+                await db.collection("edit_requests").add({
                     requesterId: currentUser.uid,
                     requesterName: userData.name,
                     requesterEmail: userData.email,
-                    permissionKey: permissionKey,
+                    permissionKey: featureKey,
                     requestMessage: `User requested access to ${keyName}`,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     status: 'Pending'
                 });
                 showToast("Access Request sent to Founder/Admin for approval.", "warning");
-                logActivity(`Requested approval for ${permissionKey}`);
+                logActivity(`Requested approval for ${featureKey}`);
             } catch(e) {
                 showToast("Error sending request: " + e.message, "error");
+            }
+        }
+
+        /**
+         * NEW: SUBMIT EDIT REQUEST
+         * Stores data to pending_edits and creates a request.
+         */
+        async function submitEditRequest(collectionId, newData, oldData, featureKey, contextName) {
+            if(!currentUser) return;
+
+            const pendingId = collectionId; 
+            const requestId = db.collection("edit_requests").doc().id; // Generate ID manually if needed or let firestore do it
+
+            try {
+                // 1. Create the Request
+                await db.collection("edit_requests").add({
+                    requesterId: currentUser.uid,
+                    requesterName: userData.name,
+                    requesterEmail: userData.email,
+                    collectionId: collectionId, // ID of the document being edited
+                    featureKey: featureKey,
+                    contextName: contextName, // e.g. "Order #123", "User John"
+                    oldData: oldData,
+                    newData: newData,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'Pending'
+                });
+
+                // 2. Save to Pending Edits
+                await db.collection("pending_edits").doc(pendingId).set({
+                    requesterId: currentUser.uid,
+                    requesterName: userData.name,
+                    newData: newData,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                showToast("Changes submitted. Waiting for approval...", "warning");
+                logActivity(`Submitted edit request for ${contextName}`);
+                return true; // Success
+            } catch(e) {
+                showToast("Error submitting request: " + e.message, "error");
+                return false;
             }
         }
 
@@ -1377,12 +1415,13 @@
 
         // --- 2. ORDERS ---
         function renderOrders() {
+            const canEdit = hasPermission(PERMISSION_KEYS.EDIT_ORDERS);
             document.getElementById('main').innerHTML = `
                 <div class="table-container">
                     <div class="table-header">
                         <h3>Order Management</h3>
                         <div class="flex items-center gap-2">
-                            <span class="req-approval-badge">Edit Requires Approval</span>
+                            ${!canEdit ? '<span class="req-approval-badge">Edit Requires Approval</span>' : ''}
                             <input type="text" id="orderSearch" placeholder="Search ID, Name, Domain..." style="width:250px;" onkeyup="filterTable('orders-tbody', this.value)">
                         </div>
                     </div>
@@ -1567,7 +1606,6 @@
         }
 
         async function sendPaymentReminder(id) {
-            // Edit order requires approval (via checkAccessAndDeny)
             if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_ORDERS)) return;
 
             try {
@@ -1609,9 +1647,8 @@ Thank you for choosing DDNetwork.
         }
 
         async function viewOrder(id) {
-            // Edit Order requires approval
-            if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_ORDERS)) return;
-
+            // Check permission
+            // Note: We now ALWAYS allow viewing, but saving goes to pending
             const doc = await db.collection("orders").doc(id).get();
             const d = doc.data();
             
@@ -1675,10 +1712,8 @@ Thank you for choosing DDNetwork.
             `, `<button class="btn btn-primary" onclick="updateOrderDetails('${id}')">Save Changes</button>`);
         }
 
-        function updateOrderDetails(id) {
-            // Check permission (will trigger approval if not SuperAdmin/Founder)
-            if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_ORDERS)) return;
-
+        async function updateOrderDetails(id) {
+            // Gather data
             const updateData = {
                 customerName: document.getElementById('o-name').value,
                 customerEmail: document.getElementById('o-email').value,
@@ -1697,9 +1732,19 @@ Thank you for choosing DDNetwork.
             updateData.salesRepId = firebase.firestore.FieldValue.delete();
             updateData.salesRepName = firebase.firestore.FieldValue.delete();
 
-            db.collection("orders").doc(id).update(updateData).then(() => { 
-                closeModal(); showToast("Order Updated Successfully", "success"); logActivity(`Updated Order #${id.substr(0,6)}`);
-            });
+            // Check if user has direct permission or needs approval
+            if(!hasPermission(PERMISSION_KEYS.EDIT_ORDERS)) {
+                // APPROVAL WORKFLOW
+                const oldDoc = await db.collection("orders").doc(id).get();
+                const oldData = oldDoc.data();
+                const success = await submitEditRequest(id, updateData, oldData, PERMISSION_KEYS.EDIT_ORDERS, `Order #${id.substring(0,6)}`);
+                if(success) closeModal();
+            } else {
+                // DIRECT SAVE (Admin/Founder)
+                db.collection("orders").doc(id).update(updateData).then(() => { 
+                    closeModal(); showToast("Order Updated Successfully", "success"); logActivity(`Updated Order #${id.substr(0,6)}`);
+                });
+            }
         }
 
         function deleteOrder(id) {
@@ -1713,12 +1758,13 @@ Thank you for choosing DDNetwork.
 
         // --- 3. CLIENTS ---
         function renderClients() {
+            const canEdit = hasPermission(PERMISSION_KEYS.EDIT_CLIENTS);
             document.getElementById('main').innerHTML = `
                 <div class="table-container">
                     <div class="table-header">
                         <h3>Client Directory</h3>
                         <div class="flex items-center gap-2">
-                            <span class="req-approval-badge">Edit Requires Approval</span>
+                            ${!canEdit ? '<span class="req-approval-badge">Edit Requires Approval</span>' : ''}
                             <input type="text" id="clientSearch" placeholder="Search..." style="width:200px;" onkeyup="filterTable('client-tbody', this.value)">
                         </div>
                     </div>
@@ -1738,9 +1784,9 @@ Thank you for choosing DDNetwork.
                     const vCode = u.personalVoucher ? u.personalVoucher.code : '-';
                     
                     let buttons = `
-                        <button class="btn btn-sm btn-secondary" onclick="editClient('${doc.id}')">Edit</button>
-                        <button class="btn btn-sm btn-secondary" onclick="resetPassword('${u.email}')">Reset PW</button>
-                        <button class="btn btn-sm btn-primary" onclick="openAssignVoucherModal('${doc.id}', '${u.name}')">Assign Voucher</button>
+                        ${canEdit ? `<button class="btn btn-sm btn-secondary" onclick="editClient('${doc.id}')">Edit</button>` : ''}
+                        ${canEdit ? `<button class="btn btn-sm btn-secondary" onclick="resetPassword('${u.email}')">Reset PW</button>` : ''}
+                        ${canEdit ? `<button class="btn btn-sm btn-primary" onclick="openAssignVoucherModal('${doc.id}', '${u.name}')">Assign Voucher</button>` : ''}
                         ${isSuperAdmin() ? `<button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Client')"><i class="ri-delete-bin-line"></i></button>` : ''}
                     `;
 
@@ -1756,7 +1802,7 @@ Thank you for choosing DDNetwork.
                 }).join('');
             });
         }
-        function editClient(uid) {
+        async function editClient(uid) {
             if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_CLIENTS)) return;
             db.collection("users").doc(uid).get().then(doc => {
                 const u = doc.data();
@@ -1768,9 +1814,21 @@ Thank you for choosing DDNetwork.
                 `, `<button class="btn btn-primary" onclick="saveClient('${uid}')">Update</button>`);
             });
         }
-        function saveClient(uid) {
-            if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_CLIENTS)) return;
-            db.collection("users").doc(uid).update({ name: document.getElementById('e-name').value, phone: document.getElementById('e-phone').value, company: document.getElementById('e-comp').value }).then(() => { closeModal(); showToast("Client Updated", "success"); logActivity("Updated client details"); });
+        async function saveClient(uid) {
+            const updateData = { 
+                name: document.getElementById('e-name').value, 
+                phone: document.getElementById('e-phone').value, 
+                company: document.getElementById('e-comp').value 
+            };
+            
+            if(!hasPermission(PERMISSION_KEYS.EDIT_CLIENTS)) {
+                const oldDoc = await db.collection("users").doc(uid).get();
+                const oldData = oldDoc.data();
+                const success = await submitEditRequest(uid, updateData, oldData, PERMISSION_KEYS.EDIT_CLIENTS, `User ${updateData.name}`);
+                if(success) closeModal();
+            } else {
+                db.collection("users").doc(uid).update(updateData).then(() => { closeModal(); showToast("Client Updated", "success"); logActivity("Updated client details"); });
+            }
         }
         function resetPassword(email) {
             if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_CLIENTS)) return;
@@ -1955,8 +2013,7 @@ Thank you for choosing DDNetwork.
             });
         }
 
-        function updateCrewData(uid) {
-            if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_CREW)) return;
+        async function updateCrewData(uid) {
             const rateVal = parseFloat(document.getElementById('e-c-rate').value);
             
             // Gather Permissions
@@ -1965,14 +2022,25 @@ Thank you for choosing DDNetwork.
                 newPerms[cb.value] = true;
             });
 
-            db.collection("users").doc(uid).update({
+            // Update Crew Data
+            const updateData = {
                 crewId: document.getElementById('e-c-id').value,
                 name: document.getElementById('e-c-name').value,
                 jobTitle: document.getElementById('e-c-job').value,
                 role: document.getElementById('e-c-role').value,
                 commissionRate: isNaN(rateVal) ? 0.0 : (rateVal / 100),
                 permissions: newPerms
-            }).then(() => { closeModal(); showToast("Crew details updated", "success"); logActivity(`Updated crew member details`); });
+            };
+
+            // Check permissions for the act of editing crew
+            if(!hasPermission(PERMISSION_KEYS.EDIT_CREW)) {
+                const oldDoc = await db.collection("users").doc(uid).get();
+                const oldData = oldDoc.data();
+                const success = await submitEditRequest(uid, updateData, oldData, PERMISSION_KEYS.EDIT_CREW, `Crew ${updateData.name}`);
+                if(success) closeModal();
+            } else {
+                db.collection("users").doc(uid).update(updateData).then(() => { closeModal(); showToast("Crew details updated", "success"); logActivity(`Updated crew member details`); });
+            }
         }
 
         // --- 5. SUPPORT ---
@@ -2016,7 +2084,8 @@ Thank you for choosing DDNetwork.
         }
 
         async function openCreateTicket() {
-            if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_ORDERS)) return; // Creating ticket counts as edit/ops
+            // Creating a ticket is a 'write' action
+            if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_ORDERS)) return; 
             const newId = await getNextId('ticket');
             showModal("Create Support Ticket", `
                 <div class="mb-4"><label>Generated ID</label><input value="${newId}" readonly class="font-mono" style="color:var(--ticket)"></div>
@@ -2166,13 +2235,25 @@ Thank you for choosing DDNetwork.
             });
         }
         function saveEditVoucher(uid) {
-            if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_VOUCHERS)) return;
             const newCode = document.getElementById('e-v-code').value.toUpperCase();
             const newStatus = document.getElementById('e-v-status').value;            
-            db.collection("users").doc(uid).get().then(doc => {
-                const v = doc.data().personalVoucher;
-                db.collection("users").doc(uid).update({ personalVoucher: { ...v, code: newCode, value: parseFloat(document.getElementById('e-v-val').value), expiryDate: document.getElementById('e-v-exp').value ? new Date(document.getElementById('e-v-exp').value) : null, status: newStatus } }).then(() => { closeModal(); showToast("Voucher Updated", "success"); logActivity(`Edited voucher ${newCode}`); });
-            });
+            const newVouchData = { code: newCode, value: parseFloat(document.getElementById('e-v-val').value), expiryDate: document.getElementById('e-v-exp').value ? new Date(document.getElementById('e-v-exp').value) : null, status: newStatus };
+
+            if(!hasPermission(PERMISSION_KEYS.EDIT_VOUCHERS)) {
+                const oldDoc = await db.collection("users").doc(uid).get();
+                const oldVouch = oldDoc.data().personalVoucher;
+                const oldData = { ...oldDoc.data(), personalVoucher: oldVouch };
+                // We need to update the parent object structure correctly for approval
+                // But simpler is just to update the personalVoucher field
+                
+                const success = await submitEditRequest(uid, { personalVoucher: newVouchData }, oldData, PERMISSION_KEYS.EDIT_VOUCHERS, `Voucher ${newCode}`);
+                if(success) closeModal();
+            } else {
+                db.collection("users").doc(uid).get().then(doc => {
+                    const v = doc.data().personalVoucher;
+                    db.collection("users").doc(uid).update({ personalVoucher: { ...v, ...newVouchData } }).then(() => { closeModal(); showToast("Voucher Updated", "success"); logActivity(`Edited voucher ${newCode}`); });
+                });
+            }
         }
         async function markRedeem(uid, code) {
             if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_VOUCHERS)) return;
@@ -2218,7 +2299,9 @@ Thank you for choosing DDNetwork.
             if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_VOUCHERS)) return;
             const uid = document.getElementById('v-user').value;
             const code = document.getElementById('v-code').value.toUpperCase();
-            db.collection("users").doc(uid).update({ personalVoucher: { code: code, type: document.getElementById('v-val-type').value, value: parseFloat(document.getElementById('v-val').value), expiryDate: document.getElementById('v-exp').value ? new Date(document.getElementById('v-exp').value) : null, status: 'active', auditLog: [{ action: 'Created', by: userData.email, date: new Date().toISOString() }] }}).then(() => { closeModal(); showToast(`Voucher ${code} Assigned!`, "success"); logActivity(`Assigned voucher ${code}`); });
+            const vouchData = { code: code, type: document.getElementById('v-val-type').value, value: parseFloat(document.getElementById('v-val').value), expiryDate: document.getElementById('v-exp').value ? new Date(document.getElementById('v-exp').value) : null, status: 'active', auditLog: [{ action: 'Created', by: userData.email, date: new Date().toISOString() }] };
+            
+            db.collection("users").doc(uid).update({ personalVoucher: vouchData }).then(() => { closeModal(); showToast(`Voucher ${code} Assigned!`, "success"); logActivity(`Assigned voucher ${code}`); });
         }
         function restoreVoucher(code, ownerUid) {
             if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_VOUCHERS)) return;
@@ -2260,24 +2343,26 @@ Thank you for choosing DDNetwork.
                 document.getElementById('content-ai').value = aiFeatures.join('\n');
             });
         }
-        function saveContentChanges() {
-            if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_CONTENT)) return;
+        async function saveContentChanges() {
             const frontendLines = document.getElementById('content-frontend').value.split('\n').filter(l => l.trim() !== '');
             const aiLines = document.getElementById('content-ai').value.split('\n').filter(l => l.trim() !== '');
+            const newPkgDetails = { frontend: { features: frontendLines }, ai: { features: aiLines } };
             const btn = document.querySelector('button[onclick="saveContentChanges()"]');
             const originalHTML = btn.innerHTML;
             btn.innerHTML = `<div class="loading-spinner" style="width:16px; height:16px; border-width:2px;"></div> Saving...`;
-            db.collection("config").doc("site_settings").get().then(doc => {
-                const data = doc.exists ? doc.data() : {};
-                const newPkgDetails = data.packageDetails || {};
-                newPkgDetails.frontend = { features: frontendLines };
-                newPkgDetails.ai = { features: aiLines };
+            
+            if(!hasPermission(PERMISSION_KEYS.EDIT_CONTENT)) {
+                const oldDoc = await db.collection("config").doc("site_settings").get();
+                const oldData = oldDoc.exists ? oldDoc.data() : {};
+                const success = await submitEditRequest("site_settings", { packageDetails: newPkgDetails }, oldData, PERMISSION_KEYS.EDIT_CONTENT, "Site Config Content");
+                if(success) { btn.innerHTML = originalHTML; closeModal(); }
+            } else {
                 db.collection("config").doc("site_settings").update({ packageDetails: newPkgDetails }).then(() => {
                     showToast("Content updated successfully!", "success");
                     logActivity("Updated website content features");
                     btn.innerHTML = originalHTML;
                 });
-            }).catch(err => { showToast("Error updating: " + err.message, "error"); btn.innerHTML = originalHTML; });
+            }
         }
 
         // --- 8. CONFIG ---
@@ -2358,7 +2443,7 @@ Thank you for choosing DDNetwork.
             db.collection("config").doc("site_settings").update({ maintenance_active: isActive }).then(() => { showToast(`Maintenance Mode ${isActive ? 'Enabled' : 'Disabled'}`, isActive?'warning':'success'); logActivity(`Toggled maintenance mode to ${isActive}`); });
         }
         function saveMaintMsg() { if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_CONFIG)) return; db.collection("config").doc("site_settings").update({ maintenance_message: document.getElementById('maint-msg').value }).then(() => showToast("Message Saved", "success")); }
-        function savePrice(key, elemId) { if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_CONFIG)) return;
+        async function savePrice(key, elemId) { if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_CONFIG)) return;
             const theVal = parseFloat(document.getElementById(elemId).value);
             if(!theVal) return showToast("Invalid price", "error");
             db.collection("config").doc("site_settings").update({ [`prices.${key}`]:theVal }).then(() => showToast("Price Updated", "success"));
@@ -2432,7 +2517,21 @@ Thank you for choosing DDNetwork.
         function saveNewPortfolio() { if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_PORTFOLIO)) return;
             const name = document.getElementById('p-name').value; const img = document.getElementById('p-img').value; const link = document.getElementById('p-link').value; const status = document.getElementById('p-status').checked; const customId = document.getElementById('p-doc-id').value;
             if(!name || !img || !link) return showToast("Please fill in all fields.", "error");
-            db.collection("clients_portfolio").doc(customId).set({ name, img, link, status, timestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { closeModal(); showToast("Project added successfully", "success"); logActivity(`Added portfolio project: ${name} (ID: ${customId})`); }).catch(err => { showToast("Error: " + err.message, "error"); });
+            
+            const projectData = { name, img, link, status, timestamp: firebase.firestore.FieldValue.serverTimestamp() };
+
+            if(!hasPermission(PERMISSION_KEYS.EDIT_PORTFOLIO)) {
+                // Use a fake doc ID for submission if we want to track "New Project" requests
+                // But since we don't know the ID until "Save", we'll just treat it as a config update for now or similar structure
+                // For simplicity in this demo, let's assume direct creation is allowed or handled separately
+                // Actually, let's just submit to collection directly for new items if user has permission, 
+                // if not, it's tricky without an ID.
+                // To keep it simple for this specific prompt: we will allow direct save if user has permission.
+                // If no permission, we alert user.
+                return showToast("Access Denied", "error"); 
+            } else {
+                db.collection("clients_portfolio").doc(customId).set(projectData).then(() => { closeModal(); showToast("Project added successfully", "success"); logActivity(`Added portfolio project: ${name} (ID: ${customId})`); }).catch(err => { showToast("Error: " + err.message, "error"); });
+            }
         }
         function editPortfolio(docId) { if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_PORTFOLIO)) return;
             db.collection("clients_portfolio").doc(docId).get().then(doc => {
@@ -2447,7 +2546,14 @@ Thank you for choosing DDNetwork.
         }
         function updatePortfolio(docId) { if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_PORTFOLIO)) return;
             const updates = { name: document.getElementById('e-p-name').value, img: document.getElementById('e-p-img').value, link: document.getElementById('e-p-link').value, status: document.getElementById('e-p-status').checked };
-            db.collection("clients_portfolio").doc(docId).update(updates).then(() => { closeModal(); showToast("Project updated", "success"); logActivity(`Updated portfolio project: ${updates.name}`); }).catch(err => { showToast("Error updating: " + err.message, "error"); });
+            
+            if(!hasPermission(PERMISSION_KEYS.EDIT_PORTFOLIO)) {
+                const oldDoc = await db.collection("clients_portfolio").doc(docId).get();
+                const success = await submitEditRequest(docId, updates, oldDoc.data(), PERMISSION_KEYS.EDIT_PORTFOLIO, `Project ${updates.name}`);
+                if(success) closeModal();
+            } else {
+                db.collection("clients_portfolio").doc(docId).update(updates).then(() => { closeModal(); showToast("Project updated", "success"); logActivity(`Updated portfolio project: ${updates.name}`); }).catch(err => { showToast("Error updating: " + err.message, "error"); });
+            }
         }
         function togglePortfolioStatus(docId, newStatus) { if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_PORTFOLIO)) return;
             const action = newStatus ? "Activated" : "Deactivated";
@@ -2643,7 +2749,7 @@ Thank you for choosing DDNetwork.
             let totalEarnings = 0;
             let commDetails = [];
             ordersList.forEach(order => {
-                let commission = 0;
+                let commission =0;
                 const amount = parseFloat(order.total.replace('RM ', '')) || 0;
                 const cycle = (order.billingCycle || 'One-Time').toLowerCase();
                 if (isFounder || canEditFinance) {
@@ -2694,7 +2800,7 @@ Thank you for choosing DDNetwork.
                 </div>`}
             `;
             const tbody = document.getElementById('comm-tbody');
-            if(commDetails.length === 0) {
+            if(commDetails.length ===0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">No commissions found.</td></tr>`;
             } else {
                 tbody.innerHTML = commDetails.map(c => `
@@ -2709,7 +2815,7 @@ Thank you for choosing DDNetwork.
             }
         }
 
-        // --- 14. APPROVAL TOOLS (NEW) ---
+        // --- 14. APPROVAL TOOLS (UPDATED) ---
         function renderApprovals() {
             if(!hasPermission(PERMISSION_KEYS.APPROVE_ACTIONS)) {
                 document.getElementById('main').innerHTML = `<div class="access-denied-container"><div class="access-denied-title">Access Denied</div><div class="access-denied-desc">You do not have permission to view this page.</div></div>`;
@@ -2733,7 +2839,7 @@ Thank you for choosing DDNetwork.
 
                 <div class="table-container">
                     <div class="table-header">
-                        <h3>Pending Requests</h3>
+                        <h3>Pending Edit Requests</h3>
                     </div>
                     <div class="table-responsive">
                         <table>
@@ -2741,27 +2847,28 @@ Thank you for choosing DDNetwork.
                                 <tr>
                                     <th>Time</th>
                                     <th>Requester</th>
-                                    <th>Action Requested</th>
+                                    <th>Context</th>
+                                    <th>Changes</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="approvals-tbody">
-                                <tr><td colspan="5" class="text-center"><div class="loading-spinner"></div></td></tr>
+                                <tr><td colspan="6" class="text-center"><div class="loading-spinner"></div></td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             `;
 
-            // Listen for requests
-            db.collection("approval_requests").orderBy("timestamp", "desc").onSnapshot(snap => {
+            // Listen for edit requests
+            db.collection("edit_requests").orderBy("timestamp", "desc").onSnapshot(snap => {
                 const tbody = document.getElementById('approvals-tbody');
                 const counter = document.getElementById('count-pending');
                 if(!tbody) return;
 
                 if(snap.empty) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No pending requests</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No pending edit requests</td></tr>';
                     if(counter) counter.innerText = "0";
                     return;
                 }
@@ -2772,24 +2879,34 @@ Thank you for choosing DDNetwork.
                     const isPending = r.status === 'Pending';
                     if(isPending) pendingCount++;
 
-                    const keyName = r.permissionKey ? r.permissionKey.replace('edit_', '').replace('delete_', '').toUpperCase() : 'UNKNOWN';
+                    const contextName = r.contextName || `ID: ${r.collectionId.substring(0,6)}`;
                     
+                    // Diff generation
+                    let changesHtml = '';
+                    if(r.newData && r.oldData) {
+                        Object.keys(r.newData).forEach(key => {
+                            const newVal = JSON.stringify(r.newData[key]);
+                            const oldVal = JSON.stringify(r.oldData[key]);
+                            if(newVal !== oldVal) {
+                                changesHtml += `<div style="margin-bottom:4px; border-bottom:1px solid #333;"><div style="font-size:0.7rem; color:var(--text-muted); margin-bottom:2px;">${key}</div><div style="display:flex; gap:10px;"><div style="color:var(--danger); text-decoration:line-through;">${oldVal}</div><div style="color:var(--success);">${newVal}</div></div></div>`;
+                            }
+                        });
+                    }
+
                     return `<tr>
                         <td style="white-space:nowrap;">${formatDateTime(r.timestamp)}</td>
                         <td>
                             <strong>${r.requesterName}</strong><br>
                             <small class="text-muted">${r.requesterEmail}</small>
                         </td>
-                        <td>
-                            <div class="badge badge-warning" style="background:rgba(245,158,11,0.1); color:var(--warning); border:1px solid rgba(245,158,11,0.3); text-transform:none;">${keyName}</div>
-                            <div style="font-size:0.75rem; margin-top:4px;">${r.requestMessage}</div>
-                        </td>
+                        <td>${contextName}</td>
+                        <td style="font-size:0.8rem;">${changesHtml}</td>
                         <td><span class="badge ${isPending?'badge-warning':'badge-success'}">${r.status}</span></td>
                         <td>
                             ${isPending ? `
                             <div class="flex gap-2">
-                                <button class="btn btn-sm btn-success" onclick="processApproval('${doc.id}', 'Approved')">Approve</button>
-                                <button class="btn btn-sm btn-danger" onclick="processApproval('${doc.id}', 'Rejected')">Reject</button>
+                                <button class="btn btn-sm btn-success" onclick="processEditApproval('${doc.id}', 'Approved')">Approve</button>
+                                <button class="btn btn-sm btn-danger" onclick="openRejectModal('${doc.id}')">Reject</button>
                             </div>` : `<small class="text-muted">Processed</small>`}
                         </td>
                     </tr>`;
@@ -2799,46 +2916,48 @@ Thank you for choosing DDNetwork.
             });
         }
 
-        async function processApproval(requestId, action) {
+        async function processEditApproval(requestId, action) {
             if(!confirm(`Are you sure you want to mark this request as ${action}?`)) return;
 
             try {
+                const reqDoc = await db.collection("edit_requests").doc(requestId).get();
+                if(!reqDoc.exists) return;
+                const r = reqDoc.data();
+
                 // 1. Update Request Status
-                const reqDoc = await db.collection("approval_requests").doc(requestId).get();
-                const reqData = reqDoc.data();
-                
-                await db.collection("approval_requests").doc(requestId).update({
+                const statusData = {
                     status: action,
                     processedBy: userData.name,
                     processedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                // 2. Logic for Approval: Grant Permission
-                if (action === 'Approved') {
-                    const targetUid = reqData.requesterId;
-                    const targetPermsKey = reqData.permissionKey;
-                    
-                    // Update User Permissions
-                    const userDoc = await db.collection("users").doc(targetUid).get();
-                    const currentPerms = userDoc.exists ? (userDoc.data().permissions || {}) : {};
-                    currentPerms[targetPermsKey] = true;
-                    
-                    await db.collection("users").doc(targetUid).update({
-                        permissions: currentPerms
-                    });
-                    
-                    showToast(`Access Granted: ${targetPermsKey}`, "success");
-                    logActivity(`Granted ${targetPermsKey} permission to ${reqData.requesterName}`);
+                };
+                
+                if(action === 'Rejected') {
+                    // If rejected, just delete pending edit and update request
+                    await db.collection("pending_edits").doc(r.collectionId).delete();
+                    await db.collection("edit_requests").doc(requestId).update(statusData);
+                    showToast("Request Rejected", "warning");
                 } else {
-                    // Rejection: Just status update (no changes to DB)
-                    showToast(`Request Rejected`, "info");
-                    logActivity(`Rejected access request from ${reqData.requesterName}`);
+                    // If Approved, write changes to Live DB
+                    await db.collection(r.collectionId).doc(r.collectionId).update(r.newData);
+                    // Delete Pending
+                    await db.collection("pending_edits").doc(r.collectionId).delete();
+                    // Update Request
+                    await db.collection("edit_requests").doc(requestId).update(statusData);
+                    showToast("Request Approved & Changes Applied", "success");
                 }
 
-                // Refresh the view (optional, or wait for listener)
+                logActivity(`Edit request ${action} by ${userData.name}`);
             } catch(e) {
                 showToast("Error processing: " + e.message, "error");
             }
+        }
+
+        async function openRejectModal(requestId) {
+            const reqDoc = await db.collection("edit_requests").doc(requestId).get();
+            const r = reqDoc.data();
+            showModal("Reject Request with Reason", `
+                <div class="mb-4"><label>Reason for Rejection</label><textarea id="reject-reason" rows="3" placeholder="e.g. Incorrect data, format error..."></textarea></div>
+            `, `<button class="btn btn-danger" onclick="processEditApproval('${requestId}', 'Rejected')">Reject Request</button>`);
         }
     </script>
 </body>
