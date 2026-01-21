@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Admin Portal v12.1 (Approval Workflow)</title>
+    <title>Admin Portal v12.2 (Strict Approval)</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -696,7 +696,7 @@
         .badge-remove { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
 
         /* CONFIG TAB SPECIFICS */
-        .config-section { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .config-section { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom:1.5rem; }
         .config-header { font-size: 0.95rem; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); color: var(--text-main); display: flex; justify-content: space-between; align-items: center; }
         .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .toggle-switch input { opacity: 0; width: 0; height: 0; }
@@ -720,7 +720,7 @@
     <div id="auth-screen">
         <div class="auth-card">
             <img src="https://raw.githubusercontent.com/ddnetwork-ent/ddnetwork/refs/heads/main/DDN%20Logo%20NoBG.png" alt="Logo">
-            <h2 class="mb-4" style="color:white; font-weight: 700; letter-spacing: -0.5px;">Admin Portal v12.1</h2>
+            <h2 class="mb-4" style="color:white; font-weight: 700; letter-spacing: -0.5px;">Admin Portal v12.2</h2>
             <form id="loginForm">
                 <input type="text" id="loginInput" class="mb-4" placeholder="Email or Crew ID" required>
                 <input type="password" id="loginPass" class="mb-4" placeholder="Password" required>
@@ -739,7 +739,7 @@
                 <button class="btn-icon" onclick="toggleSidebar()" title="Toggle Menu"><i class="ri-menu-line" style="font-size: 1.4rem;"></i></button>
                 <div class="header-brand">
                     <img src="https://raw.githubusercontent.com/ddnetwork-ent/ddnetwork/refs/heads/main/DDN%20Logo%20NoBG.png">
-                    <span>DDN v12.1</span>
+                    <span>DDN v12.2</span>
                 </div>
             </div>
             <div class="header-actions">
@@ -1150,11 +1150,13 @@
             return userData.permissions && userData.permissions[key] === true;
         }
 
+        // Updated: checkAccessAndDeny is STRICT. 
+        // Even if user has the permission, they go through the approval workflow.
+        // Only SuperAdmin/Founder bypass approval.
         function checkAccessAndDeny(featureKey) {
-            // If user has specific permission, allow action directly
-            if(hasPermission(featureKey)) return false; // Allowed
+            if(isSuperAdmin() || isFounder()) return false; // Admins bypass approval
 
-            // If no direct permission, trigger approval workflow
+            // Create Request for ALL other users regardless of their existing permissions
             requestApproval(featureKey);
             return true; // Block direct action
         }
@@ -1375,13 +1377,12 @@
 
         // --- 2. ORDERS ---
         function renderOrders() {
-            const canEdit = hasPermission(PERMISSION_KEYS.EDIT_ORDERS);
             document.getElementById('main').innerHTML = `
                 <div class="table-container">
                     <div class="table-header">
                         <h3>Order Management</h3>
                         <div class="flex items-center gap-2">
-                            ${!canEdit ? '<span class="req-approval-badge">Edit Requires Approval</span>' : ''}
+                            <span class="req-approval-badge">Edit Requires Approval</span>
                             <input type="text" id="orderSearch" placeholder="Search ID, Name, Domain..." style="width:250px;" onkeyup="filterTable('orders-tbody', this.value)">
                         </div>
                     </div>
@@ -1398,7 +1399,7 @@
                                 </tr>
                             </thead>
                             <tbody id="orders-tbody">
-                                <tr><td colspan="6" class="text-center"><div class="loading-spinner"></div></td></tr>
+                                <tr><td colspan="7" class="text-center"><div class="loading-spinner"></div></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1408,7 +1409,7 @@
                 const tbody = document.getElementById('orders-tbody');
                 if(!tbody) return;
                 if(snap.empty) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No orders found</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No orders found</td></tr>';
                     return;
                 }
 
@@ -1566,6 +1567,7 @@
         }
 
         async function sendPaymentReminder(id) {
+            // Edit order requires approval (via checkAccessAndDeny)
             if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_ORDERS)) return;
 
             try {
@@ -1607,7 +1609,7 @@ Thank you for choosing DDNetwork.
         }
 
         async function viewOrder(id) {
-            // Check permission
+            // Edit Order requires approval
             if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_ORDERS)) return;
 
             const doc = await db.collection("orders").doc(id).get();
@@ -1674,6 +1676,7 @@ Thank you for choosing DDNetwork.
         }
 
         function updateOrderDetails(id) {
+            // Check permission (will trigger approval if not SuperAdmin/Founder)
             if(checkAccessAndDeny(PERMISSION_KEYS.EDIT_ORDERS)) return;
 
             const updateData = {
@@ -1710,13 +1713,12 @@ Thank you for choosing DDNetwork.
 
         // --- 3. CLIENTS ---
         function renderClients() {
-            const canEdit = hasPermission(PERMISSION_KEYS.EDIT_CLIENTS);
             document.getElementById('main').innerHTML = `
                 <div class="table-container">
                     <div class="table-header">
                         <h3>Client Directory</h3>
                         <div class="flex items-center gap-2">
-                            ${!canEdit ? '<span class="req-approval-badge">Edit Requires Approval</span>' : ''}
+                            <span class="req-approval-badge">Edit Requires Approval</span>
                             <input type="text" id="clientSearch" placeholder="Search..." style="width:200px;" onkeyup="filterTable('client-tbody', this.value)">
                         </div>
                     </div>
@@ -1736,9 +1738,9 @@ Thank you for choosing DDNetwork.
                     const vCode = u.personalVoucher ? u.personalVoucher.code : '-';
                     
                     let buttons = `
-                        ${canEdit ? `<button class="btn btn-sm btn-secondary" onclick="editClient('${doc.id}')">Edit</button>` : ''}
-                        ${canEdit ? `<button class="btn btn-sm btn-secondary" onclick="resetPassword('${u.email}')">Reset PW</button>` : ''}
-                        ${canEdit ? `<button class="btn btn-sm btn-primary" onclick="openAssignVoucherModal('${doc.id}', '${u.name}')">Assign Voucher</button>` : ''}
+                        <button class="btn btn-sm btn-secondary" onclick="editClient('${doc.id}')">Edit</button>
+                        <button class="btn btn-sm btn-secondary" onclick="resetPassword('${u.email}')">Reset PW</button>
+                        <button class="btn btn-sm btn-primary" onclick="openAssignVoucherModal('${doc.id}', '${u.name}')">Assign Voucher</button>
                         ${isSuperAdmin() ? `<button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Client')"><i class="ri-delete-bin-line"></i></button>` : ''}
                     `;
 
@@ -2801,21 +2803,39 @@ Thank you for choosing DDNetwork.
             if(!confirm(`Are you sure you want to mark this request as ${action}?`)) return;
 
             try {
-                // Update request status
+                // 1. Update Request Status
+                const reqDoc = await db.collection("approval_requests").doc(requestId).get();
+                const reqData = reqDoc.data();
+                
                 await db.collection("approval_requests").doc(requestId).update({
                     status: action,
                     processedBy: userData.name,
                     processedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // Note: In a real app, here you would grant the permission 
-                // to the user based on requestId.permissionKey. 
-                // Since this is a single-file demo, we assume the manual 
-                // edit of the user in Crew > Edit > Permissions will happen 
-                // after this approval is given, or this action stands as the log.
-                
-                showToast(`Request ${action} successfully`, action==='Approved'?'success':'error');
-                logActivity(`Approval request ${action} by ${userData.name}`);
+                // 2. Logic for Approval: Grant Permission
+                if (action === 'Approved') {
+                    const targetUid = reqData.requesterId;
+                    const targetPermsKey = reqData.permissionKey;
+                    
+                    // Update User Permissions
+                    const userDoc = await db.collection("users").doc(targetUid).get();
+                    const currentPerms = userDoc.exists ? (userDoc.data().permissions || {}) : {};
+                    currentPerms[targetPermsKey] = true;
+                    
+                    await db.collection("users").doc(targetUid).update({
+                        permissions: currentPerms
+                    });
+                    
+                    showToast(`Access Granted: ${targetPermsKey}`, "success");
+                    logActivity(`Granted ${targetPermsKey} permission to ${reqData.requesterName}`);
+                } else {
+                    // Rejection: Just status update (no changes to DB)
+                    showToast(`Request Rejected`, "info");
+                    logActivity(`Rejected access request from ${reqData.requesterName}`);
+                }
+
+                // Refresh the view (optional, or wait for listener)
             } catch(e) {
                 showToast("Error processing: " + e.message, "error");
             }
