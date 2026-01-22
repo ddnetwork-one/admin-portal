@@ -18,22 +18,22 @@
     <style>
         :root {
             /* NEW PORTAL: Light Theme */
-            --bg-app: #f3f4f6;       /* Very Light Gray */
-            --bg-sidebar: #ffffff;   /* Pure White */
-            --bg-surface: #ffffff;   /* Pure White */
+            --bg-app: #f3f4f6;       
+            --bg-sidebar: #ffffff;   
+            --bg-surface: #ffffff;   
             --bg-surface-hover: #f9fafb; 
             --bg-input: #ffffff;
             
-            --border: #e5e7eb;       /* Light Gray Border */
+            --border: #e5e7eb;       
             --border-active: #d1d5db;
             --border-light: rgba(0,0,0,0.05);
 
-            --text-main: #111827;    /* Nearly Black */
-            --text-muted: #6b7280;   /* Medium Gray */
-            --text-faint: #9ca3af;   /* Light Gray */
+            --text-main: #111827;    
+            --text-muted: #6b7280;   
+            --text-faint: #9ca3af;   
 
             /* Accents */
-            --primary: #2563eb; /* Royal Blue */
+            --primary: #2563eb; 
             --primary-hover: #1d4ed8;
             --primary-glow: rgba(37, 99, 235, 0.1);
             
@@ -58,7 +58,6 @@
             --z-modal-overlay: 1000;
             --z-modal-content: 1010;
             --z-toast: 2000;
-            --z-invoice: 3000;
         }
 
         /* RESET & BASE */
@@ -126,35 +125,46 @@
             background: var(--bg-surface);
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
-        .btn:hover { 
+        .btn:hover:not(:disabled) { 
             background: #f9fafb;
             border-color: var(--border-active);
             transform: translateY(-1px);
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
-        .btn:active { transform: translateY(0); }
+        .btn:active:not(:disabled) { transform: translateY(0); }
+
+        /* Disabled Button State */
+        .btn:disabled, .btn.btn-disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: #e5e7eb;
+            color: var(--text-muted);
+            border-color: var(--border);
+            transform: none;
+            box-shadow: none;
+        }
 
         .btn-primary { 
             background: var(--text-main); 
             color: white; 
             border-color: var(--text-main); 
         }
-        .btn-primary:hover { background: #374151; }
+        .btn-primary:hover:not(:disabled) { background: #374151; }
 
         .btn-success { background: #ecfdf5; color: var(--success); border-color: #a7f3d0; }
-        .btn-success:hover { background: #d1fae5; border-color: var(--success); }
+        .btn-success:hover:not(:disabled) { background: #d1fae5; border-color: var(--success); }
 
         .btn-danger { background: #fef2f2; color: var(--danger); border-color: #fecaca; }
-        .btn-danger:hover { background: #fee2e2; border-color: var(--danger); }
+        .btn-danger:hover:not(:disabled) { background: #fee2e2; border-color: var(--danger); }
         
         .btn-danger-solid { background: var(--danger); color: white; border:1px solid var(--danger); }
-        .btn-danger-solid:hover { background: #b91c1c; }
+        .btn-danger-solid:hover:not(:disabled) { background: #b91c1c; }
 
         .btn-info { background: #f0f9ff; color: var(--info); border-color: #bae6fd; }
-        .btn-info:hover { background: #e0f2fe; border-color: var(--info); }
+        .btn-info:hover:not(:disabled) { background: #e0f2fe; border-color: var(--info); }
 
         .btn-secondary { background: white; border: 1px solid var(--border); color: var(--text-main); }
-        .btn-secondary:hover { background: #f8fafc; border-color: var(--text-muted); }
+        .btn-secondary:hover:not(:disabled) { background: #f8fafc; border-color: var(--text-muted); }
         
         .btn-sm { padding: 0.35rem 0.8rem; font-size: 0.75rem; border-radius: 6px; }
         
@@ -188,6 +198,12 @@
             border-color: var(--primary); 
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); 
             background: #fff;
+        }
+        input[disabled], select[disabled], textarea[disabled] {
+            background-color: #f3f4f6;
+            color: var(--text-faint);
+            cursor: not-allowed;
+            border-color: transparent;
         }
         input[readonly], textarea[readonly] { 
             background: #f9fafb; 
@@ -433,7 +449,7 @@
             display: flex;
             flex-direction: column,
             align-items: center;
-            justify-content: center;
+            justify-content: center,
             text-align: center;
             color: var(--text-muted);
             padding: 2rem;
@@ -515,6 +531,9 @@
         .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
         input:checked + .slider { background-color: var(--primary); border-color: var(--primary); }
         input:checked + .slider:before { transform: translateX(20px); }
+        /* Disabled Toggle */
+        .toggle-switch.disabled input { cursor: not-allowed; pointer-events: none; }
+        .toggle-switch.disabled .slider { opacity: 0.6; }
 
         /* Loading State */
         .loading-spinner { border: 3px solid rgba(0,0,0,0.05); border-left-color: var(--primary); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 0 auto; }
@@ -564,23 +583,15 @@
         .price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
         .gateway-card { background: #f9fafb; padding: 1rem; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 0.5rem; }
 
-        /* Commission Card */
-        .comm-card { background: #fff; border:1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
-        .comm-avatar { width: 60px; height: 60px; background: #f3f4f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; color: var(--text-muted); }
-        .comm-info { flex: 1; min-width: 200px; }
-        .comm-stats { display: flex; gap: 1rem; flex-wrap: wrap; }
-        .comm-stat-item { text-align: center; background: #f8fafc; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--border); }
-        .comm-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
-        .comm-stat-val { font-size: 1rem; font-weight: 700; color: var(--primary); }
-        
         /* Month Selector */
         .month-selector {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 10px;
             margin-bottom: 1.5rem;
             background: var(--bg-surface);
-            padding: 10px;
+            padding: 10px 20px;
             border-radius: 8px;
             border: 1px solid var(--border);
         }
@@ -588,24 +599,29 @@
             background: none;
             border: 1px solid var(--border);
             border-radius: 4px;
-            padding: 4px 10px;
+            padding: 4px 12px;
             cursor: pointer;
             font-size: 0.85rem;
             color: var(--text-muted);
             transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
         .month-btn:hover:not(:disabled) {
             background: #f3f4f6;
             color: var(--text-main);
         }
         .month-btn:disabled {
-            opacity: 0.5;
+            opacity: 0.3;
             cursor: not-allowed;
+            background: transparent;
         }
         .current-month-label {
             font-weight: 700;
             color: var(--primary);
-            min-width: 100px;
+            font-size: 1rem;
+            min-width: 150px;
             text-align: center;
         }
 
@@ -1075,27 +1091,6 @@
             }
         }
 
-        // Addon 3: Refined Finance Access
-        function checkFinanceAccess() {
-            // SuperAdmin & Mid_Admin = Full Finance Access
-            if(isSuperAdmin() || isMidAdmin()) return false; 
-            
-            // Admin = Basic Access (Can see finance, but not full list?) 
-            // Logic: "Admin = basic access". "Crew = No access" but "User can see their own commission".
-            // So Finance page is accessible to Crew (via restricted view) and others.
-            // But if we are protecting *viewing the list of everyone*:
-            
-            if(isAdmin() && !isMidAdmin()) {
-                // Admin might be restricted from seeing *all* bank details?
-                // Let's allow Admin to see the finance module but not mark paid.
-                return false; // Allow entry, specific functions will block
-            }
-
-            if(isCrew()) return false; // Crew enters to see own commission.
-
-            return true; // Deny entry (shouldn't happen with above checks, but safe fallback)
-        }
-
         // --- ROUTING SYSTEM ---
         const routes = {
             '/': renderOverview,
@@ -1304,6 +1299,9 @@
                     return;
                 }
 
+                // Check permissions globally for Manage Button
+                const canEditOrders = hasPermission(PERMISSION_KEYS.EDIT_ORDERS);
+
                 tbody.innerHTML = snap.docs.map(doc => {
                     const d = doc.data();
                     const domainDisplay = d.domain ? `<span class="font-mono" style="color:var(--primary)">${d.domain}</span>` : `<span style="color:var(--text-faint)">N/A</span>`;
@@ -1316,6 +1314,11 @@
                     if(d.status === 'Paid') statusColor = 'var(--primary)';
                     if(d.status === 'Cancelled') statusColor = 'var(--danger)';
                     
+                    // Addon: Logic for Locked/Disabled Manage Button
+                    const manageBtnClass = canEditOrders ? 'btn-secondary' : 'btn-disabled';
+                    const manageBtnTitle = canEditOrders ? 'Manage' : 'Access Denied';
+                    const manageBtnIcon = canEditOrders ? 'ri-edit-line' : 'ri-lock-line';
+
                     return `<tr>
                         <td style="white-space:nowrap;">${formatDateTime(d.timestamp)}</td>
                         <td><strong>${d.customerName}</strong><br>${domainDisplay}</td>
@@ -1324,7 +1327,7 @@
                         <td><span class="badge" style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}25">${d.status}</span></td>
                         <td>
                             <div style="display:flex; gap:5px; flex-wrap:wrap;">
-                                <button class="btn btn-sm btn-secondary" onclick="viewOrder('${doc.id}')">Manage</button>
+                                <button class="btn btn-sm ${manageBtnClass}" onclick="viewOrder('${doc.id}')" ${!canEditOrders ? 'disabled' : ''} title="${manageBtnTitle}"><i class="${manageBtnIcon}"></i> Manage</button>
                                 <button class="btn btn-sm btn-info" title="Generate Invoice" onclick="generateInvoice('${doc.id}')"><i class="ri-file-list-2-line"></i> PDF</button>
                                 <button class="btn btn-sm btn-success" title="Send WhatsApp Remainder" onclick="sendPaymentReminder('${doc.id}')"><i class="ri-whatsapp-line"></i> WA</button>
                                 ${isSuperAdmin() ? `<button class="btn btn-sm btn-danger" onclick="deleteOrder('${doc.id}')"><i class="ri-delete-bin-line"></i></button>` : ''}
@@ -1477,6 +1480,7 @@
             `, `<button class="btn btn-primary" onclick="updateOrderDetails('${id}')">Save Changes</button>`);
         }
 
+        // --- UPDATED ORDER SAVE LOGIC WITH COMMISSION MGMT ---
         async function updateOrderDetails(id) {
             const updateData = {
                 customerName: document.getElementById('o-name').value,
@@ -1494,9 +1498,58 @@
             const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_ORDERS, 'orders', id, updateData);
             if(blocked) return; 
 
-            db.collection("orders").doc(id).update(updateData).then(() => { 
-                closeModal(); showToast("Order Updated Successfully", "success"); logActivity(`Updated Order #${id.substr(0,6)}`);
+            // 1. Fetch current order to check for removed sales reps
+            const orderDoc = await db.collection("orders").doc(id).get();
+            const currentOrder = orderDoc.data();
+            const oldRepIds = currentOrder.salesRepIds || [];
+
+            // 2. Update the Order
+            await db.collection("orders").doc(id).update(updateData);
+
+            // 3. Handle Commission_Management Collection
+            const orderTotal = parseFloat(updateData.total.replace('RM ', '')) || 0;
+            const batch = db.batch();
+
+            // Remove commissions for reps who are no longer assigned
+            oldRepIds.forEach(oldRepId => {
+                if(!selectedIds.includes(oldRepId)) {
+                    const commId = `${id}_${oldRepId}`;
+                    batch.delete(db.collection("Commission_Management").doc(commId));
+                }
             });
+
+            // Add/Update commissions for currently selected reps
+            for (const repId of selectedIds) {
+                // Fetch rep to get rate
+                const repSnap = await db.collection("users").doc(repId).get();
+                if(repSnap.exists) {
+                    const repData = repSnap.data();
+                    const rate = repData.commissionRate || 0;
+                    const amount = orderTotal * rate;
+                    
+                    const commId = `${id}_${repId}`; // Unique ID per order per rep
+                    const commRef = db.collection("Commission_Management").doc(commId);
+                    
+                    const commData = {
+                        orderId: id,
+                        repId: repId,
+                        repName: repData.name,
+                        amount: amount,
+                        status: 'unpaid',
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                        periodYear: new Date().getFullYear(),
+                        periodMonth: new Date().getMonth()
+                    };
+                    batch.set(commRef, commData, { merge: true });
+                }
+            }
+
+            // Commit batch for commissions
+            await batch.commit();
+
+            closeModal(); 
+            showToast("Order & Commissions Updated Successfully", "success"); 
+            logActivity(`Updated Order #${id.substr(0,6)} and commissions`);
         }
 
         function deleteOrder(id) {
@@ -1533,11 +1586,16 @@
                     const vStatus = u.personalVoucher ? u.personalVoucher.status : 'None';
                     const vCode = u.personalVoucher ? u.personalVoucher.code : '-';
                     
-                    let buttons = `
-                        <button class="btn btn-sm btn-secondary" onclick="editClient('${doc.id}')">Edit</button>
-                        <button class="btn btn-sm btn-secondary" onclick="resetPassword('${u.email}')">Reset PW</button>
-                        <button class="btn btn-sm btn-primary" onclick="openAssignVoucherModal('${doc.id}', '${u.name}')">Assign Voucher</button>
-                    `;
+                    let buttons = '';
+                    if(hasPermission(PERMISSION_KEYS.EDIT_CLIENTS)) {
+                         buttons = `<button class="btn btn-sm btn-secondary" onclick="editClient('${doc.id}')">Edit</button>`;
+                    }
+                    buttons += `<button class="btn btn-sm btn-secondary" onclick="resetPassword('${u.email}')">Reset PW</button>`;
+                    
+                    if(hasPermission(PERMISSION_KEYS.EDIT_VOUCHERS)) {
+                        buttons += `<button class="btn btn-sm btn-primary" onclick="openAssignVoucherModal('${doc.id}', '${u.name}')">Assign Voucher</button>`;
+                    }
+
                     if (isSuperAdmin()) buttons += `<button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Client')"><i class="ri-delete-bin-line"></i></button>`;
 
                     return `<tr>
@@ -1734,6 +1792,10 @@
                 const u = doc.data();
                 const jobOptions = JOB_TITLES.map(j => `<option value="${j}" ${u.jobTitle===j?'selected':''}>${j}</option>`).join('');
                 
+                // Addon 3: Strict control over APPROVE_ACTIONS toggle
+                const canGrantApprovals = isSuperAdmin(); 
+                const isApproverCheckbox = u.permissions && u.permissions[PERMISSION_KEYS.APPROVE_ACTIONS];
+                
                 let permsHTML = '<div style="margin-top:1rem; border-top:1px solid var(--border); padding-top:1rem;"><label style="margin-bottom:0.5rem; display:block;">Access Permissions</label><div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">';
                 const userPerms = u.permissions || {};
                 
@@ -1756,11 +1818,18 @@
                 }
                 permsHTML += '</div></div>';
 
-                if(isSuperAdmin()) {
-                    permsHTML += `<label class="flex items-center gap-2 mt-2" style="font-size:0.8rem; font-weight:400; color:var(--text-muted); text-transform:none;">
-                        <input type="checkbox" class="perm-toggle" value="${PERMISSION_KEYS.APPROVE_ACTIONS}" ${userPerms[PERMISSION_KEYS.APPROVE_ACTIONS]===true?'checked':''} style="width:auto; margin:0;"> Approve Actions (Admin Power)
-                    </label>`;
-                }
+                // Special Handling for Approver Toggle
+                // Addon 3: Only SuperAdmin can toggle this. Others see it disabled.
+                const approveCheckboxDisabledAttr = canGrantApprovals ? '' : 'disabled';
+                const approveToggleClass = canGrantApprovals ? 'toggle-switch' : 'toggle-switch disabled';
+                
+                permsHTML += `
+                    <label class="${approveToggleClass} flex items-center gap-2 mt-2" style="font-size:0.8rem; font-weight:400; color:var(--text-muted); text-transform:none;">
+                        <input type="checkbox" class="perm-toggle" value="${PERMISSION_KEYS.APPROVE_ACTIONS}" ${isApproverCheckbox ? 'checked' : ''} ${approveCheckboxDisabledAttr} style="width:auto; margin:0;"> 
+                        <div class="slider"></div>
+                        <span style="margin-left: 8px;">Approve Actions (SuperAdmin Only)</span>
+                    </label>
+                `;
                 
                 const bd = u.bankDetails || {};
                 const bankHTML = `
@@ -2533,15 +2602,14 @@
             try { await db.collection("promo_codes").doc(code).delete(); showToast("Promo Code Deleted", "success"); logActivity(`Deleted public promo code: ${code}`); } catch(e) { showToast("Error deleting: " + e.message, "error"); } 
         }
 
-        // --- 12. COMMISSIONS (UPDATED) ---
+        // --- 12. COMMISSIONS (UPDATED & REFINED) ---
         // Addon 1: Month Selector Logic
         let currentCommissionsDate = new Date();
 
         async function renderCommissions() {
             // Addon 3: Check Access
-            // Crew sees their own. Mid Admin + Super Admin see everyone.
             const isCrewUser = isCrew();
-            const isRestricted = isAdmin() && !isMidAdmin() && !isSuperAdmin(); 
+            const isSuperOrMid = isSuperAdmin() || isMidAdmin();
             
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
@@ -2562,16 +2630,17 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Reference</th>
+                                    <th>Order Ref</th>
                                     <th>Date</th>
-                                    ${isCrewUser ? '<th>Amount</th>' : '<th>Crew Member</th>'}
+                                    ${!isCrewUser ? '<th>Crew Member</th>' : ''}
                                     <th>Description</th>
+                                    <th>Amount</th>
                                     <th>Status</th>
-                                    ${!isCrewUser ? '<th>Actions</th>' : ''}
+                                    ${isSuperOrMid ? '<th>Actions</th>' : ''}
                                 </tr>
                             </thead>
                             <tbody id="comm-tbody">
-                                <tr><td colspan="${isCrewUser?5:6}" class="text-center"><div class="loading-spinner"></div></td></tr>
+                                <tr><td colspan="6" class="text-center"><div class="loading-spinner"></div></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -2590,88 +2659,78 @@
             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             const displayMonth = monthNames[currentCommissionsDate.getMonth()];
             const displayYear = currentCommissionsDate.getFullYear();
+            
             document.getElementById('comm-month-label').innerText = `${displayMonth} ${displayYear}`;
 
             const isCrewUser = isCrew();
+            const isSuperOrMid = isSuperAdmin() || isMidAdmin();
             const tbody = document.getElementById('comm-tbody');
-            const startOfMonth = new Date(displayYear, currentCommissionsDate.getMonth(), 1);
-            const endOfMonth = new Date(displayYear, currentCommissionsDate.getMonth() + 1, 0, 0, 0);
+            const selectedDate = new Date(displayYear, currentCommissionsDate.getMonth(), 1);
+            const now = new Date();
 
-            let query = db.collection("orders")
-                .where("status", "==", "Paid")
-                .where("timestamp", ">=", startOfMonth)
-                .where("timestamp", "<", endOfMonth)
+            // Addon 1: Future Month Check
+            if (selectedDate > now && selectedDate.getMonth() !== now.getMonth()) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">There are no records available for the Finance department.</td></tr>`;
+                return;
+            }
+
+            // Addon 1: Query Commission_Management collection
+            let query = db.collection("Commission_Management")
+                .where("periodYear", "==", displayYear)
+                .where("periodMonth", "==", currentCommissionsDate.getMonth())
                 .orderBy("timestamp", "desc");
 
-            // Addon 1: If Crew, filter by user's orders. If Admin, get all.
-            if(isCrewUser()) {
-                query = query.where("salesRepIds", "array-contains", currentUser.uid);
+            // If Crew, only get their own
+            if(isCrewUser) {
+                query = query.where("repId", "==", currentUser.uid);
             }
 
             const snap = await query.get();
             
             if (snap.empty) {
-                // Addon 1: Check if month is future
-                const today = new Date();
-                if (startOfMonth > today) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">There are no records available for the Finance department.</td></tr>`;
-                } else {
-                    tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">No commissions found for this period.</td></tr>`;
-                }
-                return;
+                 tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">No commissions found for this period.</td></tr>`;
+                 return;
             }
 
             tbody.innerHTML = snap.docs.map(doc => {
                 const d = doc.data();
                 const orderDate = d.timestamp ? d.timestamp.toDate() : new Date();
                 
-                // Addon 1: Check Paid Status in subcollection
-                const paidStatusId = `${doc.id}_${displayYear}_${currentCommissionsDate.getMonth()}`;
-                const currentStatus = d.commissionStatus ? d.commissionStatus[paidStatusId] : 'unpaid'; // Default to unpaid if not found
-                
-                // Calculate Amount
-                let commAmount = 0;
-                if(isCrewUser() && d.salesRepIds && d.salesRepIds.includes(currentUser.uid)) {
-                    commAmount = parseFloat(d.total.replace('RM ', '')) * (userData.commissionRate || 0);
-                } else if (!isCrewUser()) {
-                    // Admin view (simplified for table view)
-                    commAmount = parseFloat(d.total.replace('RM ', '')); 
-                } else {
-                    commAmount = 0; // Not entitled
-                }
+                const statusBadge = d.status === 'paid' 
+                    ? `<span class="status-badge status-paid">Paid</span>`
+                    : `<span class="status-badge status-unpaid">Not Paid</span>`;
 
-                let statusBadge = '';
-                if(currentStatus === 'paid') statusBadge = `<span class="status-badge status-paid">Paid</span>`;
-                else statusBadge = `<span class="status-badge status-unpaid">Not Paid</span>`;
-
-                const actionsHTML = (!isCrewUser() && (isSuperAdmin() || isMidAdmin())) ? `
-                    <button class="btn btn-sm btn-success" onclick="markCommissionPaid('${doc.id}', '${displayYear}', '${currentCommissionsDate.getMonth()}')" title="Mark Paid">
-                        <i class="ri-checkbox-circle-line"></i>
+                // Actions: Only Super/Mid can mark paid
+                const actionsHTML = (isSuperOrMid && d.status !== 'paid') ? `
+                    <button class="btn btn-sm btn-success" onclick="markCommissionPaid('${doc.id}')" title="Mark Paid">
+                        <i class="ri-checkbox-circle-line"></i> Pay
                     </button>
-                ` : '';
+                ` : (isSuperOrMid ? `<span class="text-sm text-muted">-</span>` : '');
 
                 return `<tr>
-                    <td class="font-mono text-sm">${doc.id.substring(0,6).toUpperCase()}</td>
-                    <td style="font-size:0.8rem;">${formatDateTime(d.timestamp)}</td>
-                    ${!isCrewUser() ? `<td>${d.customerName}</td>` : ''}
-                    <td>${d.package}</td>
-                    <td style="font-weight:700;">RM ${commAmount.toFixed(2)}</td>
+                    <td class="font-mono text-sm">${d.orderId.substring(0,8).toUpperCase()}</td>
+                    <td style="font-size:0.8rem;">${formatDateTime(orderDate)}</td>
+                    ${!isCrewUser ? `<td>${d.repName}</td>` : ''}
+                    <td>${d.orderId.substring(0,8)} Commission</td>
+                    <td style="font-weight:700;">RM ${d.amount.toFixed(2)}</td>
                     <td>${statusBadge}</td>
-                    ${!isCrewUser() ? `<td>${actionsHTML}</td>` : ''}
+                    ${isSuperOrMid ? `<td>${actionsHTML}</td>` : ''}
                 </tr>`;
             }).join('');
         }
 
-        async function markCommissionPaid(orderId, year, month) {
+        async function markCommissionPaid(commDocId) {
             if(!isSuperAdmin() && !isMidAdmin()) return showToast("Access Denied", "error");
-            const paidStatusId = `${orderId}_${year}_${month}`;
+            
+            if(!confirm("Mark this commission as paid?")) return;
             
             try {
-                await db.collection("orders").doc(orderId).update({
-                    [`commissionStatus.${paidStatusId}`]: 'paid'
+                await db.collection("Commission_Management").doc(commDocId).update({
+                    status: 'paid',
+                    paidAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 showToast("Marked as Paid", "success");
-                logActivity(`Marked commission for Order ${orderId.substring(0,6)} as Paid`);
+                logActivity(`Marked commission ${commDocId} as Paid`);
                 updateCommissionView(); // Refresh
             } catch(e) {
                 showToast("Error updating status", "error");
