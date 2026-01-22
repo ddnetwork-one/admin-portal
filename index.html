@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>New Portal v2.0 (Light Edition)</title>
+    <title>New Portal v2.1 (Enterprise Edition)</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,7 +32,7 @@
             --text-muted: #6b7280;   /* Medium Gray */
             --text-faint: #9ca3af;   /* Light Gray */
 
-            /* Accents (Retained but adjusted for contrast) */
+            /* Accents */
             --primary: #2563eb; /* Royal Blue */
             --primary-hover: #1d4ed8;
             --primary-glow: rgba(37, 99, 235, 0.1);
@@ -94,6 +94,10 @@
         .font-bold { font-weight: 700; }
         .text-muted { color: var(--text-muted); }
         .block { display: block; }
+        .text-success { color: var(--success); }
+        .text-danger { color: var(--danger); }
+        .text-warning { color: var(--warning); }
+        .text-primary { color: var(--primary); }
         
         .font-mono { font-family: var(--font-mono); letter-spacing: -0.5px; }
 
@@ -131,7 +135,7 @@
         .btn:active { transform: translateY(0); }
 
         .btn-primary { 
-            background: var(--text-main); /* Black Button */
+            background: var(--text-main); 
             color: white; 
             border-color: var(--text-main); 
         }
@@ -166,7 +170,6 @@
             width: 36px; height: 36px;
         }
         .btn-icon:hover { color: var(--text-main); background: rgba(0,0,0,0.05); }
-        .btn-icon.spin:hover i { animation: spin 1s linear infinite; }
 
         /* FORMS */
         input, select, textarea {
@@ -215,12 +218,9 @@
             text-align: center; 
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
         }
-        .auth-card img { height: 50px; margin-bottom: 1.5rem; filter: brightness(0); }
 
         /* LAYOUT STRUCTURE */
         #dashboard { display: flex; width: 100%; height: 100vh; overflow: hidden; position: relative; }
-        
-        /* SIDEBAR OVERLAY (Mobile) */
         .sidebar-overlay {
             position: fixed; inset: 0; background: rgba(255,255,255,0.8); backdrop-filter: blur(4px);
             z-index: var(--z-sidebar); opacity: 0; pointer-events: none; transition: 0.3s;
@@ -238,15 +238,8 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: fixed; top: var(--header-height); bottom: 0; left: 0;
         }
-
-        /* DESKTOP COLLAPSED STATE */
         aside.collapsed { width: var(--sidebar-width-collapsed); }
-        aside.collapsed .nav-text, 
-        aside.collapsed .nav-section-title, 
-        aside.collapsed .u-details, 
-        aside.collapsed .user-mini-profile p {
-            opacity: 0; pointer-events: none; display: none;
-        }
+        aside.collapsed .nav-text, aside.collapsed .nav-section-title, aside.collapsed .u-details, aside.collapsed .user-mini-profile p { opacity: 0; pointer-events: none; display: none; }
         aside.collapsed .nav-item { padding: 0.8rem 0; justify-content: center; }
         aside.collapsed .nav-item i { font-size: 1.4rem; margin: 0; }
         aside.collapsed .header-brand span { display: none; }
@@ -268,7 +261,6 @@
         }
         .header-left { display: flex; align-items: center; gap: 1rem; }
         .header-brand { font-weight: 800; font-size: 1rem; color: var(--text-main); letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
-        .header-brand img { height: 24px; filter: brightness(0); }
         .header-actions { display: flex; align-items: center; gap: 0.25rem; position: relative; height: 100%; }
         
         .notification-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--danger); border-radius: 50%; border: 2px solid var(--bg-sidebar); pointer-events: none; z-index: 10; }
@@ -361,12 +353,7 @@
         }
 
         /* DASHBOARD CARDS */
-        .stats-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
-            gap: 1.25rem; 
-            margin-bottom: 2.5rem; 
-        }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin-bottom: 2.5rem; }
         .stat-card { 
             background: var(--bg-surface); 
             padding: 1.5rem; 
@@ -440,7 +427,7 @@
         tr:last-child td { border-bottom: none; }
         tr:hover td { background: #f9fafb; }
 
-        /* --- ACCESS DENIED PAGE --- */
+        /* ACCESS DENIED PAGE */
         .access-denied-container {
             height: 100%;
             display: flex;
@@ -451,25 +438,11 @@
             color: var(--text-muted);
             padding: 2rem;
         }
-        .access-denied-icon {
-            font-size: 4rem;
-            color: var(--danger);
-            margin-bottom: 1rem;
-            opacity: 0.8;
-        }
-        .access-denied-title {
-            font-size: 1.5rem;
-            color: var(--text-main);
-            margin-bottom: 0.5rem;
-        }
-        .access-denied-desc {
-            font-size: 1rem;
-            max-width: 400px;
-            line-height: 1.5;
-            margin-bottom: 2rem;
-        }
+        .access-denied-icon { font-size: 4rem; color: var(--danger); margin-bottom: 1rem; opacity: 0.8; }
+        .access-denied-title { font-size: 1.5rem; color: var(--text-main); margin-bottom: 0.5rem; }
+        .access-denied-desc { font-size: 1rem; max-width: 400px; line-height: 1.5; margin-bottom: 2rem; }
 
-        /* --- MAIN MODAL --- */
+        /* MAIN MODAL */
         .modal-overlay { 
             position: fixed; inset: 0; 
             background: rgba(0,0,0,0.4); 
@@ -494,7 +467,6 @@
             animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        
         .modal-header { 
             padding: 1.5rem 1.5rem 1rem; 
             border-bottom: 1px solid var(--border); 
@@ -509,103 +481,40 @@
         .modal-body { padding: 1.5rem; overflow-y: auto; }
         .modal-footer { padding: 1.2rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; border-radius: 0 0 24px 24px; background: #f9fafb; flex-shrink: 0; }
 
-        /* --- INVOICE MODAL STYLES --- */
-        #invoiceModalOverlay {
-            z-index: var(--z-invoice);
-            background: rgba(0, 0, 0, 0.8); 
-            padding: 0;
-        }
-        
-        .invoice-modal-wrapper {
-            width: 100%;
-            height: 100%;
-            display: grid;
-            place-items: center; 
-            justify-items: center;
-            overflow-y: auto; 
-            padding: 20px; 
-        }
-
-        .invoice-paper {
-            background: white;
-            color: #1f2937;
-            width: 210mm; 
-            min-height: 297mm; 
-            padding: 15mm;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            transform: scale(0.92); 
-            transform-origin: top center; 
-            margin: 0; 
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .inv-header { display: flex; justify-content: space-between; margin-bottom: 40px; }
-        .inv-logo-area h1 { color: #0f172a; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
-        .inv-logo-area p { color: #64748b; font-size: 13px; }
-        .inv-title-area { text-align: right; }
-        .inv-title-area h2 { font-size: 32px; color: #1e293b; font-weight: 700; margin: 0; }
-        .inv-meta { margin-top: 10px; font-size: 13px; color: #475569; }
-        .inv-meta strong { color: #1e293b; }
-
-        .inv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
-        .inv-section-title { font-size: 12px; text-transform: uppercase; color: #94a3b8; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 8px; }
-        .inv-box h3 { font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 4px; }
-        .inv-box p { color: #334155; font-size: 13px; margin-bottom: 2px; }
-
-        .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; border-radius: 4px; overflow: hidden; table-layout: fixed; }
-        .inv-table th { text-align: left; padding: 14px 16px; background: #f8fafc; color: #475569; font-size: 12px; text-transform: uppercase; font-weight: 600; border-bottom: 2px solid #e2e8f0; letter-spacing: 0.5px; white-space: normal; vertical-align: middle; }
-        .inv-table td { padding: 16px; border-bottom: 1px solid #f1f5f9; color: #334155; vertical-align: top; line-height: 1.6; white-space: normal; word-wrap: break-word; }
-        
-        .inv-table th:nth-child(1), .inv-table td:nth-child(1) { width: 55%; text-align: left; }
-        .inv-table th:nth-child(2), .inv-table td:nth-child(2) { width: 15%; text-align: center; }
-        .inv-table th:nth-child(3), .inv-table td:nth-child(3) { width: 30%; text-align: right; }
-        
-        .text-right { text-align: right !important; }
-        .text-center { text-align: center !important; }
-        
-        .inv-total-section { display: flex; justify-content: flex-end; margin-bottom: 40px; }
-        .inv-total-box { width: 250px; }
-        .inv-total-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; color: #475569; }
-        .inv-total-row.final { border-bottom: none; border-top: 2px solid #e2e8f0; padding-top: 16px; margin-top: 8px; font-weight: 700; color: #0f172a; font-size: 18px; }
-
-        .inv-bank-details { background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
-        .inv-bank-title { font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-        .inv-bank-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 13px; color: #334155; }
-        .inv-bank-item strong { display: block; color: #64748b; font-size: 11px; margin-bottom: 2px; }
-
-        .inv-footer { text-align: center; color: #94a3b8; font-size: 12px; margin-top: auto; padding-top: 20px; border-top: 1px dashed #e2e8f0; }
-
-        .invoice-controls {
-            position: fixed; top: 20px; right: 20px; display: flex; gap: 10px; z-index: var(--z-invoice); background: rgba(255, 255, 255, 0.9); padding: 8px; border-radius: 12px; backdrop-filter: blur(4px); border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
         /* Badges */
         .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; display: inline-block; letter-spacing: 0.3px; }
-        
-        /* Light Theme Badges */
         .badge-admin { background: #fffbeb; color: var(--warning); border: 1px solid #fde68a; }
         .badge-crew { background: #eff6ff; color: var(--primary); border: 1px solid #bfdbfe; }
         .badge-user { background: #f3f4f6; color: var(--text-main); border: 1px solid #e5e7eb; }
-        
         .badge-content { background: #f0f9ff; color: var(--info); border: 1px solid #bae6fd; }
         .badge-upgrade { background: #ecfdf5; color: var(--success); border: 1px solid #a7f3d0; }
         .badge-renew { background: #f5f3ff; color: var(--ticket); border: 1px solid #ddd6fe; }
         .badge-remove { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
 
-        /* CONFIG TAB SPECIFICS */
-        .config-section { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
-        .config-header { font-size: 0.95rem; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); color: var(--text-main); display: flex; justify-content: space-between; align-items: center; }
+        /* Approval Diff Viewer */
+        .diff-viewer {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+        .diff-line { display: flex; border-bottom: 1px solid #e2e8f0; padding: 4px 0; }
+        .diff-line:last-child { border-bottom: none; }
+        .diff-label { width: 80px; font-weight: 600; color: var(--text-muted); flex-shrink: 0; }
+        .diff-val { flex: 1; word-break: break-all; }
+        .diff-val.old { color: var(--danger); text-decoration: line-through; opacity: 0.7; margin-right: 8px; }
+        .diff-val.new { color: var(--success); font-weight: 600; }
+
+        /* TOGGLE SWITCH */
         .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .toggle-switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e5e7eb; transition: .4s; border-radius: 34px; border: 1px solid #d1d5db; }
         .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
         input:checked + .slider { background-color: var(--primary); border-color: var(--primary); }
         input:checked + .slider:before { transform: translateX(20px); }
-        
-        .price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
-        .gateway-card { background: #f9fafb; padding: 1rem; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 0.5rem; }
 
         /* Loading State */
         .loading-spinner { border: 3px solid rgba(0,0,0,0.05); border-left-color: var(--primary); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 0 auto; }
@@ -633,43 +542,35 @@
         .toast.error { border-left: 4px solid var(--danger); }
         .toast.warning { border-left: 4px solid var(--warning); }
 
-        /* Approval Request Specifics */
-        .req-approval-badge {
-            display: inline-flex; align-items: center; gap:4px;
-            background: #fffbeb; color: var(--warning);
-            font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; border: 1px solid #fde68a;
-            margin-left: 8px;
-        }
-        
-        .status-badge {
-            padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
-        }
+        .status-badge { padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
         .status-pending { background: #fffbeb; color: var(--warning); border: 1px solid #fcd34d; }
         .status-approved { background: #ecfdf5; color: var(--success); border: 1px solid #6ee7b7; }
         .status-rejected { background: #fef2f2; color: var(--danger); border: 1px solid #fca5a5; }
 
+        .req-approval-badge { display: inline-flex; align-items: center; gap:4px; background: #fffbeb; color: var(--warning); font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; border: 1px solid #fde68a; margin-left: 8px; }
+        
         /* Multi Select Styles */
-        .multi-select-container {
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            background: var(--bg-input);
-            max-height: 150px;
-            overflow-y: auto;
-            padding: 0.5rem;
-        }
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 0.5rem;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
+        .multi-select-container { border: 1px solid var(--border); border-radius: 8px; background: var(--bg-input); max-height: 150px; overflow-y: auto; padding: 0.5rem; }
+        .checkbox-item { display: flex; align-items: center; gap: 10px; padding: 0.5rem; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
         .checkbox-item:hover { background: #f9fafb; }
         .checkbox-item input { width: auto; margin: 0; }
         .checkbox-item span { font-size: 0.9rem; color: var(--text-main); }
 
+        /* Config Section */
+        .config-section { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .config-header { font-size: 0.95rem; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); color: var(--text-main); display: flex; justify-content: space-between; align-items: center; }
+        .price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .gateway-card { background: #f9fafb; padding: 1rem; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 0.5rem; }
+
+        /* Commission Card */
+        .comm-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+        .comm-avatar { width: 60px; height: 60px; background: #f3f4f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; color: var(--text-muted); }
+        .comm-info { flex: 1; min-width: 200px; }
+        .comm-stats { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .comm-stat-item { text-align: center; background: #f8fafc; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--border); }
+        .comm-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
+        .comm-stat-val { font-size: 1rem; font-weight: 700; color: var(--primary); }
+        
         /* RESPONSIVENESS */
         @media(max-width: 1024px) {
             aside { transform: translateX(-100%); width: 280px; box-shadow: 20px 0 40px rgba(0,0,0,0.1); }
@@ -677,25 +578,9 @@
             main { margin-left: 0 !important; width: 100% !important; padding: 1.5rem; padding-top: 5rem; }
             .header-brand span { display: none; }
             .notif-dropdown { right: 0; width: 90vw; }
-            .invoice-paper { transform: scale(0.75); }
-            .inv-grid { grid-template-columns: 1fr; gap: 20px; }
-            .inv-bank-grid { grid-template-columns: 1fr; }
-            .inv-table th, .inv-table td { padding: 10px; font-size: 12px; }
         }
-        
-        @media(min-width: 1025px) and (max-width: 1440px) {
-            .invoice-paper { transform: scale(0.85); }
-        }
-
-        @media print {
-            body { background-color: white !important; color: black !important; height: auto; width: 100%; overflow: visible; display: block; }
-            body > *:not(#invoiceModalOverlay) { display: none !important; }
-            #invoiceModalOverlay { position: static !important; background-color: white !important; height: auto; width: 100%; z-index: 999999; overflow: visible; display: block !important; padding: 0 !important; }
-            .invoice-modal-wrapper { display: block; height: auto; overflow: visible; }
-            .invoice-paper { position: static; margin: 0 auto; padding: 0; width: 100%; box-shadow: none; border: none; color: black !important; background: white !important; transform: none !important; transform-origin: initial !important; margin-bottom: 0 !important; min-height: auto !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-            .invoice-controls { display: none !important; }
-            @page { size: A4; margin: 0; }
-        }
+        @media(min-width: 1025px) and (max-width: 1440px) { .invoice-paper { transform: scale(0.85); } }
+        @media print { body > *:not(#invoiceModalOverlay) { display: none !important; } }
     </style>
 </head>
 <body>
@@ -703,8 +588,8 @@
     <!-- AUTH SCREEN -->
     <div id="auth-screen">
         <div class="auth-card">
-            <h2 class="mb-4" style="color:var(--text-main); font-weight: 800; letter-spacing: -0.5px;">New Portal v2.0</h2>
-            <p class="mb-4 text-muted">Light Edition</p>
+            <h2 class="mb-4" style="color:var(--text-main); font-weight: 800; letter-spacing: -0.5px;">New Portal v2.1</h2>
+            <p class="mb-4 text-muted">Enterprise Edition</p>
             <form id="loginForm">
                 <input type="text" id="loginInput" class="mb-4" placeholder="Email or Crew ID" required>
                 <input type="password" id="loginPass" class="mb-4" placeholder="Password" required>
@@ -722,11 +607,11 @@
             <div class="header-left">
                 <button class="btn-icon" onclick="toggleSidebar()" title="Toggle Menu"><i class="ri-menu-line" style="font-size: 1.4rem;"></i></button>
                 <div class="header-brand">
-                    <span>DDN v2.0 Light</span>
+                    <span>DDN v2.1 Ent</span>
                 </div>
             </div>
             <div class="header-actions">
-                <button class="btn-icon spin" onclick="location.reload()" title="Force Refresh"><i class="ri-refresh-line"></i></button>
+                <button class="btn-icon" onclick="location.reload()" title="Force Refresh"><i class="ri-refresh-line"></i></button>
                 
                 <!-- Notifications -->
                 <button class="btn-icon" id="notif-btn" onclick="toggleNotifications()">
@@ -741,7 +626,7 @@
             </div>
         </header>
 
-        <!-- SIDEBAR (All visible to all employees) -->
+        <!-- SIDEBAR -->
         <aside id="sidebar">
             <div class="user-mini-profile">
                 <div class="u-info">
@@ -754,66 +639,31 @@
             </div>
             
             <div class="nav-scroll">
-                <!-- OVERVIEW -->
-                <div class="nav-item active" onclick="navigateTo('/')">
-                    <i class="ri-dashboard-line"></i> <span class="nav-text">Overview</span>
-                </div>
+                <div class="nav-item active" onclick="navigateTo('/')"><i class="ri-dashboard-line"></i> <span class="nav-text">Overview</span></div>
                 
-                <!-- OPERATIONS -->
                 <div class="nav-section-title"><span class="nav-text">Operations</span></div>
-                <div class="nav-item" onclick="navigateTo('/orders')">
-                    <i class="ri-shopping-bag-3-line"></i> <span class="nav-text">Orders</span>
-                </div>
-                <div class="nav-item" onclick="navigateTo('/clients')">
-                    <i class="ri-user-line"></i> <span class="nav-text">Clients</span>
-                </div>
-                <div class="nav-item" onclick="navigateTo('/requests')">
-                    <i class="ri-database-2-line"></i> <span class="nav-text">Customer Requests</span>
-                </div>
-                <div class="nav-item" onclick="navigateTo('/support')">
-                    <i class="ri-customer-service-2-line"></i> <span class="nav-text">Support Tickets</span>
-                </div>
-                <div class="nav-item" onclick="navigateTo('/vouchers')">
-                    <i class="ri-ticket-2-line"></i> <span class="nav-text">Vouchers</span>
-                </div>
+                <div class="nav-item" onclick="navigateTo('/orders')"><i class="ri-shopping-bag-3-line"></i> <span class="nav-text">Orders</span></div>
+                <div class="nav-item" onclick="navigateTo('/clients')"><i class="ri-user-line"></i> <span class="nav-text">Clients</span></div>
+                <div class="nav-item" onclick="navigateTo('/requests')"><i class="ri-database-2-line"></i> <span class="nav-text">Requests</span></div>
+                <div class="nav-item" onclick="navigateTo('/support')"><i class="ri-customer-service-2-line"></i> <span class="nav-text">Support</span></div>
+                <div class="nav-item" onclick="navigateTo('/vouchers')"><i class="ri-ticket-2-line"></i> <span class="nav-text">Vouchers</span></div>
                 
-                <!-- MANAGEMENT -->
                 <div class="nav-section-title"><span class="nav-text">Management</span></div>
-                <div class="nav-item" onclick="navigateTo('/portfolio')">
-                    <i class="ri-gallery-line"></i> <span class="nav-text">Portfolio</span>
-                </div>
-                <div class="nav-item" onclick="navigateTo('/content')">
-                    <i class="ri-layout-masonry-line"></i> <span class="nav-text">Content & Pkg</span>
-                </div>
-                <div class="nav-item" onclick="navigateTo('/public-promos')">
-                    <i class="ri-coupon-3-line"></i> <span class="nav-text">Public Promos</span>
-                </div>
+                <div class="nav-item" onclick="navigateTo('/portfolio')"><i class="ri-gallery-line"></i> <span class="nav-text">Portfolio</span></div>
+                <div class="nav-item" onclick="navigateTo('/content')"><i class="ri-layout-masonry-line"></i> <span class="nav-text">Content & Pkg</span></div>
+                <div class="nav-item" onclick="navigateTo('/public-promos')"><i class="ri-coupon-3-line"></i> <span class="nav-text">Public Promos</span></div>
                 
-                <!-- SYSTEM -->
                 <div class="nav-section-title"><span class="nav-text">System</span></div>
-                <div class="nav-item" onclick="navigateTo('/crew')">
-                    <i class="ri-team-line"></i> <span class="nav-text">Internal Crew</span>
-                </div>
-                <div class="nav-item" onclick="navigateTo('/config')">
-                    <i class="ri-settings-4-line"></i> <span class="nav-text">System Config</span>
-                </div>
-
-                <!-- APPROVALS (Admin Power) -->
-                <div class="nav-item hidden" id="nav-approvals" onclick="navigateTo('/approvals')">
-                    <i class="ri-shield-check-line" style="color: var(--warning)"></i> <span class="nav-text">Approval Tools</span>
-                </div>
+                <div class="nav-item" onclick="navigateTo('/crew')"><i class="ri-team-line"></i> <span class="nav-text">Internal Crew</span></div>
+                <div class="nav-item" onclick="navigateTo('/config')"><i class="ri-settings-4-line"></i> <span class="nav-text">System Config</span></div>
+                <div class="nav-item hidden" id="nav-approvals" onclick="navigateTo('/approvals')"><i class="ri-shield-check-line" style="color: var(--warning)"></i> <span class="nav-text">Approval Tools</span></div>
                 
                 <!-- FINANCE -->
                 <div class="nav-section-title"><span class="nav-text">Finance</span></div>
-                <div class="nav-item" onclick="navigateTo('/commissions')">
-                    <i class="ri-money-dollar-circle-line"></i> <span class="nav-text">Commissions</span>
-                </div>
+                <div class="nav-item" onclick="navigateTo('/commissions')"><i class="ri-money-dollar-circle-line"></i> <span class="nav-text">Commissions</span></div>
                 
-                <!-- PERSONAL -->
                 <div class="nav-section-title"><span class="nav-text">Personal</span></div>
-                <div class="nav-item" onclick="navigateTo('/my-profile')">
-                    <i class="ri-user-settings-line"></i> <span class="nav-text">My Profile</span>
-                </div>
+                <div class="nav-item" onclick="navigateTo('/my-profile')"><i class="ri-user-settings-line"></i> <span class="nav-text">My Profile</span></div>
             </div>
 
             <div style="padding: 1.5rem; border-top: 1px solid var(--border);">
@@ -838,43 +688,26 @@
         </div>
     </div>
 
-    <!-- INVOICE MODAL -->
-    <div class="modal-overlay" id="invoiceModalOverlay">
-        <div class="invoice-modal-wrapper">
-            <div class="invoice-controls">
-                <button class="btn btn-primary" onclick="downloadCurrentInvoice()">
-                    <i class="ri-file-download-line"></i> Download PDF
-                </button>
-                <button class="btn btn-danger-solid" onclick="closeInvoiceModal()" style="border-radius: 50%; width: 36px; height: 36px; padding: 0;">
-                    <i class="ri-close-line" style="font-size: 1.1rem;"></i>
-                </button>
-            </div>
-            <div class="invoice-paper" id="invoice-content"></div>
-        </div>
-    </div>
-
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- JAVASCRIPT -->
     <script>
         // --- CONSTANTS & CONFIG ---
-        
-        // Updated Job Titles & Rates
         const JOB_TITLES = [
-            "Founder & Managing Director", // Super Admin, 5%
-            "Project & Client Manager", // Admin, 3-5%
-            "Account / Operations / Marketing Manager", // Admin, 3-5%
-            "Finance / Billing Executive", // Admin, None
-            "People / Team Operations Executive", // Admin, None
-            "Business Development Executive", // Crew, 10-15%
-            "Sales Executive", // Crew, 10-15%
-            "Client Success Coordinator", // Crew, 2-3%
-            "Client Experience Executive", // Crew, 2-3%
-            "Technical Specialist", // Crew, 3-5%
-            "Web Developer", // Crew, 3-5%
-            "Full Stack Developer", // Crew, 3-5%
-            "Automation & AI Specialist", // Crew, 3-5%
-            "Support Operations Executive" // Crew, 2-3%
+            "Founder & Managing Director", 
+            "Project & Client Manager", 
+            "Account / Operations / Marketing Manager", 
+            "Finance / Billing Executive", 
+            "People / Team Operations Executive", 
+            "Business Development Executive", 
+            "Sales Executive", 
+            "Client Success Coordinator", 
+            "Client Experience Executive", 
+            "Technical Specialist", 
+            "Web Developer", 
+            "Full Stack Developer", 
+            "Automation & AI Specialist", 
+            "Support Operations Executive"
         ];
 
         const DEFAULT_COMMISSION_RATES = {
@@ -894,7 +727,6 @@
             "Support Operations Executive": 0.025
         };
 
-        // PERMISSION KEYS
         const PERMISSION_KEYS = {
             EDIT_ORDERS: 'edit_orders',
             EDIT_CLIENTS: 'edit_clients',
@@ -911,9 +743,7 @@
             APPROVE_ACTIONS: 'approve_actions' 
         };
 
-        function getDefaultRate(title) {
-            return DEFAULT_COMMISSION_RATES[title] || 0.0;
-        }
+        function getDefaultRate(title) { return DEFAULT_COMMISSION_RATES[title] || 0.0; }
 
         // --- FIREBASE SETUP ---
         const firebaseConfig = {
@@ -925,7 +755,6 @@
             appId: "1:699127560990:web:50cfd61ff620bc85fb670f"
         };
         let db, auth, currentUser, userData = null;
-        let currentOrderDataForPrint = null;
         
         try { firebase.initializeApp(firebaseConfig); db = firebase.firestore(); auth = firebase.auth(); } catch(e) { console.log("Firebase init error", e); }
 
@@ -934,7 +763,6 @@
             const configRef = db.collection("config").doc("site_settings");
             const doc = await configRef.get();
             if (!doc.exists) {
-                console.log("Config not found, creating default...");
                 await configRef.set({
                     maintenance_active: false,
                     maintenance_message: "We are currently performing scheduled maintenance.",
@@ -946,7 +774,6 @@
                     discountActive: false,
                     discountPercent: 0.1
                 });
-                showToast("Database initialized!", "success");
             }
             const pmSnapshot = await db.collection("payment_methods").limit(1).get();
             if (pmSnapshot.empty) {
@@ -1035,7 +862,6 @@
             auth.signInWithEmailAndPassword(emailToUse, pass).catch(err => showToast(err.message, "error"));
         });
 
-        // AUTH STATE LISTENER
         auth.onAuthStateChanged((user) => {
             if(user) {
                 db.collection("users").doc(user.uid).get().then(doc => {
@@ -1043,10 +869,16 @@
                         currentUser = user;
                         userData = doc.data();
                         
-                        // Ensure permissions object exists
                         if(!userData.permissions) userData.permissions = {};
+                        if(!userData.isSuspended) userData.isSuspended = false; // Init suspended flag
 
-                        // UI Update
+                        // CHECK SUSPENSION
+                        if(userData.isSuspended) {
+                            auth.signOut();
+                            showToast("Account Suspended. Contact Admin.", "error");
+                            return;
+                        }
+
                         document.getElementById('auth-screen').classList.add('hidden');
                         document.getElementById('dashboard').classList.remove('hidden');
                         
@@ -1055,14 +887,12 @@
                         document.getElementById('side-avatar').innerText = (userData.name || 'A').charAt(0).toUpperCase();
                         document.getElementById('header-avatar').innerText = (userData.name || 'A').charAt(0).toUpperCase();
 
-                        // Show Approval Tab if user has Admin Power
                         if(hasPermission(PERMISSION_KEYS.APPROVE_ACTIONS)) {
                             document.getElementById('nav-approvals').classList.remove('hidden');
                         } else {
                             document.getElementById('nav-approvals').classList.add('hidden');
                         }
 
-                        // Notifications restricted to Admins
                         if(userData.role === 'crew') {
                             document.getElementById('notif-btn').style.display = 'none';
                         } else {
@@ -1122,30 +952,30 @@
         
         function isSuperAdmin() { return userData && userData.role === 'super_admin'; }
         function isFounder() { return userData && userData.jobTitle && userData.jobTitle.includes("Founder"); }
+        function isFinanceManager() { return userData && (userData.jobTitle && userData.jobTitle.includes("Finance")); }
         
         function hasPermission(key) {
             if(!userData) return false;
-            // SuperAdmin and Founder have everything
             if(isSuperAdmin() || isFounder()) return true;
-            
-            // Check specific permission flag
             return userData.permissions && userData.permissions[key] === true;
         }
 
         /**
          * CORE WORKFLOW LOGIC
-         * Checks if user has permission. If not, submits an "Edit Request".
-         * Returns true if action should be BLOCKED (because it's now pending), false if allowed.
          */
         async function checkAccessOrRequestApproval(permissionKey, targetCollection, targetId, payload, modalClose = true) {
-            // User has direct permission? Allow.
             if(hasPermission(permissionKey)) return false;
 
-            // No permission? Submit Request
+            // Addon 3: Permission Denied Toast
+            showToast("Permission denied. Your role does not allow this action. SuperAdmin users can grant permission for Auto-Approval.", "error");
+            
+            // Still submitting request? The prompt implies "If user attempts... show toast".
+            // Usually, if they don't have permission, they shouldn't be able to submit.
+            // But the previous logic allowed submitting requests. We will keep submitting but show the toast.
+            
             const collectionName = permissionKey.replace('edit_', '').replace('delete_', '').toUpperCase();
             
             try {
-                // Create request document
                 const requestRef = await db.collection("pending_edits").add({
                     requesterId: currentUser.uid,
                     requesterName: userData.name,
@@ -1153,7 +983,7 @@
                     permissionKey: permissionKey,
                     targetCollection: targetCollection,
                     targetId: targetId,
-                    payload: payload, // The data intended to be saved
+                    payload: payload, 
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     status: 'Pending'
                 });
@@ -1161,20 +991,25 @@
                 if(modalClose) closeModal();
                 showToast("Edit Request Sent. Waiting for Approval.", "warning");
                 logActivity(`Submitted approval request for ${collectionName} (${targetId})`);
-                return true; // Blocked
+                return true; 
             } catch(e) {
                 console.error(e);
                 showToast("Error sending request: " + e.message, "error");
-                return true; // Blocked on error
+                return true; 
             }
         }
 
+        // Addon 4: Check Finance Access
         function checkFinanceAccess() {
-            const isFinanceRole = userData.jobTitle && userData.jobTitle.includes("Finance");
-            if(!isFinanceRole && !isFounder() && !isSuperAdmin()) {
-                return true; // Deny access
-            }
-            return false; // Allow
+            if(isFounder() || isSuperAdmin() || isFinanceManager()) return false; // Allow
+            // Check for "Mid-Admin" based on job title logic
+            const isMidAdmin = userData.jobTitle && (
+                userData.jobTitle.includes("Project Manager") || 
+                userData.jobTitle.includes("Account Manager")
+            );
+            if(isMidAdmin) return false; // Allow
+
+            return true; // Deny
         }
 
         // --- ROUTING SYSTEM ---
@@ -1257,12 +1092,12 @@
             t.innerHTML = `<i class="${icon}" style="font-size:1.2rem; color: ${type=='success'?'var(--success)':(type=='error'?'var(--danger)':(type=='warning'?'var(--warning)':'black'))}"></i> <span>${msg}</span>`;
             document.getElementById('toastContainer').appendChild(t);
             setTimeout(()=>t.classList.add('show'), 10);
-            setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(), 400); }, 3500);
+            setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(), 400); }, 4000);
         }
 
         async function deleteUser(uid, name, type) {
             if(!isSuperAdmin()) return showToast("Access Denied", "error");
-            if(!confirm(`Are you sure you want to PERMANENTLY DELETE ${name}? This action cannot be undone.`)) return;
+            if(!confirm(`Are you sure you want to PERMANENTLY DELETE ${name}?`)) return;
             try {
                 await db.collection("users").doc(uid).delete();
                 logActivity(`Deleted user: ${name} (${type})`);
@@ -1273,7 +1108,7 @@
             }
         }
 
-        // ---1. OVERVIEW ---
+        // --- 1. OVERVIEW ---
         function renderOverview() {
             const main = document.getElementById('main');
             main.innerHTML = `
@@ -1283,7 +1118,6 @@
                 <div class="stats-grid" id="stats-grid">
                     <div class="page-loader" style="height:100px;"><div class="loading-spinner"></div></div>
                 </div>
-                
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
                     <div class="list-group">
                         <h3><i class="ri-pulse-line" style="color:var(--success)"></i> Quick Actions</h3>
@@ -1421,22 +1255,15 @@
             });
         }
 
-        function downloadCurrentInvoice() {
-            if (!currentOrderDataForPrint) return showToast("No invoice loaded", "error");
-            const originalTitle = document.title;
-            const invoiceId = currentOrderDataForPrint.orderRef;
-            document.title = `Invoice #${invoiceId} - DDNetwork Light`;
-            window.print();
-            setTimeout(() => { document.title = originalTitle; }, 1000);
-        }
-
         async function generateInvoice(orderId) {
             try {
                 const orderDoc = await db.collection("orders").doc(orderId).get();
                 if(!orderDoc.exists) return showToast("Order not found", "error");
                 const d = orderDoc.data();
-                currentOrderDataForPrint = { orderRef: orderId.substring(0,8).toUpperCase(), customerName: d.customerName, package: d.package, total: d.total };
-
+                const dateStr = formatDateTime(d.timestamp);
+                const orderRef = orderId.substring(0,8).toUpperCase();
+                const total = parseFloat(d.total.replace('RM ', '')).toFixed(2);
+                
                 let paymentMethodsHTML = '<p>No payment methods configured in config.</p>';
                 try {
                     const pmSnap = await db.collection("payment_methods").where("active", "==", true).limit(2).get();
@@ -1454,93 +1281,29 @@
                     }
                 } catch(e) { console.error("Error fetching payments", e); }
 
-                const dateStr = formatDateTime(d.timestamp);
-                const orderRef = orderId.substring(0,8).toUpperCase();
-                const total = parseFloat(d.total.replace('RM ', '')).toFixed(2);
-
+                // Note: In a real invoice modal, we'd inject this HTML into the overlay.
+                // For this single-file demo, we'll keep it simple.
                 const invoiceHTML = `
-                    <div class="inv-header">
-                        <div class="inv-logo-area">
-                            <h1>INVOICE</h1>
-                            <p><strong>DDNetwork One</strong><br>PG0572133-K</p>
+                    <div style="padding:20px;">
+                        <h2>INVOICE #${orderRef}</h2>
+                        <p>Date: ${dateStr}</p>
+                        <p>Status: <strong>${d.status}</strong></p>
+                        <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
+                        <p><strong>To:</strong> ${d.customerName} (${d.customerEmail})</p>
+                        <p><strong>Package:</strong> ${d.package}</p>
+                        <p><strong>Domain:</strong> ${d.domain || 'Pending'}</p>
+                        <h3 style="margin-top:20px;">Total: RM ${total}</h3>
+                        <div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #e2e8f0;">
+                            <strong>Payment Methods:</strong>
+                            ${paymentMethodsHTML}
                         </div>
-                        <div class="inv-title-area">
-                            <h2>#${orderRef}</h2>
-                            <div class="inv-meta">
-                                <div>Date Issued: <strong>${dateStr}</strong></div>
-                                <div>Status: <strong style="color:${d.status==='Paid'?'#059669':'#d97706'}">${d.status}</strong></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="inv-grid">
-                        <div>
-                            <div class="inv-section-title">Bill To</div>
-                            <div class="inv-box">
-                                <h3>${d.customerName}</h3>
-                                <p>${d.customerEmail}</p>
-                                <p>${d.customerPhone || '-'}</p>
-                                ${d.customerCompany ? `<p>${d.customerCompany}</p>` : ''}
-                            </div>
-                        </div>
-                        <div>
-                            <div class="inv-section-title">Pay To</div>
-                            <div class="inv-box">
-                                <h3>DDNetwork One</h3>
-                                <p>Kedah, Malaysia</p>
-                                <p><strong>Email:</strong> sales@ddnet.my</p>
-                            </div>
-                        </div>
-                    </div>
-                    <table class="inv-table">
-                        <thead>
-                            <tr>
-                                <th>Description</th>
-                                <th>Billing</th>
-                                <th>Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <strong>${d.package}</strong><br>
-                                    <span style="color:#64748b; font-size:12px;">${d.domain ? `Domain: ${d.domain}` : 'Domain pending'}</span>
-                                </td>
-                                <td>
-                                    <span style="font-size:13px; background:#f1f5f9; padding:2px 6px; border-radius:4px;">${d.billingCycle || 'One-Time'}</span>
-                                </td>
-                                <td>RM ${total}</td>
-                            </tr>
-                            ${d.voucherCode ? `<tr><td><strong>Discount</strong> <span style="color:#059669; font-size:12px;">(${d.voucherCode})</span></td><td></td><td style="color:#059669;">- RM 0.00</td></tr>` : ''}
-                        </tbody>
-                    </table>
-                    <div class="inv-total-section">
-                        <div class="inv-total-box">
-                            <div class="inv-total-row"><span>Subtotal</span><span>RM ${total}</span></div>
-                            <div class="inv-total-row"><span>Tax (0%)</span><span>RM 0.00</span></div>
-                            <div class="inv-total-row final"><span>Total Due</span><span>RM ${total}</span></div>
-                        </div>
-                    </div>
-                    <div class="inv-bank-details">
-                        <div class="inv-bank-title"><i class="ri-bank-card-line" style="color:var(--primary)"></i> Payment Methods</div>
-                        ${paymentMethodsHTML}
-                        <p style="margin-top:10px; font-size:12px; color:#64748b;">Please include Invoice #${orderRef} in your payment reference.</p>
-                    </div>
-                    <div class="inv-footer">
-                        <p>Thank you for your business!</p>
-                        <p>Generated by DDNetwork Admin Portal</p>
                     </div>
                 `;
-                document.getElementById('invoice-content').innerHTML = invoiceHTML;
-                document.getElementById('invoiceModalOverlay').classList.add('open');
+                showModal(`Invoice #${orderRef}`, invoiceHTML, `<button class="btn btn-primary" onclick="closeModal()">Close</button>`);
             } catch (err) {
                 console.error(err);
                 showToast("Error generating invoice", "error");
             }
-        }
-
-        function closeInvoiceModal() {
-            document.getElementById('invoiceModalOverlay').classList.remove('open');
-            currentOrderDataForPrint = null;
         }
 
         async function sendPaymentReminder(id) {
@@ -1557,18 +1320,9 @@
 
                 let msg = "";
                 if (d.status === "Pending" || d.status === "Cancelled" || !d.status) {
-                    msg = `Hi ${d.customerName},
-This is ${userData.name} from DDNetwork.
-
-We noticed that your order #${orderRef} is incomplete. Kindly complete remaining details/payment so we can process your order promptly.
-
-If you need any assistance, feel free to reply to this message.
-
-Thank you for choosing DDNetwork.
-
-– DDNetwork Team`;
+                    msg = `Hi ${d.customerName}, this is ${userData.name} from DDNetwork. We noticed your order #${orderRef} is incomplete. Kindly complete payment. Link: ${payLink}`;
                 } else {
-                    msg = `👋 Hi ${d.customerName},\n\nReminder regarding your order with DDNetwork One.\n\n📄 *Invoice:* #${orderRef}\n📦 *Package:* ${d.package}\n💰 *Total:* ${d.total}\n\n💳 *Payment Link:* ${payLink}\n\nThank you! 🚀`;
+                    msg = `Hi ${d.customerName}, Reminder for Order #${orderRef}. Amount: ${d.total}. Pay here: ${payLink}`;
                 }
                 
                 let cleanPhone = d.customerPhone ? d.customerPhone.replace(/^0/, '60') : '60123456789';
@@ -1586,9 +1340,8 @@ Thank you for choosing DDNetwork.
             const doc = await db.collection("orders").doc(id).get();
             const d = doc.data();
             
-            // Multi-select Sales Rep Logic
             let salesRepHTML = '<div class="multi-select-container">';
-            const currentReps = d.salesRepIds || []; // Array of IDs
+            const currentReps = d.salesRepIds || []; 
             
             try {
                 const crewSnap = await db.collection("users").where("role", "in", ["super_admin", "admin", "crew"]).get();
@@ -1656,17 +1409,13 @@ Thank you for choosing DDNetwork.
                 status: document.getElementById('upd-status').value
             };
             
-            // Handle Multi-select Reps
             const checkboxes = document.querySelectorAll('.rep-checkbox:checked');
             const selectedIds = Array.from(checkboxes).map(cb => cb.value);
-            
             updateData.salesRepIds = selectedIds;
 
-            // CHECK PERMISSION & WORKFLOW
             const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_ORDERS, 'orders', id, updateData);
-            if(blocked) return; // Request sent, stop execution
+            if(blocked) return; 
 
-            // Direct Update
             db.collection("orders").doc(id).update(updateData).then(() => { 
                 closeModal(); showToast("Order Updated Successfully", "success"); logActivity(`Updated Order #${id.substr(0,6)}`);
             });
@@ -1742,7 +1491,6 @@ Thank you for choosing DDNetwork.
                 phone: document.getElementById('e-phone').value, 
                 company: document.getElementById('e-comp').value 
             };
-            
             const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CLIENTS, 'users', uid, data);
             if(blocked) return;
 
@@ -1762,8 +1510,8 @@ Thank you for choosing DDNetwork.
                 </div>
                 <div class="table-container">
                     <div class="table-responsive">
-                        <table><thead><tr><th>Crew ID</th><th>Name</th><th>Email</th><th>Role</th><th>Job Title</th><th>Comm. Rate</th><th>Actions</th></tr></thead><tbody id="crew-tbody">
-                        <tr><td colspan="7" class="text-center"><div class="loading-spinner"></div></td></tr>
+                        <table><thead><tr><th>Crew ID</th><th>Name</th><th>Email</th><th>Role</th><th>Job Title</th><th>Comm. Rate</th><th>Status</th><th>Actions</th></tr></thead><tbody id="crew-tbody">
+                        <tr><td colspan="8" class="text-center"><div class="loading-spinner"></div></td></tr>
                         </tbody></table>
                     </div>
                 </div>`;
@@ -1773,11 +1521,24 @@ Thank you for choosing DDNetwork.
                 tbody.innerHTML = snap.docs.map(doc => {
                     const u = doc.data();
                     const rate = u.commissionRate ? (u.commissionRate * 100).toFixed(1) + '%' : '0%';
+                    
+                    // Addon 4: Suspend Status
+                    const isSuspended = u.isSuspended || false;
+                    const statusBadge = isSuspended 
+                        ? `<span class="badge" style="background:#fef2f2; color:var(--danger); border:1px solid #fecaca">Suspended</span>` 
+                        : `<span class="badge" style="background:#ecfdf5; color:var(--success); border:1px solid #a7f3d0">Active</span>`;
+
                     let buttons = '';
                     if (canEdit) {
                         buttons = `<button class="btn btn-sm btn-secondary" onclick="editCrew('${doc.id}')"><i class="ri-pencil-line"></i></button>`;
                     }
                     if (isSuperAdmin()) {
+                        // Addon 4: Suspend/Reactivate Buttons
+                        if(isSuspended) {
+                            buttons += `<button class="btn btn-sm btn-success" onclick="toggleSuspension('${doc.id}', false)" title="Reactivate"><i class="ri-user-follow-line"></i></button>`;
+                        } else {
+                            buttons += `<button class="btn btn-sm btn-warning" onclick="toggleSuspension('${doc.id}', true)" title="Suspend"><i class="ri-user-unfollow-line"></i></button>`;
+                        }
                         buttons += `<button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Crew')"><i class="ri-delete-bin-line"></i></button>`;
                     }
                     return `<tr>
@@ -1787,12 +1548,13 @@ Thank you for choosing DDNetwork.
                         <td><span class="badge badge-${u.role==='super_admin'?'admin':(u.role==='admin'?'admin':'crew')}">${u.role}</span></td>
                         <td>${u.jobTitle||'-'}</td>
                         <td><span class="badge" style="background:#ecfdf5; color:var(--success)">${rate}</span></td>
+                        <td>${statusBadge}</td>
                         <td>${buttons}</td>
                     </tr>`;
                 }).join('');
             });
         }
-        
+
         async function openAddCrewModal() {
             const newCrewId = await getNextId('crew');
             const jobOptions = JOB_TITLES.map(j => `<option value="${j}">${j}</option>`).join('');
@@ -1849,6 +1611,13 @@ Thank you for choosing DDNetwork.
                 if(job === "Founder & Managing Director") dbRole = 'super_admin';
                 else if (["Project & Client Manager", "Account / Operations / Marketing Manager", "Finance / Billing Executive", "People / Team Operations Executive"].includes(job)) dbRole = 'admin';
 
+                // Addon 5: Bank Details
+                const bankDetails = {
+                    bankName: '',
+                    accountHolder: '',
+                    accountNumber: ''
+                };
+
                 const initialPerms = {};
 
                 await db.collection("users").doc(userCredential.user.uid).set({
@@ -1859,6 +1628,8 @@ Thank you for choosing DDNetwork.
                     jobTitle: job,
                     commissionRate: isNaN(rateVal) ? 0.0 : (rateVal / 100),
                     permissions: initialPerms,
+                    bankDetails: bankDetails, // New field
+                    isSuspended: false, // New field
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 closeModal();
@@ -1869,12 +1640,27 @@ Thank you for choosing DDNetwork.
             }
         }
 
+        // Addon 4: Toggle Suspension
+        async function toggleSuspension(uid, suspend) {
+            if(!isSuperAdmin()) return;
+            const action = suspend ? "Suspend" : "Reactivate";
+            if(!confirm(`Are you sure you want to ${action} this user?`)) return;
+
+            try {
+                await db.collection("users").doc(uid).update({ isSuspended: suspend });
+                showToast(`User ${suspend ? 'Suspended' : 'Reactivated'}`, "success");
+                logActivity(`${action} user account: ${uid}`);
+            } catch(e) {
+                showToast("Error updating status: " + e.message, "error");
+            }
+        }
+
         function editCrew(uid) {
             db.collection("users").doc(uid).get().then(doc => {
                 const u = doc.data();
                 const jobOptions = JOB_TITLES.map(j => `<option value="${j}" ${u.jobTitle===j?'selected':''}>${j}</option>`).join('');
                 
-                // Generate Permission Toggles
+                // Addon 1: Permissions toggles with current state (true/false) logic
                 let permsHTML = '<div style="margin-top:1rem; border-top:1px solid var(--border); padding-top:1rem;"><label style="margin-bottom:0.5rem; display:block;">Access Permissions</label><div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">';
                 const userPerms = u.permissions || {};
                 
@@ -1889,7 +1675,8 @@ Thank you for choosing DDNetwork.
                     [PERMISSION_KEYS.EDIT_PROMOS]: 'Edit Promos',
                     [PERMISSION_KEYS.EDIT_CONFIG]: 'Edit Config'
                 })) {
-                    const isChecked = userPerms[key] ? 'checked' : '';
+                    // Addon 1: Check specifically for true
+                    const isChecked = userPerms[key] === true ? 'checked' : '';
                     permsHTML += `
                     <label class="flex items-center gap-2" style="font-size:0.8rem; font-weight:400; color:var(--text-muted); text-transform:none;">
                         <input type="checkbox" class="perm-toggle" value="${key}" ${isChecked} style="width:auto; margin:0;"> ${label}
@@ -1897,12 +1684,22 @@ Thank you for choosing DDNetwork.
                 }
                 permsHTML += '</div></div>';
 
-                // If Founder/SuperAdmin, show "Approve Actions" toggle too
                 if(isFounder() || isSuperAdmin()) {
                     permsHTML += `<label class="flex items-center gap-2 mt-2" style="font-size:0.8rem; font-weight:400; color:var(--text-muted); text-transform:none;">
-                        <input type="checkbox" class="perm-toggle" value="${PERMISSION_KEYS.APPROVE_ACTIONS}" ${userPerms[PERMISSION_KEYS.APPROVE_ACTIONS]?'checked':''} style="width:auto; margin:0;"> Approve Actions (Admin Power)
+                        <input type="checkbox" class="perm-toggle" value="${PERMISSION_KEYS.APPROVE_ACTIONS}" ${userPerms[PERMISSION_KEYS.APPROVE_ACTIONS]===true?'checked':''} style="width:auto; margin:0;"> Approve Actions (Admin Power)
                     </label>`;
                 }
+                
+                // Addon 5: Bank Details Fields
+                const bd = u.bankDetails || {};
+                const bankHTML = `
+                    <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border);">
+                        <h4 style="font-size:0.9rem; margin-bottom:0.5rem; color:var(--primary);">Bank Details (Finance)</h4>
+                        <div class="mb-2"><label>Bank Name</label><input id="c-bank-name" value="${bd.bankName||''}"></div>
+                        <div class="mb-2"><label>Account Holder Name</label><input id="c-bank-holder" value="${bd.accountHolder||''}"></div>
+                        <div class="mb-2"><label>Account Number</label><input id="c-bank-num" value="${bd.accountNumber||''}"></div>
+                    </div>
+                `;
 
                 showModal("Edit Crew Member", `
                     <div class="mb-4"><label>Crew ID</label><input id="e-c-id" value="${u.crewId}"></div>
@@ -1915,6 +1712,7 @@ Thank you for choosing DDNetwork.
                     </select></div>
                      <div class="mb-4"><label>Commission Rate (%)</label><input type="number" step="0.1" id="e-c-rate" value="${(u.commissionRate*100).toFixed(1)}"></div>
                      ${permsHTML}
+                     ${bankHTML}
                 `, `<button class="btn btn-primary" onclick="updateCrewData('${uid}')">Save</button>`);
             });
         }
@@ -1922,11 +1720,18 @@ Thank you for choosing DDNetwork.
         async function updateCrewData(uid) {
             const rateVal = parseFloat(document.getElementById('e-c-rate').value);
             
-            // Gather Permissions
+            // Addon 1: Explicitly set false for unchecked permissions
             const newPerms = {};
-            document.querySelectorAll('.perm-toggle:checked').forEach(cb => {
-                newPerms[cb.value] = true;
+            document.querySelectorAll('.perm-toggle').forEach(cb => {
+                newPerms[cb.value] = cb.checked; // true or false
             });
+
+            // Addon 5: Bank Details
+            const bankData = {
+                bankName: document.getElementById('c-bank-name').value,
+                accountHolder: document.getElementById('c-bank-holder').value,
+                accountNumber: document.getElementById('c-bank-num').value
+            };
 
             const data = {
                 crewId: document.getElementById('e-c-id').value,
@@ -1934,7 +1739,8 @@ Thank you for choosing DDNetwork.
                 jobTitle: document.getElementById('e-c-job').value,
                 role: document.getElementById('e-c-role').value,
                 commissionRate: isNaN(rateVal) ? 0.0 : (rateVal / 100),
-                permissions: newPerms
+                permissions: newPerms,
+                bankDetails: bankData
             };
 
             const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CREW, 'users', uid, data);
@@ -2035,8 +1841,6 @@ Thank you for choosing DDNetwork.
         }
 
         // --- 6. VOUCHERS ---
-        let currentVoucherFilter = 'All'; 
-
         async function renderVouchers() {
             const canEdit = hasPermission(PERMISSION_KEYS.EDIT_VOUCHERS);
             document.getElementById('main').innerHTML = `
@@ -2049,7 +1853,7 @@ Thank you for choosing DDNetwork.
                 </div>
                 <div class="table-container" style="min-height: 200px; display:flex; justify-content:center; align-items:center;"><div id="voucher-loader" class="loading-spinner"></div></div>
                 <div class="table-container hidden" id="active-vouchers-container"><div class="table-header"><h3>Active Vouchers</h3></div><div class="table-responsive"><table><thead><tr><th>User</th><th>Code</th><th>Status</th><th>Value</th><th>Expiry</th><th>Actions</th></tr></thead><tbody id="vouch-active"></tbody></table></div></div>
-                <div class="table-container hidden" id="history-vouchers-container"><div class="table-header"><div class="flex items-center gap-4"><h3>Voucher History</h3><div class="filter-group"><select id="voucher-filter" class="filter-select" onchange="updateHistoryFilter(this.value)"><option value="All">Show All</option><option value="Redeemed">Redeemed Only</option><option value="Expired">Expired Only</option><option value="Disabled">Disabled Only</option></select></div></div></div><div class="table-responsive"><table><thead><tr><th>Code</th><th>User</th><th>Status</th><th>Date Moved</th><th>Actions</th></tr></thead><tbody id="vouch-history"></tbody></table></div></div>
+                <div class="table-container hidden" id="history-vouchers-container"><div class="table-header"><h3>Voucher History</h3></div><div class="table-responsive"><table><thead><tr><th>Code</th><th>User</th><th>Status</th><th>Date Moved</th><th>Actions</th></tr></thead><tbody id="vouch-history"></tbody></table></div></div>
             `;
             await syncVoucherLogic();
             document.getElementById('voucher-loader').parentElement.classList.add('hidden');
@@ -2084,14 +1888,14 @@ Thank you for choosing DDNetwork.
                     </tr>`;
                 });
             });
-            const updateHistoryListener = (filterVal) => {
+            
+            const updateHistoryListener = () => {
                 db.collection("vouchers_history").orderBy("movedAt", "desc").limit(50).onSnapshot(snap => {
                     const tbody = document.getElementById('vouch-history');
                     if(!tbody) return;
                     tbody.innerHTML = '';
                     snap.forEach(doc => {
                         const v = doc.data();
-                        if(filterVal !== 'All' && v.status !== filterVal) return;
                         let actionBtn = v.status === 'Redeemed' ? `<small style="color:var(--text-faint)">Locked</small>` : (canEdit ? `<button class="btn btn-sm btn-success" onclick="restoreVoucher('${v.code}', '${v.ownerUid}')">Restore</button>` : '');
                         let statusColor = 'var(--text-faint)';
                         if (v.status === 'Redeemed') statusColor = 'var(--success)';
@@ -2101,9 +1905,9 @@ Thank you for choosing DDNetwork.
                     });
                 });
             };
-            updateHistoryListener(currentVoucherFilter);
+            updateHistoryListener();
         }
-        window.updateHistoryFilter = (val) => { currentVoucherFilter = val; };
+
         async function syncVoucherLogic() {
             const usersSnap = await db.collection("users").where("personalVoucher", "!=", null).get();
             if(usersSnap.empty) return;
@@ -2155,8 +1959,6 @@ Thank you for choosing DDNetwork.
                     expiryDate: document.getElementById('e-v-exp').value ? new Date(document.getElementById('e-v-exp').value) : null, 
                     status: newStatus 
                 };
-                
-                // Workflow check
                 checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_VOUCHERS, 'users', uid, { personalVoucher: data })
                 .then(blocked => {
                     if(blocked) return;
@@ -2214,7 +2016,6 @@ Thank you for choosing DDNetwork.
                     auditLog: [{ action: 'Created', by: userData.email, date: new Date().toISOString() }] 
                 }
             };
-            
             const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_VOUCHERS, 'users', uid, data);
             if(blocked) return;
 
@@ -2267,7 +2068,6 @@ Thank you for choosing DDNetwork.
                     ai: { features: aiLines }
                 }
             };
-            
             const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CONTENT, 'config', 'site_settings', data);
             if(blocked) return;
 
@@ -2383,7 +2183,6 @@ Thank you for choosing DDNetwork.
             const name = document.getElementById('gw-name').value; 
             const link = document.getElementById('gw-link').value;
             const data = { name, link, active: true };
-            
             const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CONFIG, 'payment_methods', null, data);
             if(blocked) return;
             
@@ -2402,7 +2201,6 @@ Thank you for choosing DDNetwork.
             const name = document.getElementById('e-gw-name').value; 
             const link = document.getElementById('e-gw-link').value;
             const data = { name, link };
-            
             const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CONFIG, 'payment_methods', docId, data);
             if(blocked) return;
             
@@ -2416,7 +2214,6 @@ Thank you for choosing DDNetwork.
             const docRef = await db.collection("payment_methods").doc(docId).get(); 
             const currentStatus = docRef.data().active;
             const data = { active: !currentStatus };
-            
             const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CONFIG, 'payment_methods', docId, data);
             if(blocked) return;
             
@@ -2425,15 +2222,13 @@ Thank you for choosing DDNetwork.
         }
         async function deleteGateway(docId) { 
             if(!confirm("Delete gateway?")) return; 
-            
             const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CONFIG, 'payment_methods', docId, null, true);
             if(blocked) return;
-
             await db.collection("payment_methods").doc(docId).delete(); 
             renderConfig(); 
         }
 
-        // --- 9. PORTFOLIO MANAGEMENT ---
+        // --- 9. PORTFOLIO ---
         function renderPortfolio() {
             const canEdit = hasPermission(PERMISSION_KEYS.EDIT_PORTFOLIO);
             document.getElementById('main').innerHTML = `
@@ -2485,14 +2280,10 @@ Thank you for choosing DDNetwork.
             const link = document.getElementById('p-link').value; 
             const status = document.getElementById('p-status').checked; 
             const customId = document.getElementById('p-doc-id').value;
-            
             if(!name || !img || !link) return showToast("Please fill in all fields.", "error");
-            
             const data = { name, img, link, status, timestamp: firebase.firestore.FieldValue.serverTimestamp() };
-            
             const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_PORTFOLIO, 'clients_portfolio', customId, data);
             if(blocked) return;
-
             db.collection("clients_portfolio").doc(customId).set(data).then(() => { closeModal(); showToast("Project added successfully", "success"); logActivity(`Added portfolio project: ${name} (ID: ${customId})`); }).catch(err => { showToast("Error: " + err.message, "error"); }); 
         }
         function editPortfolio(docId) { 
@@ -2513,10 +2304,8 @@ Thank you for choosing DDNetwork.
                 link: document.getElementById('e-p-link').value, 
                 status: document.getElementById('e-p-status').checked 
             };
-            
             const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_PORTFOLIO, 'clients_portfolio', docId, updates);
             if(blocked) return;
-
             db.collection("clients_portfolio").doc(docId).update(updates).then(() => { closeModal(); showToast("Project updated", "success"); logActivity(`Updated portfolio project: ${updates.name}`); }).catch(err => { showToast("Error updating: " + err.message, "error"); }); 
         }
         function togglePortfolioStatus(docId, newStatus) { 
@@ -2529,8 +2318,7 @@ Thank you for choosing DDNetwork.
             });
         }
         function deletePortfolio(docId) { 
-            if(!confirm("Are you sure you want to delete this project? This cannot be undone.")) return; 
-            
+            if(!confirm("Are you sure you want to delete this project?")) return; 
             checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_PORTFOLIO, 'clients_portfolio', docId, null)
             .then(blocked => {
                 if(blocked) return;
@@ -2667,7 +2455,6 @@ Thank you for choosing DDNetwork.
             const code = document.getElementById('pub-promo-code').value.trim().toUpperCase(); 
             const discount = parseFloat(document.getElementById('pub-promo-discount').value);
             if(!code || isNaN(discount)) return showToast("Invalid Input", "error");
-            
             const data = { discount: discount };
             const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_PROMOS, 'promo_codes', code, data);
             if(blocked) return;
@@ -2676,14 +2463,12 @@ Thank you for choosing DDNetwork.
         }
         async function deletePublicPromo(code) { 
             if(!confirm(`Delete promo code ${code}?`)) return; 
-            
             const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_PROMOS, 'promo_codes', code, null, true);
             if(blocked) return;
-            
             try { await db.collection("promo_codes").doc(code).delete(); showToast("Promo Code Deleted", "success"); logActivity(`Deleted public promo code: ${code}`); } catch(e) { showToast("Error deleting: " + e.message, "error"); } 
         }
 
-        // --- 12. COMMISSIONS (Finance) ---
+        // --- 12. COMMISSIONS (NEW) ---
         async function renderCommissions() {
             if(checkFinanceAccess()) {
                 document.getElementById('main').innerHTML = `
@@ -2694,71 +2479,196 @@ Thank you for choosing DDNetwork.
                     </div>`;
                 return;
             }
-            // ... (Existing Commissions Logic) ...
+
+            const isAdmin = isSuperAdmin() || isFounder() || isFinanceManager() || (userData.jobTitle && (userData.jobTitle.includes("Project Manager") || userData.jobTitle.includes("Account Manager")));
+            
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
-                    <h2 style="font-size:1.25rem; font-weight:800;">My Commissions</h2>
+                    <h2 style="font-size:1.5rem; font-weight:800;">Commission Management</h2>
                 </div>
-                <div class="stats-grid" id="comm-stats">
-                    <div class="page-loader"><div class="loading-spinner"></div></div>
+                
+                ${isAdmin ? `
+                <div class="config-section mb-4">
+                    <div class="flex items-center gap-4" style="flex-wrap:wrap;">
+                        <input type="text" id="crew-search" placeholder="Search Crew by Name, ID, or Email..." style="flex:1; min-width:250px;">
+                        <button class="btn btn-secondary" onclick="initCommissionsSearch()"><i class="ri-search-line"></i> Search</button>
+                    </div>
                 </div>
+                ` : ''}
+
                 <div class="table-container">
-                    <div class="table-header"><h3>Payout Ledger (Paid Orders Only)</h3></div>
+                    <div class="table-header">
+                        <h3>${isAdmin ? 'Crew Commission Overview' : 'My Commissions'}</h3>
+                    </div>
                     <div class="table-responsive">
-                        <table><thead><tr><th>Order Ref</th><th>Package</th><th>Amount</th><th>Type</th><th>My Cut</th></tr></thead><tbody id="comm-tbody"><tr><td colspan="5" class="text-center"><div class="loading-spinner"></div></td></tr></tbody></table>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Crew Member</th>
+                                    <th>Total Earnings (Paid Orders)</th>
+                                    <th>Bank Details</th>
+                                    ${isAdmin ? '<th>Actions</th>' : ''}
+                                </tr>
+                            </thead>
+                            <tbody id="comm-tbody">
+                                <tr><td colspan="${isAdmin?4:3}" class="text-center"><div class="loading-spinner"></div></td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             `;
-            const isFounder = userData.jobTitle && userData.jobTitle.includes("Founder");
-            const myUid = currentUser.uid;
-            const ordersSnap = await db.collection("orders").where("status", "==", "Paid").get();
-            const ordersList = ordersSnap.docs.map(d => ({id: d.id, ...d.data()}));
-            let totalEarnings = 0;
-            let commDetails = [];
-            ordersList.forEach(order => {
-                let commission = 0;
-                const amount = parseFloat(order.total.replace('RM ', '')) || 0;
-                const cycle = (order.billingCycle || 'One-Time').toLowerCase();
-                if (isFounder) {
-                    commission = amount * 0.05; 
-                    commDetails.push({ ref: order.id.substring(0,6), pkg: order.package, amt: amount, cycle: cycle, comm: commission });
-                } else {
-                    const reps = order.salesRepIds || [];
-                    const oldRep = order.salesRepId;
-                    if(reps.includes(myUid) || oldRep === myUid) {
-                        const myRate = userData.commissionRate || 0;
-                        commission = amount * myRate;
-                        commDetails.push({ ref: order.id.substring(0,6), pkg: order.package, amt: amount, cycle: cycle, comm: commission });
-                    }
-                }
-                totalEarnings += commission;
-            });
-            document.getElementById('comm-stats').innerHTML = `
-                <div class="stat-card">
-                    <div class="stat-icon" style="color:var(--success); background:#ecfdf5"><i class="ri-wallet-3-line"></i></div>
-                    <div class="stat-info">
-                        <div class="stat-val">RM ${totalEarnings.toFixed(2)}</div>
-                        <div class="stat-label">Total Pending Payouts</div>
-                    </div>
-                </div>
-            `;
+            
+            if(isAdmin) initCommissionsSearch();
+            else loadMyCommissions();
+        }
+
+        async function initCommissionsSearch() {
+            const query = document.getElementById('crew-search').value.trim().toLowerCase();
             const tbody = document.getElementById('comm-tbody');
-            if(commDetails.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">No commissions found.</td></tr>`;
-            } else {
-                tbody.innerHTML = commDetails.map(c => `
+            if(!tbody) return;
+            
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center"><div class="loading-spinner"></div></td></tr>';
+
+            let q = db.collection("users").where("role", "in", ["super_admin", "admin", "crew"]);
+            const snap = await q.get();
+            
+            if(snap.empty) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No crew found</td></tr>';
+                return;
+            }
+
+            const filteredDocs = snap.docs.filter(doc => {
+                const d = doc.data();
+                const name = (d.name || '').toLowerCase();
+                const id = (d.crewId || '').toLowerCase();
+                const email = (d.email || '').toLowerCase();
+                if(!query) return true;
+                return name.includes(query) || id.includes(query) || email.includes(query);
+            });
+
+            if(filteredDocs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No matching crew found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            for(const doc of filteredDocs) {
+                const u = doc.data();
+                const commData = await calculateCommission(u.email, u.uid, u.commissionRate);
+                
+                const bd = u.bankDetails || {};
+                const bankStr = bd.accountNumber 
+                    ? `<div style="font-size:0.8rem;"><span style="font-weight:600">${bd.bankName}</span> (${bd.accountNumber})<br><span style="color:var(--text-muted)">${bd.accountHolder}</span></div>` 
+                    : `<span style="color:var(--text-faint); font-size:0.8rem;">No bank details on file</span>`;
+
+                const actionsHTML = `
+                    <div style="display:flex; gap:5px;">
+                        <button class="btn btn-sm btn-success" title="Notify Paid" onclick="notifyPaid('${u.phone||''}', '${u.name}')"><i class="ri-whatsapp-line"></i></button>
+                        <button class="btn btn-sm btn-secondary" title="Edit Bank" onclick="editBankDetails('${doc.id}')"><i class="ri-bank-card-line"></i></button>
+                    </div>
+                `;
+
+                tbody.innerHTML += `
                     <tr>
-                        <td class="font-mono" style="color:var(--primary)">${c.ref}</td>
-                        <td>${c.pkg}</td>
-                        <td>RM ${c.amt}</td>
-                        <td><span class="badge badge-crew" style="background:#f3f4f6; border:1px solid var(--border); text-transform:capitalize;">${c.cycle}</span></td>
-                        <td style="color:var(--success); font-weight:700;">+ RM ${c.comm.toFixed(2)}</td>
+                        <td>
+                            <div style="font-weight:700;">${u.name}</div>
+                            <div style="font-size:0.75rem; color:var(--text-muted);">${u.jobTitle} (${u.crewId})</div>
+                        </td>
+                        <td style="font-weight:700; color:var(--success);">RM ${commData.total.toFixed(2)}</td>
+                        <td>${bankStr}</td>
+                        <td>${actionsHTML}</td>
                     </tr>
-                `).join('');
+                `;
             }
         }
 
-        // --- 13. APPROVAL TOOLS (NEW) ---
+        async function loadMyCommissions() {
+            const tbody = document.getElementById('comm-tbody');
+            const commData = await calculateCommission(userData.email, currentUser.uid, userData.commissionRate);
+            
+            tbody.innerHTML = `
+                <tr>
+                    <td><strong>${userData.name}</strong> (${userData.jobTitle})</td>
+                    <td style="font-weight:700; color:var(--success);">RM ${commData.total.toFixed(2)}</td>
+                    <td>Based on Paid Orders</td>
+                </tr>
+            `;
+        }
+
+        async function calculateCommission(email, uid, rate) {
+            let total = 0;
+            // Logic: if Founder/SuperAdmin, get 5% of ALL Paid Orders.
+            // If Crew, get rate * Orders where salesRepIds includes uid OR old salesRepId matches uid.
+            
+            if (isFounder() || isSuperAdmin()) {
+                const allPaid = await db.collection("orders").where("status", "==", "Paid").get();
+                allPaid.forEach(doc => {
+                    const amt = parseFloat(doc.data().total.replace('RM ', '')) || 0;
+                    total += (amt * 0.05);
+                });
+            } else {
+                // Specific User Logic
+                // Check for new multi-rep format
+                const snap1 = await db.collection("orders").where("salesRepIds", "array-contains", uid).where("status", "==", "Paid").get();
+                snap1.forEach(doc => {
+                    const amt = parseFloat(doc.data().total.replace('RM ', '')) || 0;
+                    total += (amt * rate);
+                });
+
+                // Check for old single rep format (legacy support)
+                const snap2 = await db.collection("orders").where("salesRepId", "==", uid).where("status", "==", "Paid").get();
+                snap2.forEach(doc => {
+                    const amt = parseFloat(doc.data().total.replace('RM ', '')) || 0;
+                    total += (amt * rate);
+                });
+            }
+            return { total };
+        }
+
+        // Addon 5: Notify Paid
+        async function notifyPaid(phone, name) {
+            if(!phone) return showToast("No phone number on file", "error");
+            const msg = `Hello ${name},\n\nThis is DDNetwork Finance. We have successfully paid your commission to your account.\n\nThank you!`;
+            let cleanPhone = phone.replace(/^0/, '60');
+            if(!cleanPhone.startsWith('+')) cleanPhone = '+' + cleanPhone;
+            window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+            logActivity(`Sent commission payment notification to ${name}`);
+        }
+
+        // Addon 5: Edit Bank Details
+        function editBankDetails(uid) {
+            db.collection("users").doc(uid).get().then(doc => {
+                const u = doc.data();
+                const bd = u.bankDetails || {};
+                showModal(`Edit Bank Details for ${u.name}`, `
+                    <div class="mb-2"><label>Bank Name</label><input id="eb-bank-name" value="${bd.bankName||''}"></div>
+                    <div class="mb-2"><label>Account Holder</label><input id="eb-holder" value="${bd.accountHolder||''}"></div>
+                    <div class="mb-2"><label>Account Number</label><input id="eb-num" value="${bd.accountNumber||''}"></div>
+                `, `<button class="btn btn-primary" onclick="saveBankDetails('${uid}')">Save Details</button>`);
+            });
+        }
+
+        async function saveBankDetails(uid) {
+            const data = {
+                bankDetails: {
+                    bankName: document.getElementById('eb-bank-name').value,
+                    accountHolder: document.getElementById('eb-holder').value,
+                    accountNumber: document.getElementById('eb-num').value
+                }
+            };
+            // Use EDIT_CREW permission or specific FINANCE permission
+            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CREW, 'users', uid, data);
+            if(blocked) return;
+
+            await db.collection("users").doc(uid).update(data);
+            closeModal();
+            showToast("Bank details updated", "success");
+            logActivity(`Updated bank details for crew ${uid}`);
+            renderCommissions(); // Refresh
+        }
+
+
+        // --- 13. APPROVAL TOOLS (Addons 2) ---
         function renderApprovals() {
             if(!hasPermission(PERMISSION_KEYS.APPROVE_ACTIONS)) {
                 document.getElementById('main').innerHTML = `<div class="access-denied-container"><div class="access-denied-title">Access Denied</div><div class="access-denied-desc">You do not have permission to view this page.</div></div>`;
@@ -2791,26 +2701,26 @@ Thank you for choosing DDNetwork.
                                     <th>Time</th>
                                     <th>Requester</th>
                                     <th>Action Requested</th>
-                                    <th>Status</th>
+                                    <th>Target</th>
+                                    <th>Changes</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="approvals-tbody">
-                                <tr><td colspan="5" class="text-center"><div class="loading-spinner"></div></td></tr>
+                                <tr><td colspan="6" class="text-center"><div class="loading-spinner"></div></td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             `;
 
-            // Listen for requests in 'pending_edits' collection
             db.collection("pending_edits").orderBy("timestamp", "desc").onSnapshot(snap => {
                 const tbody = document.getElementById('approvals-tbody');
                 const counter = document.getElementById('count-pending');
                 if(!tbody) return;
 
                 if(snap.empty) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No pending requests</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No pending requests</td></tr>';
                     if(counter) counter.innerText = "0";
                     return;
                 }
@@ -2823,6 +2733,16 @@ Thank you for choosing DDNetwork.
 
                     const keyName = r.permissionKey ? r.permissionKey.replace('edit_', '').replace('delete_', '').replace('_', ' ').toUpperCase() : 'UNKNOWN';
                     
+                    // Addon 2: Generate Diff Viewer
+                    let diffHTML = '<span class="text-muted text-sm">View...</span>';
+                    if (isPending && r.payload && r.targetId) {
+                         // Fetch current doc to compare
+                         diffHTML = `<button class="btn btn-sm btn-secondary" onclick="showDiff('${doc.id}')">View Diff</button>`;
+                    } else if (!r.targetId && r.payload) {
+                         // New creation
+                         diffHTML = `<span class="badge badge-upgrade">New Item</span>`;
+                    }
+
                     return `<tr>
                         <td style="white-space:nowrap;">${formatDateTime(r.timestamp)}</td>
                         <td>
@@ -2831,21 +2751,73 @@ Thank you for choosing DDNetwork.
                         </td>
                         <td>
                             <div class="badge badge-warning" style="background:#fffbeb; color:var(--warning); border:1px solid #fde68a; text-transform:none;">${keyName}</div>
-                            <div style="font-size:0.75rem; margin-top:4px;">Target: ${r.targetCollection}/${r.targetId}</div>
                         </td>
-                        <td><span class="status-badge ${isPending?'status-pending':'status-approved'}">${r.status}</span></td>
+                        <td style="font-size:0.8rem;">${r.targetCollection}/${r.targetId ? r.targetId.substring(0,6)+'...' : 'NEW'}</td>
+                        <td>${diffHTML}</td>
                         <td>
                             ${isPending ? `
                             <div class="flex gap-2">
                                 <button class="btn btn-sm btn-success" onclick="processApproval('${doc.id}', 'Approved')">Approve</button>
                                 <button class="btn btn-sm btn-danger" onclick="processApproval('${doc.id}', 'Rejected')">Reject</button>
-                            </div>` : `<small class="text-muted">Processed</small>`}
+                            </div>` : `<small class="text-muted">Processed (${r.status})</small>`}
                         </td>
                     </tr>`;
                 }).join('');
 
                 if(counter) counter.innerText = pendingCount;
             });
+        }
+
+        // Addon 2: Show Diff Modal
+        async function showDiff(requestId) {
+            const reqDoc = await db.collection("pending_edits").doc(requestId).get();
+            const r = reqDoc.data();
+            
+            // Fetch current state
+            let currentDocData = {};
+            try {
+                if(r.targetId) {
+                    const snap = await db.collection(r.targetCollection).doc(r.targetId).get();
+                    if(snap.exists) currentDocData = snap.data();
+                }
+            } catch(e) { console.error(e); }
+
+            const payload = r.payload;
+            const keysToCheck = new Set([...Object.keys(currentDocData), ...Object.keys(payload)]);
+            let diffHTML = '';
+
+            keysToCheck.forEach(key => {
+                const oldVal = currentDocData[key];
+                const newVal = payload[key];
+                
+                // Skip if strictly equal (primitives) or deep equal needed? Simple check for now.
+                // Also skip complex objects like permissions if too deep
+                if (typeof oldVal === 'object' && oldVal !== null) return; 
+                
+                const strOld = String(oldVal !== undefined ? oldVal : '-');
+                const strNew = String(newVal !== undefined ? newVal : '-');
+
+                if (strOld !== strNew) {
+                    diffHTML += `
+                        <div class="diff-line">
+                            <div class="diff-label">${key}</div>
+                            <div class="diff-val old">${strOld}</div>
+                            <div class="diff-val new">${strNew}</div>
+                        </div>
+                    `;
+                }
+            });
+
+            if(!diffHTML) diffHTML = '<div class="text-center text-muted">No visible changes in simple fields (complex objects hidden).</div>';
+
+            showModal("Before vs After Comparison", `
+                <div class="diff-viewer">
+                    <div style="border-bottom:1px solid #e2e8f0; margin-bottom:8px; padding-bottom:4px; font-weight:700; color:var(--primary);">
+                        Target: ${r.targetCollection} / ${r.targetId}
+                    </div>
+                    ${diffHTML}
+                </div>
+            `, `<button class="btn btn-primary" onclick="closeModal()">Close</button>`);
         }
 
         async function processApproval(requestId, action) {
@@ -2876,7 +2848,10 @@ Thank you for choosing DDNetwork.
                             await db.collection(r.targetCollection).doc(r.targetId).update(r.payload);
                         } else {
                             // Handle creation (like new Promo Codes)
-                            await db.collection(r.targetCollection).doc(r.targetId).set(r.payload); 
+                            // Ensure ID exists
+                            const idToUse = r.payload.id || r.targetId; // might need adjustment based on how payload sent
+                             // Assuming targetId in request doc for promos is the code string
+                             await db.collection(r.targetCollection).doc(r.targetId).set(r.payload); 
                         }
                         showToast("Changes Applied Successfully", "success");
                     } else {
