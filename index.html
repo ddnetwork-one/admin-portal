@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Admin Portal v13.1 (Approval Workflow)</title>
+    <title>New Portal v2.0 (Light Edition)</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 
     <!-- Firebase SDKs -->
@@ -17,31 +17,31 @@
 
     <style>
         :root {
-            /* Developer Dark Theme */
-            --bg-app: #050505; 
-            --bg-sidebar: #0a0a0c;
-            --bg-surface: #0f0f12; 
-            --bg-surface-hover: #18181b;
-            --bg-input: #121214;
+            /* NEW PORTAL: Light Theme */
+            --bg-app: #f3f4f6;       /* Very Light Gray */
+            --bg-sidebar: #ffffff;   /* Pure White */
+            --bg-surface: #ffffff;   /* Pure White */
+            --bg-surface-hover: #f9fafb; 
+            --bg-input: #ffffff;
             
-            --border: #27272a;
-            --border-active: #3f3f46;
-            --border-light: rgba(255,255,255,0.08);
+            --border: #e5e7eb;       /* Light Gray Border */
+            --border-active: #d1d5db;
+            --border-light: rgba(0,0,0,0.05);
 
-            --text-main: #f4f4f5;
-            --text-muted: #a1a1aa;
-            --text-faint: #52525b;
+            --text-main: #111827;    /* Nearly Black */
+            --text-muted: #6b7280;   /* Medium Gray */
+            --text-faint: #9ca3af;   /* Light Gray */
 
-            /* Accents */
-            --primary: #3b82f6; /* Electric Blue */
-            --primary-hover: #2563eb;
-            --primary-glow: rgba(59, 130, 246, 0.2);
+            /* Accents (Retained but adjusted for contrast) */
+            --primary: #2563eb; /* Royal Blue */
+            --primary-hover: #1d4ed8;
+            --primary-glow: rgba(37, 99, 235, 0.1);
             
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --ticket: #8b5cf6; 
-            --info: #0ea5e9;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --ticket: #7c3aed; 
+            --info: #0284c7;
             
             --font-main: 'Inter', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
@@ -95,24 +95,23 @@
         .text-muted { color: var(--text-muted); }
         .block { display: block; }
         
-        /* Monospace font for IDs/Code */
         .font-mono { font-family: var(--font-mono); letter-spacing: -0.5px; }
 
         /* SCROLLBAR */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius:4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius:4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
         /* BUTTONS */
         .btn {
             padding: 0.6rem 1.2rem; 
-            border-radius: 6px; 
-            border:1px solid transparent; 
+            border-radius: 8px; 
+            border:1px solid var(--border); 
             cursor: pointer; 
             font-weight: 500; 
             font-size: 0.85rem; 
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            transition: all 0.2s ease; 
             display: inline-flex; 
             align-items: center; 
             justify-content: center;
@@ -120,45 +119,44 @@
             text-decoration: none;
             white-space: nowrap;
             color: var(--text-main);
-            background: var(--bg-surface-hover);
-            position: relative;
-            overflow: hidden;
+            background: var(--bg-surface);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
         .btn:hover { 
-            background: #2a2a35;
+            background: #f9fafb;
             border-color: var(--border-active);
             transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
         .btn:active { transform: translateY(0); }
 
         .btn-primary { 
-            background: var(--primary); 
+            background: var(--text-main); /* Black Button */
             color: white; 
-            border:1px solid var(--primary); 
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); 
+            border-color: var(--text-main); 
         }
-        .btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+        .btn-primary:hover { background: #374151; }
 
-        .btn-success { background: rgba(16, 185, 129, 0.1); color: var(--success); border:1px solid rgba(16, 185, 129, 0.2); }
-        .btn-success:hover { background: rgba(16, 185, 129, 0.2); border-color: var(--success); }
+        .btn-success { background: #ecfdf5; color: var(--success); border-color: #a7f3d0; }
+        .btn-success:hover { background: #d1fae5; border-color: var(--success); }
 
-        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border:1px solid rgba(239, 68, 68, 0.2); }
-        .btn-danger:hover { background: rgba(239, 68, 68, 0.2); border-color: var(--danger); }
+        .btn-danger { background: #fef2f2; color: var(--danger); border-color: #fecaca; }
+        .btn-danger:hover { background: #fee2e2; border-color: var(--danger); }
         
         .btn-danger-solid { background: var(--danger); color: white; border:1px solid var(--danger); }
-        .btn-danger-solid:hover { background: #dc2626; }
+        .btn-danger-solid:hover { background: #b91c1c; }
 
-        .btn-info { background: rgba(14, 165, 233, 0.1); color: var(--info); border:1px solid rgba(14, 165, 233, 0.2); }
-        .btn-info:hover { background: rgba(14, 165, 233, 0.2); border-color: var(--info); }
+        .btn-info { background: #f0f9ff; color: var(--info); border-color: #bae6fd; }
+        .btn-info:hover { background: #e0f2fe; border-color: var(--info); }
 
-        .btn-secondary { background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-main); }
-        .btn-secondary:hover { border-color: var(--text-muted); background: var(--bg-surface-hover); }
+        .btn-secondary { background: white; border: 1px solid var(--border); color: var(--text-main); }
+        .btn-secondary:hover { background: #f8fafc; border-color: var(--text-muted); }
         
-        .btn-sm { padding: 0.35rem 0.8rem; font-size: 0.75rem; border-radius: 4px; }
+        .btn-sm { padding: 0.35rem 0.8rem; font-size: 0.75rem; border-radius: 6px; }
         
         .btn-icon { 
             padding: 0.5rem; 
-            border-radius: 6px; 
+            border-radius: 8px; 
             background: transparent; 
             color: var(--text-muted); 
             cursor: pointer; 
@@ -167,7 +165,7 @@
             display: flex; align-items: center; justify-content: center;
             width: 36px; height: 36px;
         }
-        .btn-icon:hover { color: white; background: rgba(255,255,255,0.05); }
+        .btn-icon:hover { color: var(--text-main); background: rgba(0,0,0,0.05); }
         .btn-icon.spin:hover i { animation: spin 1s linear infinite; }
 
         /* FORMS */
@@ -176,29 +174,31 @@
             padding: 0.65rem 0.85rem; 
             background: var(--bg-input); 
             border:1px solid var(--border); 
-            border-radius: 6px; 
-            color: white; 
+            border-radius: 8px; 
+            color: var(--text-main); 
             font-family: inherit; 
             font-size: 0.9rem; 
             transition: 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
         }
         input:focus, select:focus, textarea:focus { 
             border-color: var(--primary); 
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); 
-            background: #000;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); 
+            background: #fff;
         }
         input[readonly], textarea[readonly] { 
-            background: #141414; 
+            background: #f9fafb; 
             cursor: default; 
             border-color: transparent; 
             color: var(--text-muted); 
+            box-shadow: none;
         }
         label { display: block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase; }
 
         /* AUTH SCREEN */
         #auth-screen { 
             position: fixed; inset: 0; 
-            background: radial-gradient(circle at 50% 50%, #1e1e24 0%, #000 100%); 
+            background: linear-gradient(135deg, #f3f4f6 0%, #ffffff 100%); 
             z-index: 9999; 
             display: flex; 
             align-items: center; 
@@ -208,21 +208,21 @@
         .auth-card { 
             width: 100%; max-width: 400px; 
             padding: 2.5rem; 
-            background: rgba(18, 18, 22, 0.8); 
+            background: white; 
             backdrop-filter: blur(20px);
-            border-radius: 16px; 
+            border-radius: 24px; 
             border:1px solid var(--border); 
             text-align: center; 
-            box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
         }
-        .auth-card img { height: 50px; margin-bottom: 1.5rem; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
+        .auth-card img { height: 50px; margin-bottom: 1.5rem; filter: brightness(0); }
 
         /* LAYOUT STRUCTURE */
         #dashboard { display: flex; width: 100%; height: 100vh; overflow: hidden; position: relative; }
         
         /* SIDEBAR OVERLAY (Mobile) */
         .sidebar-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+            position: fixed; inset: 0; background: rgba(255,255,255,0.8); backdrop-filter: blur(4px);
             z-index: var(--z-sidebar); opacity: 0; pointer-events: none; transition: 0.3s;
         }
         .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
@@ -240,40 +240,23 @@
         }
 
         /* DESKTOP COLLAPSED STATE */
-        aside.collapsed {
-            width: var(--sidebar-width-collapsed);
-        }
+        aside.collapsed { width: var(--sidebar-width-collapsed); }
         aside.collapsed .nav-text, 
         aside.collapsed .nav-section-title, 
         aside.collapsed .u-details, 
         aside.collapsed .user-mini-profile p {
-            opacity: 0;
-            pointer-events: none;
-            display: none;
+            opacity: 0; pointer-events: none; display: none;
         }
-        aside.collapsed .nav-item {
-            padding: 0.8rem 0;
-            justify-content: center;
-        }
-        aside.collapsed .nav-item i {
-            font-size: 1.4rem;
-            margin: 0;
-        }
-        aside.collapsed .header-brand span {
-            display: none;
-        }
-        aside.collapsed .btn-danger span {
-            display: none;
-        }
-        aside.collapsed .user-mini-profile {
-            padding: 1rem 0;
-            justify-content: center;
-        }
+        aside.collapsed .nav-item { padding: 0.8rem 0; justify-content: center; }
+        aside.collapsed .nav-item i { font-size: 1.4rem; margin: 0; }
+        aside.collapsed .header-brand span { display: none; }
+        aside.collapsed .btn-danger span { display: none; }
+        aside.collapsed .user-mini-profile { padding: 1rem 0; justify-content: center; }
 
         /* HEADER */
         header {
             height: var(--header-height);
-            background: rgba(5, 5, 5, 0.8);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(12px);
             border-bottom:1px solid var(--border);
             display: flex;
@@ -284,8 +267,8 @@
             z-index: var(--z-header);
         }
         .header-left { display: flex; align-items: center; gap: 1rem; }
-        .header-brand { font-weight: 700; font-size: 1rem; color: white; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
-        .header-brand img { height: 24px; filter: brightness(0) invert(1); }
+        .header-brand { font-weight: 800; font-size: 1rem; color: var(--text-main); letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
+        .header-brand img { height: 24px; filter: brightness(0); }
         .header-actions { display: flex; align-items: center; gap: 0.25rem; position: relative; height: 100%; }
         
         .notification-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--danger); border-radius: 50%; border: 2px solid var(--bg-sidebar); pointer-events: none; z-index: 10; }
@@ -294,7 +277,7 @@
             position: absolute; top: 70px; right: 10px; width: 320px;
             background: var(--bg-surface); border:1px solid var(--border);
             border-radius: 12px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
             display: none; flex-direction: column; padding: 0;
             z-index: var(--z-dropdown); 
             max-height: 400px; overflow-y: auto;
@@ -306,28 +289,28 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
         .notif-item { padding: 0.9rem 1.2rem; border-bottom: 1px solid var(--border); transition: 0.2s; cursor: pointer; }
-        .notif-item:hover { background: rgba(255,255,255,0.03); }
-        .notif-item strong { color: white; display: block; margin-bottom: 2px; font-size: 0.85rem; }
+        .notif-item:hover { background: #f9fafb; }
+        .notif-item strong { color: var(--text-main); display: block; margin-bottom: 2px; font-size: 0.85rem; }
         .notif-item div { color: var(--text-muted); font-size: 0.8rem; line-height: 1.4; }
         .notif-time { font-size: 0.7rem; color: var(--text-faint); margin-top: 4px; display: block; }
 
         /* Sidebar Navigation */
-        .user-mini-profile { padding: 1.25rem; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.01); display: flex; align-items: center; gap: 12px; }
+        .user-mini-profile { padding: 1.25rem; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.02); display: flex; align-items: center; gap: 12px; }
         .u-info { display: flex; align-items: center; gap: 12px; width: 100%; }
         .u-avatar { 
             width: 40px; height: 40px; 
-            background: linear-gradient(135deg, var(--primary), #6366f1); 
-            border-radius: 8px; 
+            background: var(--text-main); 
+            border-radius: 10px; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             font-weight: 700; 
             font-size: 1.1rem; 
             color: white; 
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             flex-shrink: 0;
         }
-        .u-details h4 { font-size: 0.9rem; color: white; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .u-details h4 { font-size: 0.9rem; color: var(--text-main); font-weight: 700; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .u-details p { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
 
         .nav-scroll { flex: 1; overflow-y: auto; padding: 1rem 0; }
@@ -350,12 +333,12 @@
             border-left: 3px solid transparent; 
             font-weight: 500;
             margin-right: 0.5rem;
-            border-radius: 0 6px 6px 0;
+            border-radius: 0 8px 8px 0;
             position: relative;
         }
-        .nav-item:hover { background: rgba(255,255,255,0.03); color: white; }
+        .nav-item:hover { background: rgba(0,0,0,0.03); color: var(--text-main); }
         .nav-item.active { 
-            background: linear-gradient(90deg, rgba(59, 130, 246, 0.1), transparent); 
+            background: #eff6ff; 
             color: var(--primary); 
             border-left-color: var(--primary); 
             font-weight: 600;
@@ -387,19 +370,19 @@
         .stat-card { 
             background: var(--bg-surface); 
             padding: 1.5rem; 
-            border-radius: 12px; 
+            border-radius: 16px; 
             border: 1px solid var(--border); 
             display: flex; 
             align-items: center; 
             gap: 1.2rem;
             transition: all 0.2s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-        .stat-card:hover { transform: translateY(-2px); border-color: var(--border-active); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .stat-card:hover { transform: translateY(-2px); border-color: var(--border-active); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
         .stat-icon { 
             width: 48px; height: 48px; 
-            border-radius: 10px; 
-            background: rgba(255,255,255,0.03); 
+            border-radius: 12px; 
+            background: #f3f4f6; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
@@ -407,27 +390,27 @@
             color: var(--text-main);
         }
         .stat-info { display: flex; flex-direction: column; }
-        .stat-val { font-size: 1.6rem; font-weight: 700; color: white; line-height: 1.1; margin-bottom: 4px; letter-spacing: -1px; }
+        .stat-val { font-size: 1.6rem; font-weight: 700; color: var(--text-main); line-height: 1.1; margin-bottom: 4px; letter-spacing: -1px; }
         .stat-label { color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 
         /* LIST GROUP */
-        .list-group { background: var(--bg-surface); border-radius: 12px; border: 1px solid var(--border); padding: 1.5rem; }
-        .list-group h3 { font-size: 1rem; font-weight: 600; margin-bottom:1.2rem; display: flex; justify-content: space-between; align-items: center; color: white; }
+        .list-group { background: var(--bg-surface); border-radius: 16px; border: 1px solid var(--border); padding: 1.5rem; }
+        .list-group h3 { font-size: 1rem; font-weight: 600; margin-bottom:1.2rem; display: flex; justify-content: space-between; align-items: center; color: var(--text-main); }
         .activity-item { display: flex; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); }
         .activity-item:last-child { border: none; }
-        .activity-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
-        .activity-content h5 { font-size: 0.85rem; font-weight: 600; color: white; margin-bottom: 2px; }
+        .activity-icon { width: 32px; height: 32px; border-radius: 8px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
+        .activity-content h5 { font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin-bottom: 2px; }
         .activity-content p { font-size: 0.75rem; color: var(--text-muted); }
         .activity-time { margin-left: auto; font-size: 0.7rem; color: var(--text-faint); white-space: nowrap; }
 
         /* TABLES */
         .table-container { 
             background: var(--bg-surface); 
-            border-radius: 12px; 
+            border-radius: 16px; 
             border: 1px solid var(--border); 
             overflow: hidden; 
             margin-bottom: 2rem; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         .table-header { 
             padding: 1.2rem 1.5rem; 
@@ -435,10 +418,10 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            background: rgba(255,255,255,0.02); 
+            background: #f9fafb; 
             flex-wrap: wrap; gap: 10px;
         }
-        .table-header h3 { font-size: 0.95rem; font-weight: 600; color: white; letter-spacing: -0.3px; }
+        .table-header h3 { font-size: 0.95rem; font-weight: 600; color: var(--text-main); letter-spacing: -0.3px; }
         .table-responsive { overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch; }
         table { width: 100%; border-collapse: collapse; min-width: 800px; }
         th { 
@@ -448,20 +431,20 @@
             font-size: 0.7rem; 
             font-weight: 600; 
             text-transform: uppercase; 
-            background: rgba(0,0,0,0.3); 
+            background: #f3f4f6; 
             white-space: nowrap;
             border-bottom: 1px solid var(--border);
             letter-spacing: 0.5px;
         }
-        td { padding: 1rem 1.2rem; border-bottom: 1px solid var(--border); color: var(--text-main); font-size: 0.85rem; vertical-align: middle; transition: 0.1s; }
+        td { padding: 1rem 1.2rem; border-bottom: 1px solid var(--border); color: var(--text-main); font-size: 0.85rem; vertical-align: middle; transition: 0.1s; background: white; }
         tr:last-child td { border-bottom: none; }
-        tr:hover td { background: rgba(255,255,255,0.02); }
+        tr:hover td { background: #f9fafb; }
 
         /* --- ACCESS DENIED PAGE --- */
         .access-denied-container {
             height: 100%;
             display: flex;
-            flex-direction: column;
+            flex-direction: column,
             align-items: center;
             justify-content: center;
             text-align: center;
@@ -476,7 +459,7 @@
         }
         .access-denied-title {
             font-size: 1.5rem;
-            color: white;
+            color: var(--text-main);
             margin-bottom: 0.5rem;
         }
         .access-denied-desc {
@@ -489,8 +472,8 @@
         /* --- MAIN MODAL --- */
         .modal-overlay { 
             position: fixed; inset: 0; 
-            background: rgba(0,0,0,0.85); 
-            backdrop-filter: blur(8px); 
+            background: rgba(0,0,0,0.4); 
+            backdrop-filter: blur(4px); 
             z-index: var(--z-modal-overlay); 
             display: none; 
             justify-content: center; 
@@ -502,34 +485,34 @@
             background: var(--bg-surface); 
             width: 100%; 
             max-width: 520px; 
-            border-radius: 16px; 
+            border-radius: 24px; 
             border: 1px solid var(--border); 
             display: flex; 
             flex-direction: column; 
             max-height: 90vh; 
-            box-shadow: 0 40px 80px rgba(0,0,0,0.8);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
             animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
         
         .modal-header { 
-            padding: 1.25rem 1.5rem; 
+            padding: 1.5rem 1.5rem 1rem; 
             border-bottom: 1px solid var(--border); 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            background: rgba(255,255,255,0.02); 
-            border-radius: 16px 16px 0 0; 
+            background: #f9fafb; 
+            border-radius: 24px 24px 0 0; 
             flex-shrink: 0;
         }
-        .modal-title { font-size: 1.1rem; font-weight: 700; color: white; }
+        .modal-title { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
         .modal-body { padding: 1.5rem; overflow-y: auto; }
-        .modal-footer { padding: 1.2rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; border-radius: 0 0 16px 16px; background: rgba(0,0,0,0.2); flex-shrink: 0; }
+        .modal-footer { padding: 1.2rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; border-radius: 0 0 24px 24px; background: #f9fafb; flex-shrink: 0; }
 
         /* --- INVOICE MODAL STYLES --- */
         #invoiceModalOverlay {
             z-index: var(--z-invoice);
-            background: rgba(0, 0, 0, 0.95); 
+            background: rgba(0, 0, 0, 0.8); 
             padding: 0;
         }
         
@@ -549,7 +532,7 @@
             width: 210mm; 
             min-height: 297mm; 
             padding: 15mm;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             transform: scale(0.92); 
             transform-origin: top center; 
             margin: 0; 
@@ -595,35 +578,37 @@
         .inv-footer { text-align: center; color: #94a3b8; font-size: 12px; margin-top: auto; padding-top: 20px; border-top: 1px dashed #e2e8f0; }
 
         .invoice-controls {
-            position: fixed; top: 20px; right: 20px; display: flex; gap: 10px; z-index: var(--z-invoice); background: rgba(15, 23, 42, 0.9); padding: 8px; border-radius: 12px; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            position: fixed; top: 20px; right: 20px; display: flex; gap: 10px; z-index: var(--z-invoice); background: rgba(255, 255, 255, 0.9); padding: 8px; border-radius: 12px; backdrop-filter: blur(4px); border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         /* Badges */
-        .badge { padding: 3px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; display: inline-block; letter-spacing: 0.3px; }
-        .badge-admin { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
-        .badge-crew { background: rgba(59, 130, 246, 0.15); color: var(--primary); border: 1px solid rgba(59, 130, 246, 0.2); }
-        .badge-user { background: rgba(255,255,255,0.1); color: white; }
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; display: inline-block; letter-spacing: 0.3px; }
         
-        .badge-content { background: rgba(14, 165, 233, 0.15); color: var(--info); border: 1px solid rgba(14, 165, 233, 0.2); }
-        .badge-upgrade { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
-        .badge-renew { background: rgba(139, 92, 246, 0.15); color: var(--ticket); border: 1px solid rgba(139, 92, 246, 0.2); }
-        .badge-remove { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+        /* Light Theme Badges */
+        .badge-admin { background: #fffbeb; color: var(--warning); border: 1px solid #fde68a; }
+        .badge-crew { background: #eff6ff; color: var(--primary); border: 1px solid #bfdbfe; }
+        .badge-user { background: #f3f4f6; color: var(--text-main); border: 1px solid #e5e7eb; }
+        
+        .badge-content { background: #f0f9ff; color: var(--info); border: 1px solid #bae6fd; }
+        .badge-upgrade { background: #ecfdf5; color: var(--success); border: 1px solid #a7f3d0; }
+        .badge-renew { background: #f5f3ff; color: var(--ticket); border: 1px solid #ddd6fe; }
+        .badge-remove { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
 
         /* CONFIG TAB SPECIFICS */
-        .config-section { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .config-section { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
         .config-header { font-size: 0.95rem; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); color: var(--text-main); display: flex; justify-content: space-between; align-items: center; }
         .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--bg-input); transition: .4s; border-radius: 34px; border: 1px solid var(--border); }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e5e7eb; transition: .4s; border-radius: 34px; border: 1px solid #d1d5db; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
         input:checked + .slider { background-color: var(--primary); border-color: var(--primary); }
         input:checked + .slider:before { transform: translateX(20px); }
         
         .price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
-        .gateway-card { background: var(--bg-input); padding: 1rem; border-radius: 8px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 0.5rem; }
+        .gateway-card { background: #f9fafb; padding: 1rem; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 0.5rem; }
 
         /* Loading State */
-        .loading-spinner { border: 3px solid rgba(255,255,255,0.1); border-left-color: var(--primary); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 0 auto; }
+        .loading-spinner { border: 3px solid rgba(0,0,0,0.05); border-left-color: var(--primary); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 0 auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .page-loader { display: flex; justify-content: center; align-items: center; height: 300px; width: 100%; }
 
@@ -631,11 +616,11 @@
         .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: var(--z-toast); display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast { 
             background: var(--bg-surface); 
-            color: white; 
+            color: var(--text-main); 
             padding:1rem 1.25rem; 
-            border-radius: 10px; 
+            border-radius: 12px; 
             border: 1px solid var(--border); 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6); 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); 
             display: flex; 
             align-items: center; 
             gap: 12px; 
@@ -651,22 +636,22 @@
         /* Approval Request Specifics */
         .req-approval-badge {
             display: inline-flex; align-items: center; gap:4px;
-            background: rgba(245, 158, 11, 0.15); color: var(--warning);
-            font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(245, 158, 11, 0.2);
+            background: #fffbeb; color: var(--warning);
+            font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; border: 1px solid #fde68a;
             margin-left: 8px;
         }
         
         .status-badge {
             padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
         }
-        .status-pending { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
-        .status-approved { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
-        .status-rejected { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .status-pending { background: #fffbeb; color: var(--warning); border: 1px solid #fcd34d; }
+        .status-approved { background: #ecfdf5; color: var(--success); border: 1px solid #6ee7b7; }
+        .status-rejected { background: #fef2f2; color: var(--danger); border: 1px solid #fca5a5; }
 
         /* Multi Select Styles */
         .multi-select-container {
             border: 1px solid var(--border);
-            border-radius: 6px;
+            border-radius: 8px;
             background: var(--bg-input);
             max-height: 150px;
             overflow-y: auto;
@@ -677,17 +662,17 @@
             align-items: center;
             gap: 10px;
             padding: 0.5rem;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             transition: background 0.2s;
         }
-        .checkbox-item:hover { background: rgba(255,255,255,0.05); }
+        .checkbox-item:hover { background: #f9fafb; }
         .checkbox-item input { width: auto; margin: 0; }
         .checkbox-item span { font-size: 0.9rem; color: var(--text-main); }
 
         /* RESPONSIVENESS */
         @media(max-width: 1024px) {
-            aside { transform: translateX(-100%); width: 280px; box-shadow: 20px 0 40px rgba(0,0,0,0.5); }
+            aside { transform: translateX(-100%); width: 280px; box-shadow: 20px 0 40px rgba(0,0,0,0.1); }
             aside.mobile-open { transform: translateX(0); }
             main { margin-left: 0 !important; width: 100% !important; padding: 1.5rem; padding-top: 5rem; }
             .header-brand span { display: none; }
@@ -718,7 +703,8 @@
     <!-- AUTH SCREEN -->
     <div id="auth-screen">
         <div class="auth-card">
-            <h2 class="mb-4" style="color:white; font-weight: 700; letter-spacing: -0.5px;">Admin Portal v13.1</h2>
+            <h2 class="mb-4" style="color:var(--text-main); font-weight: 800; letter-spacing: -0.5px;">New Portal v2.0</h2>
+            <p class="mb-4 text-muted">Light Edition</p>
             <form id="loginForm">
                 <input type="text" id="loginInput" class="mb-4" placeholder="Email or Crew ID" required>
                 <input type="password" id="loginPass" class="mb-4" placeholder="Password" required>
@@ -736,7 +722,7 @@
             <div class="header-left">
                 <button class="btn-icon" onclick="toggleSidebar()" title="Toggle Menu"><i class="ri-menu-line" style="font-size: 1.4rem;"></i></button>
                 <div class="header-brand">
-                    <span>DDN v13.1</span>
+                    <span>DDN v2.0 Light</span>
                 </div>
             </div>
             <div class="header-actions">
@@ -1268,7 +1254,7 @@
         function showToast(msg, type='info') {
             const t = document.createElement('div'); t.className = `toast ${type}`;
             const icon = type=='success'?'ri-checkbox-circle-fill':(type=='error'?'ri-error-warning-fill':(type=='warning'?'ri-alert-fill':'ri-information-fill'));
-            t.innerHTML = `<i class="${icon}" style="font-size:1.2rem; color: ${type=='success'?'var(--success)':(type=='error'?'var(--danger)':(type=='warning'?'var(--warning)':'white'))}"></i> <span>${msg}</span>`;
+            t.innerHTML = `<i class="${icon}" style="font-size:1.2rem; color: ${type=='success'?'var(--success)':(type=='error'?'var(--danger)':(type=='warning'?'var(--warning)':'black'))}"></i> <span>${msg}</span>`;
             document.getElementById('toastContainer').appendChild(t);
             setTimeout(()=>t.classList.add('show'), 10);
             setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(), 400); }, 3500);
@@ -1292,7 +1278,7 @@
             const main = document.getElementById('main');
             main.innerHTML = `
                 <div class="flex justify-between items-center mb-4" style="flex-wrap: wrap; gap:10px;">
-                    <h2 style="font-size:1.5rem; font-weight:700; letter-spacing:-0.5px;">Dashboard Overview</h2>
+                    <h2 style="font-size:1.5rem; font-weight:800; letter-spacing:-0.5px;">Dashboard Overview</h2>
                 </div>
                 <div class="stats-grid" id="stats-grid">
                     <div class="page-loader" style="height:100px;"><div class="loading-spinner"></div></div>
@@ -1409,9 +1395,9 @@
                     const domainDisplay = d.domain ? `<span class="font-mono" style="color:var(--primary)">${d.domain}</span>` : `<span style="color:var(--text-faint)">N/A</span>`;
                     let voucherBadge = '<span style="color:var(--text-faint)">None</span>';
                     if (d.voucherCode) {
-                        voucherBadge = `<span class="badge badge-voucher" style="background:rgba(245, 158, 11, 0.1); color:var(--warning); border:1px solid rgba(245, 158, 11, 0.2)"><i class="ri-coupon-line"></i> ${d.voucherCode}</span>`;
+                        voucherBadge = `<span class="badge badge-voucher" style="background:#fffbeb; color:var(--warning); border:1px solid #fde68a"><i class="ri-coupon-line"></i> ${d.voucherCode}</span>`;
                     }
-                    let statusColor = '#71717a';
+                    let statusColor = '#9ca3af';
                     if(d.status === 'Completed') statusColor = 'var(--success)';
                     if(d.status === 'Paid') statusColor = 'var(--primary)';
                     if(d.status === 'Cancelled') statusColor = 'var(--danger)';
@@ -1439,7 +1425,7 @@
             if (!currentOrderDataForPrint) return showToast("No invoice loaded", "error");
             const originalTitle = document.title;
             const invoiceId = currentOrderDataForPrint.orderRef;
-            document.title = `Invoice #${invoiceId} - DDNetwork One`;
+            document.title = `Invoice #${invoiceId} - DDNetwork Light`;
             window.print();
             setTimeout(() => { document.title = originalTitle; }, 1000);
         }
@@ -1482,7 +1468,7 @@
                             <h2>#${orderRef}</h2>
                             <div class="inv-meta">
                                 <div>Date Issued: <strong>${dateStr}</strong></div>
-                                <div>Status: <strong style="color:${d.status==='Paid'?'#10b981':'#f59e0b'}">${d.status}</strong></div>
+                                <div>Status: <strong style="color:${d.status==='Paid'?'#059669':'#d97706'}">${d.status}</strong></div>
                             </div>
                         </div>
                     </div>
@@ -1524,7 +1510,7 @@
                                 </td>
                                 <td>RM ${total}</td>
                             </tr>
-                            ${d.voucherCode ? `<tr><td><strong>Discount</strong> <span style="color:#10b981; font-size:12px;">(${d.voucherCode})</span></td><td></td><td style="color:#10b981;">- RM 0.00</td></tr>` : ''}
+                            ${d.voucherCode ? `<tr><td><strong>Discount</strong> <span style="color:#059669; font-size:12px;">(${d.voucherCode})</span></td><td></td><td style="color:#059669;">- RM 0.00</td></tr>` : ''}
                         </tbody>
                     </table>
                     <div class="inv-total-section">
@@ -1631,7 +1617,7 @@ Thank you for choosing DDNetwork.
                     <div><label class="text-muted text-sm">Phone</label><input id="o-phone" value="${d.customerPhone||''}"></div>
                     <div><label class="text-muted text-sm">Total</label><input id="o-total" value="${d.total}"></div>
                 </div>
-                <div class="mb-4 p-2" style="background:rgba(59,130,246,0.05); border-radius:6px; border:1px solid rgba(59,130,246,0.1);">
+                <div class="mb-4 p-2" style="background:#f3f4f6; border-radius:8px; border:1px solid var(--border);">
                     <div class="flex justify-between items-center">
                         <span style="font-size:0.8rem; color:var(--text-muted);">Billing Cycle</span>
                         <span class="font-bold" style="color:var(--primary);">${d.billingCycle || '-'}</span>
@@ -1731,7 +1717,7 @@ Thank you for choosing DDNetwork.
                         <td>${u.name}</td>
                         <td>${u.company||'-'}</td>
                         <td>${u.email}<br><small style="color:var(--text-faint)">${u.phone||''}</small></td>
-                        <td>${vStatus !== 'None' ? `<span class="badge" style="background:${vStatus==='active'?'var(--success)':'var(--text-faint)'}">${vCode}</span>` : '-'}</td>
+                        <td>${vStatus !== 'None' ? `<span class="badge" style="background:${vStatus==='active'?'#ecfdf5':'#f3f4f6'}">${vCode}</span>` : '-'}</td>
                         <td>
                             <div style="display:flex; gap:5px;">${buttons}</div>
                         </td>
@@ -1771,7 +1757,7 @@ Thank you for choosing DDNetwork.
             const canEdit = hasPermission(PERMISSION_KEYS.EDIT_CREW);
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
-                    <h2 style="font-size:1.25rem; font-weight:700;">Internal Crew</h2>
+                    <h2 style="font-size:1.25rem; font-weight:800;">Internal Crew</h2>
                     ${canEdit ? `<button class="btn btn-primary" onclick="openAddCrewModal()"><i class="ri-add-line"></i> Add Crew</button>` : ''}
                 </div>
                 <div class="table-container">
@@ -1800,7 +1786,7 @@ Thank you for choosing DDNetwork.
                         <td>${u.email}</td>
                         <td><span class="badge badge-${u.role==='super_admin'?'admin':(u.role==='admin'?'admin':'crew')}">${u.role}</span></td>
                         <td>${u.jobTitle||'-'}</td>
-                        <td><span class="badge" style="background:var(--success)15; color:var(--success)">${rate}</span></td>
+                        <td><span class="badge" style="background:#ecfdf5; color:var(--success)">${rate}</span></td>
                         <td>${buttons}</td>
                     </tr>`;
                 }).join('');
@@ -1825,11 +1811,11 @@ Thank you for choosing DDNetwork.
                 <div class="flex gap-4 mb-4">
                     <div style="flex:1">
                         <label>Role</label>
-                        <input type="text" id="c-role" readonly style="background:var(--bg-sidebar)">
+                        <input type="text" id="c-role" readonly style="background:#f9fafb">
                     </div>
                     <div style="flex:1">
                         <label>Comm. Rate (%)</label>
-                        <input type="number" step="0.1" id="c-rate" readonly style="background:var(--bg-sidebar)">
+                        <input type="number" step="0.1" id="c-rate" readonly style="background:#f9fafb">
                     </div>
                 </div>
                 <div class="mb-4"><label>Temporary Password</label><input type="password" id="c-pass" placeholder="Set password"></div>
@@ -2026,7 +2012,7 @@ Thank you for choosing DDNetwork.
                 db.collection("users").where("role", "in", ["super_admin", "admin", "crew"]).get().then(snap => {
                     const crewOpts = snap.docs.map(c => `<option value="${c.id}" ${d.assignedTo===c.id?'selected':''}>${c.data().name}</option>`).join('');
                     showModal(`Ticket: ${d.ticketId || id}`, `
-                        <p class="mb-4 p-4" style="background:var(--bg-sidebar); border-radius:8px; border:1px solid var(--border)">${d.message}</p>
+                        <p class="mb-4 p-4" style="background:#f9fafb; border-radius:8px; border:1px solid var(--border)">${d.message}</p>
                         <div class="flex gap-4 mb-4">
                             <div style="flex:1"><label>Status</label><select id="tk-status"><option value="Open" ${d.status=='Open'?'selected':''}>Open</option><option value="In Progress" ${d.status=='In Progress'?'selected':''}>In Progress</option><option value="Closed" ${d.status=='Closed'?'selected':''}>Closed</option></select></div>
                             <div style="flex:1"><label>Assign To Crew</label><select id="tk-assign"><option value="">Unassigned</option>${crewOpts}</select></div>
@@ -2055,7 +2041,7 @@ Thank you for choosing DDNetwork.
             const canEdit = hasPermission(PERMISSION_KEYS.EDIT_VOUCHERS);
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
-                    <h3 style="font-size:1.25rem; font-weight:700;">Voucher Management</h3>
+                    <h3 style="font-size:1.25rem; font-weight:800;">Voucher Management</h3>
                     <div class="flex gap-2">
                         ${canEdit ? `<button class="btn btn-primary" onclick="openAssignVoucherModal(null, null)"><i class="ri-add-line"></i> Assign New</button>` : ''}
                         <button class="btn btn-secondary" onclick="renderVouchers()"><i class="ri-refresh-line"></i> Sync Data</button>
@@ -2249,7 +2235,7 @@ Thank you for choosing DDNetwork.
             const canEdit = hasPermission(PERMISSION_KEYS.EDIT_CONTENT);
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
-                    <h2 style="font-size:1.25rem; font-weight:700;">Content & Packages</h2>
+                    <h2 style="font-size:1.25rem; font-weight:800;">Content & Packages</h2>
                     ${canEdit ? `<button class="btn btn-primary" onclick="saveContentChanges()"><i class="ri-save-line"></i> Save Changes</button>` : ''}
                 </div>
                 <div class="config-section">
@@ -2299,7 +2285,7 @@ Thank you for choosing DDNetwork.
         function renderConfig() {
             const canEdit = hasPermission(PERMISSION_KEYS.EDIT_CONFIG);
             document.getElementById('main').innerHTML = `
-                <h2 style="font-size:1.25rem; font-weight:700; margin-bottom:1.5rem;">System Configuration</h2>
+                <h2 style="font-size:1.25rem; font-weight:800; margin-bottom:1.5rem;">System Configuration</h2>
                 <div class="config-section">
                     <div class="config-header flex justify-between">
                         <span>Maintenance Mode</span>
@@ -2307,7 +2293,7 @@ Thank you for choosing DDNetwork.
                         <label class="toggle-switch">
                             <input type="checkbox" id="maint-toggle" onchange="toggleMaintenance()">
                             <span class="slider"></span>
-                        </label>` : `<span class="badge" style="background:var(--bg-input)">Read Only</span>`}
+                        </label>` : `<span class="badge" style="background:#f3f4f6">Read Only</span>`}
                     </div>
                     <p class="text-muted text-sm mb-4">Toggle a warning banner on main site and restrict access.</p>
                     <div class="mb-4">
@@ -2355,7 +2341,7 @@ Thank you for choosing DDNetwork.
                         <div class="gateway-card">
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <strong style="color:var(--primary)">${gw.name}</strong>
-                                <span class="badge ${gw.active?'badge-success':'badge-danger'}" style="${gw.active?'background:rgba(16,185,129,0.1);color:#10b981':'background:rgba(239,68,68,0.1);color:#ef4444'}">${gw.active?'Active':'Inactive'}</span>
+                                <span class="badge ${gw.active?'badge-success':'badge-danger'}" style="${gw.active?'background:#ecfdf5;color:#059669':'background:#fef2f2;color:#dc2626'}">${gw.active?'Active':'Inactive'}</span>
                             </div>
                             <div class="text-sm text-muted" style="word-break:break-all;">${gw.link || 'No Link'}</div>
                             ${canEdit ? `
@@ -2452,7 +2438,7 @@ Thank you for choosing DDNetwork.
             const canEdit = hasPermission(PERMISSION_KEYS.EDIT_PORTFOLIO);
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
-                    <h2 style="font-size:1.25rem; font-weight:700;">Client Portfolio</h2>
+                    <h2 style="font-size:1.25rem; font-weight:800;">Client Portfolio</h2>
                     ${canEdit ? `<button class="btn btn-primary" onclick="openAddPortfolioModal()"><i class="ri-add-line"></i> Add Project</button>` : ''}
                 </div>
                 <div class="table-container">
@@ -2468,13 +2454,13 @@ Thank you for choosing DDNetwork.
                 if(snap.empty) { tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No portfolio projects found.</td></tr>'; return; }
                 tbody.innerHTML = snap.docs.map(doc => {
                     const p = doc.data();
-                    const statusBadge = p.status ? `<span class="badge" style="background:var(--success)15; color:var(--success); border:1px solid var(--success)25">Active</span>` : `<span class="badge" style="background:var(--text-faint); color:var(--text-muted); border:1px solid var(--border)">Inactive</span>`;
+                    const statusBadge = p.status ? `<span class="badge" style="background:#ecfdf5; color:var(--success); border:1px solid #a7f3d0">Active</span>` : `<span class="badge" style="background:#f3f4f6; color:var(--text-muted); border:1px solid var(--border)">Inactive</span>`;
                     let actions = '';
                     if (canEdit) {
                         actions = `<button class="btn btn-sm btn-secondary" onclick="editPortfolio('${doc.id}')"><i class="ri-pencil-line"></i></button><button class="btn ${p.status ? 'btn-danger' : 'btn-success'}" onclick="togglePortfolioStatus('${doc.id}', ${!p.status})"><i class="${p.status ? 'ri-eye-off-line' : 'ri-eye-line'}"></i></button><button class="btn btn-sm btn-danger" onclick="deletePortfolio('${doc.id}')"><i class="ri-delete-bin-line"></i></button>`;
                     }
                     return `<tr>
-                        <td><img src="${p.img}" alt="thumb" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border);" onerror="this.src='https://placehold.co/50?text=No+Img'"></td>
+                        <td><img src="${p.img}" alt="thumb" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border);" onerror="this.src='https://placehold.co/50?text=No+Img'"></td>
                         <td><strong>${p.name}</strong></td>
                         <td><a href="${p.link}" target="_blank" class="btn btn-sm btn-secondary"><i class="ri-external-link-line"></i> Visit</a></td>
                         <td>${statusBadge}</td>
@@ -2487,7 +2473,7 @@ Thank you for choosing DDNetwork.
             const initialId = generateDocIdFromName('');
             showModal("Add New Project", `
                 <div class="mb-4"><label>Project Name</label><input type="text" id="p-name" placeholder="e.g. Clinic Azam" oninput="updateDocIdPreview()"><small style="color:var(--text-faint)">ID will be generated from name</small></div>
-                <div class="mb-4"><label>Generated ID (Auto)</label><input type="text" id="p-doc-id" readonly value="${initialId}" class="font-mono" style="color:var(--primary); background:var(--bg-sidebar);"></div>
+                <div class="mb-4"><label>Generated ID (Auto)</label><input type="text" id="p-doc-id" readonly value="${initialId}" class="font-mono" style="color:var(--primary); background:#f9fafb;"></div>
                 <div class="mb-4"><label>Image URL</label><input type="text" id="p-img" placeholder="https://..."><small style="color:var(--text-faint)">Direct link to image file.</small></div>
                 <div class="mb-4"><label>Website Link</label><input type="text" id="p-link" placeholder="https://..."></div>
                 <div class="flex items-center gap-4"><label class="toggle-switch"><input type="checkbox" id="p-status" checked><span class="slider"></span></label><span style="font-size:0.9rem; color:var(--text-main);">Visible on Main Site</span></div>
@@ -2557,7 +2543,7 @@ Thank you for choosing DDNetwork.
             const canDelete = hasPermission(PERMISSION_KEYS.DELETE_REQUESTS);
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
-                    <h2 style="font-size:1.25rem; font-weight:700;">Customer Requests</h2>
+                    <h2 style="font-size:1.25rem; font-weight:800;">Customer Requests</h2>
                     <input type="text" id="reqSearch" placeholder="Search Client..." style="width:200px;" onkeyup="filterTable('req-tbody', this.value)">
                 </div>
                 <div class="table-container">
@@ -2607,7 +2593,7 @@ Thank you for choosing DDNetwork.
                 else if (type === 'renew') { detailsHTML = `<div class="flex gap-4 mb-4"><div style="flex:1"><label>Plan to Renew</label><input value="${d.plan || '-'}" readonly></div><div style="flex:1"><label>Duration</label><input value="${d.duration || '-'}" readonly></div></div>`; } 
                 else if (type === 'remove') { detailsHTML = `<div class="mb-4"><label>Items to Remove</label><textarea readonly rows="3">${d.details || '-'}</textarea></div>`; }
                 showModal(`Request Details (${type.toUpperCase()})`, `
-                    <div class="mb-4 p-4" style="background:var(--bg-sidebar); border-radius:8px; border:1px solid var(--border)">
+                    <div class="mb-4 p-4" style="background:#f9fafb; border-radius:8px; border:1px solid var(--border)">
                         <div class="text-sm text-muted mb-1">Client Info</div>
                         <strong>${d.name}</strong> (${d.phone})<br>${d.userId ? `<small class="text-muted">User ID: ${d.userId}</small>` : ''}
                     </div>
@@ -2644,7 +2630,7 @@ Thank you for choosing DDNetwork.
             const canEdit = hasPermission(PERMISSION_KEYS.EDIT_PROMOS);
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
-                    <h2 style="font-size:1.25rem; font-weight:700;">Public Promo Codes</h2>
+                    <h2 style="font-size:1.25rem; font-weight:800;">Public Promo Codes</h2>
                     ${canEdit ? `<button class="btn btn-primary" onclick="addPublicPromo()"><i class="ri-add-line"></i> Add Code</button>` : ''}
                 </div>
                 <div class="table-container">
@@ -2668,7 +2654,7 @@ Thank you for choosing DDNetwork.
                     }
                     return `<tr>
                         <td class="font-mono" style="color:var(--warning); font-weight:700;">${code}</td>
-                        <td><span class="badge" style="background:var(--success)15; color:var(--success); border:1px solid var(--success)25">${discountPercent}</span></td>
+                        <td><span class="badge" style="background:#ecfdf5; color:var(--success); border:1px solid #a7f3d0">${discountPercent}</span></td>
                         <td>${actions}</td>
                     </tr>`;
                 }).join('');
@@ -2711,7 +2697,7 @@ Thank you for choosing DDNetwork.
             // ... (Existing Commissions Logic) ...
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
-                    <h2 style="font-size:1.25rem; font-weight:700;">My Commissions</h2>
+                    <h2 style="font-size:1.25rem; font-weight:800;">My Commissions</h2>
                 </div>
                 <div class="stats-grid" id="comm-stats">
                     <div class="page-loader"><div class="loading-spinner"></div></div>
@@ -2749,7 +2735,7 @@ Thank you for choosing DDNetwork.
             });
             document.getElementById('comm-stats').innerHTML = `
                 <div class="stat-card">
-                    <div class="stat-icon" style="color:var(--success); background:var(--success)15"><i class="ri-wallet-3-line"></i></div>
+                    <div class="stat-icon" style="color:var(--success); background:#ecfdf5"><i class="ri-wallet-3-line"></i></div>
                     <div class="stat-info">
                         <div class="stat-val">RM ${totalEarnings.toFixed(2)}</div>
                         <div class="stat-label">Total Pending Payouts</div>
@@ -2765,7 +2751,7 @@ Thank you for choosing DDNetwork.
                         <td class="font-mono" style="color:var(--primary)">${c.ref}</td>
                         <td>${c.pkg}</td>
                         <td>RM ${c.amt}</td>
-                        <td><span class="badge badge-crew" style="background:rgba(255,255,255,0.05); border:1px solid var(--border); text-transform:capitalize;">${c.cycle}</span></td>
+                        <td><span class="badge badge-crew" style="background:#f3f4f6; border:1px solid var(--border); text-transform:capitalize;">${c.cycle}</span></td>
                         <td style="color:var(--success); font-weight:700;">+ RM ${c.comm.toFixed(2)}</td>
                     </tr>
                 `).join('');
@@ -2781,12 +2767,12 @@ Thank you for choosing DDNetwork.
 
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
-                    <h2 style="font-size:1.5rem; font-weight:700; color: var(--warning);"><i class="ri-shield-check-line"></i> Approval Tools</h2>
+                    <h2 style="font-size:1.5rem; font-weight:800; color: var(--warning);"><i class="ri-shield-check-line"></i> Approval Tools</h2>
                 </div>
                 
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-icon" style="color:var(--warning); background:rgba(245,158,11,0.15)"><i class="ri-time-line"></i></div>
+                        <div class="stat-icon" style="color:var(--warning); background:#fffbeb"><i class="ri-time-line"></i></div>
                         <div class="stat-info">
                             <div class="stat-val" id="count-pending">0</div>
                             <div class="stat-label">Pending Requests</div>
@@ -2844,7 +2830,7 @@ Thank you for choosing DDNetwork.
                             <small class="text-muted">${r.requesterEmail}</small>
                         </td>
                         <td>
-                            <div class="badge badge-warning" style="background:rgba(245,158,11,0.1); color:var(--warning); border:1px solid rgba(245,158,11,0.3); text-transform:none;">${keyName}</div>
+                            <div class="badge badge-warning" style="background:#fffbeb; color:var(--warning); border:1px solid #fde68a; text-transform:none;">${keyName}</div>
                             <div style="font-size:0.75rem; margin-top:4px;">Target: ${r.targetCollection}/${r.targetId}</div>
                         </td>
                         <td><span class="status-badge ${isPending?'status-pending':'status-approved'}">${r.status}</span></td>
@@ -2910,7 +2896,7 @@ Thank you for choosing DDNetwork.
 
         function renderMyProfile() {
             document.getElementById('main').innerHTML = `
-                <div class="p-4" style="background:var(--bg-surface); border:1px solid var(--border); border-radius:12px; max-width:500px; margin:0 auto;">
+                <div class="p-4" style="background:var(--bg-surface); border:1px solid var(--border); border-radius:16px; max-width:500px; margin:0 auto;">
                     <div class="flex items-center gap-4 mb-6">
                         <div class="u-avatar" style="width:50px; height:50px; font-size:1.5rem;">${(userData.name || 'A').charAt(0)}</div>
                         <div>
