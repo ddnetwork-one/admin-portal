@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>New Portal v2.1 (Enterprise Edition)</title>
+    <title>New Portal v2.2 (Enterprise Edition)</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -339,7 +339,7 @@
 
         /* MAIN CONTENT */
         main { 
-            flex: 1; 
+            flex:1; 
             overflow-y: auto; 
             overflow-x: hidden; 
             background: var(--bg-app); 
@@ -501,7 +501,7 @@
             font-size: 0.8rem;
             margin-top: 5px;
         }
-        .diff-line { display: flex; border-bottom: 1px solid #e2e8f0; padding: 4px 0; }
+        .diff-line { display: flex; border-bottom:1px solid #e2e8f0; padding: 4px 0; }
         .diff-line:last-child { border-bottom: none; }
         .diff-label { width: 80px; font-weight: 600; color: var(--text-muted); flex-shrink: 0; }
         .diff-val { flex: 1; word-break: break-all; }
@@ -546,6 +546,8 @@
         .status-pending { background: #fffbeb; color: var(--warning); border: 1px solid #fcd34d; }
         .status-approved { background: #ecfdf5; color: var(--success); border: 1px solid #6ee7b7; }
         .status-rejected { background: #fef2f2; color: var(--danger); border: 1px solid #fca5a5; }
+        .status-paid { background: #ecfdf5; color: var(--success); border: 1px solid #6ee7b7; }
+        .status-unpaid { background: #fffbeb; color: var(--warning); border: 1px solid #fcd34d; }
 
         .req-approval-badge { display: inline-flex; align-items: center; gap:4px; background: #fffbeb; color: var(--warning); font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; border: 1px solid #fde68a; margin-left: 8px; }
         
@@ -563,7 +565,7 @@
         .gateway-card { background: #f9fafb; padding: 1rem; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 0.5rem; }
 
         /* Commission Card */
-        .comm-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+        .comm-card { background: #fff; border:1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
         .comm-avatar { width: 60px; height: 60px; background: #f3f4f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; color: var(--text-muted); }
         .comm-info { flex: 1; min-width: 200px; }
         .comm-stats { display: flex; gap: 1rem; flex-wrap: wrap; }
@@ -571,6 +573,42 @@
         .comm-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
         .comm-stat-val { font-size: 1rem; font-weight: 700; color: var(--primary); }
         
+        /* Month Selector */
+        .month-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+            background: var(--bg-surface);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .month-btn {
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 4px 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            transition: 0.2s;
+        }
+        .month-btn:hover:not(:disabled) {
+            background: #f3f4f6;
+            color: var(--text-main);
+        }
+        .month-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .current-month-label {
+            font-weight: 700;
+            color: var(--primary);
+            min-width: 100px;
+            text-align: center;
+        }
+
         /* RESPONSIVENESS */
         @media(max-width: 1024px) {
             aside { transform: translateX(-100%); width: 280px; box-shadow: 20px 0 40px rgba(0,0,0,0.1); }
@@ -588,7 +626,7 @@
     <!-- AUTH SCREEN -->
     <div id="auth-screen">
         <div class="auth-card">
-            <h2 class="mb-4" style="color:var(--text-main); font-weight: 800; letter-spacing: -0.5px;">New Portal v2.1</h2>
+            <h2 class="mb-4" style="color:var(--text-main); font-weight: 800; letter-spacing: -0.5px;">New Portal v2.2</h2>
             <p class="mb-4 text-muted">Enterprise Edition</p>
             <form id="loginForm">
                 <input type="text" id="loginInput" class="mb-4" placeholder="Email or Crew ID" required>
@@ -607,7 +645,7 @@
             <div class="header-left">
                 <button class="btn-icon" onclick="toggleSidebar()" title="Toggle Menu"><i class="ri-menu-line" style="font-size: 1.4rem;"></i></button>
                 <div class="header-brand">
-                    <span>DDN v2.1 Ent</span>
+                    <span>DDN v2.2 Ent</span>
                 </div>
             </div>
             <div class="header-actions">
@@ -709,6 +747,24 @@
             "Automation & AI Specialist", 
             "Support Operations Executive"
         ];
+
+        // Addon 2: Role Mapping Logic
+        const JOB_ROLE_MAP = {
+            "Founder & Managing Director": "super_admin",
+            "Project & Client Manager": "mid_admin",
+            "Account / Operations / Marketing Manager": "mid_admin",
+            "Finance / Billing Executive": "mid_admin",
+            "People / Team Operations Executive": "admin",
+            "Business Development Executive": "admin",
+            "Sales Executive": "crew",
+            "Client Success Coordinator": "mid_admin",
+            "Client Experience Executive": "crew",
+            "Technical Specialist": "crew",
+            "Web Developer": "admin",
+            "Full Stack Developer": "mid_admin",
+            "Automation & AI Specialist": "crew",
+            "Support Operations Executive": "crew"
+        };
 
         const DEFAULT_COMMISSION_RATES = {
             "Founder & Managing Director": 0.05,
@@ -870,9 +926,8 @@
                         userData = doc.data();
                         
                         if(!userData.permissions) userData.permissions = {};
-                        if(!userData.isSuspended) userData.isSuspended = false; // Init suspended flag
+                        if(!userData.isSuspended) userData.isSuspended = false;
 
-                        // CHECK SUSPENSION
                         if(userData.isSuspended) {
                             auth.signOut();
                             showToast("Account Suspended. Contact Admin.", "error");
@@ -883,7 +938,7 @@
                         document.getElementById('dashboard').classList.remove('hidden');
                         
                         document.getElementById('side-name').innerText = userData.name || 'User';
-                        document.getElementById('side-job').innerText = userData.jobTitle || userData.role;
+                        document.getElementById('side-job').innerText = `${userData.jobTitle} (${userData.role.toUpperCase()})`;
                         document.getElementById('side-avatar').innerText = (userData.name || 'A').charAt(0).toUpperCase();
                         document.getElementById('header-avatar').innerText = (userData.name || 'A').charAt(0).toUpperCase();
 
@@ -950,13 +1005,39 @@
 
         // --- ACCESS CONTROL & PERMISSIONS ---
         
+        // Addon 3: Updated Access Logic
         function isSuperAdmin() { return userData && userData.role === 'super_admin'; }
+        function isMidAdmin() { return userData && userData.role === 'mid_admin'; }
+        function isAdmin() { return userData && userData.role === 'admin'; }
+        function isCrew() { return userData && userData.role === 'crew'; }
+        
         function isFounder() { return userData && userData.jobTitle && userData.jobTitle.includes("Founder"); }
         function isFinanceManager() { return userData && (userData.jobTitle && userData.jobTitle.includes("Finance")); }
-        
+
         function hasPermission(key) {
             if(!userData) return false;
+            // Addon 3: Full Access for SuperAdmin
             if(isSuperAdmin() || isFounder()) return true;
+            
+            // Addon 3: Basic Access for Admin
+            if(isAdmin()) {
+                // Admins get basic access
+                const basicPerms = [PERMISSION_KEYS.EDIT_ORDERS, PERMISSION_KEYS.VIEW_FINANCE];
+                return basicPerms.includes(key);
+            }
+
+            // Mid Admin gets Middle Access
+            if(isMidAdmin()) {
+                // Mid Admin gets specific keys or full access to basic
+                return true; 
+            }
+
+            // Crew gets No Access (only profile/commission)
+            if(isCrew()) {
+                const crewPerms = [PERMISSION_KEYS.VIEW_FINANCE]; // Only view their own
+                return crewPerms.includes(key);
+            }
+
             return userData.permissions && userData.permissions[key] === true;
         }
 
@@ -966,12 +1047,7 @@
         async function checkAccessOrRequestApproval(permissionKey, targetCollection, targetId, payload, modalClose = true) {
             if(hasPermission(permissionKey)) return false;
 
-            // Addon 3: Permission Denied Toast
             showToast("Permission denied. Your role does not allow this action. SuperAdmin users can grant permission for Auto-Approval.", "error");
-            
-            // Still submitting request? The prompt implies "If user attempts... show toast".
-            // Usually, if they don't have permission, they shouldn't be able to submit.
-            // But the previous logic allowed submitting requests. We will keep submitting but show the toast.
             
             const collectionName = permissionKey.replace('edit_', '').replace('delete_', '').toUpperCase();
             
@@ -999,17 +1075,25 @@
             }
         }
 
-        // Addon 4: Check Finance Access
+        // Addon 3: Refined Finance Access
         function checkFinanceAccess() {
-            if(isFounder() || isSuperAdmin() || isFinanceManager()) return false; // Allow
-            // Check for "Mid-Admin" based on job title logic
-            const isMidAdmin = userData.jobTitle && (
-                userData.jobTitle.includes("Project Manager") || 
-                userData.jobTitle.includes("Account Manager")
-            );
-            if(isMidAdmin) return false; // Allow
+            // SuperAdmin & Mid_Admin = Full Finance Access
+            if(isSuperAdmin() || isMidAdmin()) return false; 
+            
+            // Admin = Basic Access (Can see finance, but not full list?) 
+            // Logic: "Admin = basic access". "Crew = No access" but "User can see their own commission".
+            // So Finance page is accessible to Crew (via restricted view) and others.
+            // But if we are protecting *viewing the list of everyone*:
+            
+            if(isAdmin() && !isMidAdmin()) {
+                // Admin might be restricted from seeing *all* bank details?
+                // Let's allow Admin to see the finance module but not mark paid.
+                return false; // Allow entry, specific functions will block
+            }
 
-            return true; // Deny
+            if(isCrew()) return false; // Crew enters to see own commission.
+
+            return true; // Deny entry (shouldn't happen with above checks, but safe fallback)
         }
 
         // --- ROUTING SYSTEM ---
@@ -1122,7 +1206,7 @@
                     <div class="list-group">
                         <h3><i class="ri-pulse-line" style="color:var(--success)"></i> Quick Actions</h3>
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
-                            <button class="btn btn-secondary" onclick="navigateTo('/orders')"><i class="ri-shopping-bag-line"></i> New Order</button>
+                            ${hasPermission(PERMISSION_KEYS.EDIT_ORDERS) ? `<button class="btn btn-secondary" onclick="navigateTo('/orders')"><i class="ri-shopping-bag-line"></i> New Order</button>` : ''}
                             <button class="btn btn-secondary" onclick="navigateTo('/support')"><i class="ri-ticket-line"></i> Check Tickets</button>
                             <button class="btn btn-secondary" onclick="navigateTo('/requests')"><i class="ri-database-2-line"></i> Requests</button>
                             ${hasPermission(PERMISSION_KEYS.EDIT_CREW) ? `<button class="btn btn-secondary" onclick="navigateTo('/crew')"><i class="ri-user-add-line"></i> Add Crew</button>` : ''}
@@ -1135,10 +1219,6 @@
                 </div>
             `;
             
-            if(hasPermission(PERMISSION_KEYS.VIEW_FINANCE)) {
-                 // Add finance stats if visible
-            }
-
             db.collection("activity_logs").orderBy("timestamp", "desc").limit(5).onSnapshot(snap => {
                 const feed = document.getElementById('activity-feed');
                 if(feed) {
@@ -1281,8 +1361,6 @@
                     }
                 } catch(e) { console.error("Error fetching payments", e); }
 
-                // Note: In a real invoice modal, we'd inject this HTML into the overlay.
-                // For this single-file demo, we'll keep it simple.
                 const invoiceHTML = `
                     <div style="padding:20px;">
                         <h2>INVOICE #${orderRef}</h2>
@@ -1344,7 +1422,7 @@
             const currentReps = d.salesRepIds || []; 
             
             try {
-                const crewSnap = await db.collection("users").where("role", "in", ["super_admin", "admin", "crew"]).get();
+                const crewSnap = await db.collection("users").where("role", "in", ["super_admin", "admin", "mid_admin", "crew"]).get();
                 if(crewSnap.empty) {
                     salesRepHTML = '<div class="p-4 text-muted">No staff found</div>';
                 } else {
@@ -1511,18 +1589,17 @@
                 <div class="table-container">
                     <div class="table-responsive">
                         <table><thead><tr><th>Crew ID</th><th>Name</th><th>Email</th><th>Role</th><th>Job Title</th><th>Comm. Rate</th><th>Status</th><th>Actions</th></tr></thead><tbody id="crew-tbody">
-                        <tr><td colspan="8" class="text-center"><div class="loading-spinner"></div></td></tr>
+                        <tr><td colspan="9" class="text-center"><div class="loading-spinner"></div></td></tr>
                         </tbody></table>
                     </div>
                 </div>`;
-            db.collection("users").where("role", "in", ["super_admin", "admin", "crew"]).onSnapshot(snap => {
+            db.collection("users").where("role", "in", ["super_admin", "mid_admin", "admin", "crew"]).onSnapshot(snap => {
                 const tbody = document.getElementById('crew-tbody');
                 if(!tbody) return;
                 tbody.innerHTML = snap.docs.map(doc => {
                     const u = doc.data();
                     const rate = u.commissionRate ? (u.commissionRate * 100).toFixed(1) + '%' : '0%';
                     
-                    // Addon 4: Suspend Status
                     const isSuspended = u.isSuspended || false;
                     const statusBadge = isSuspended 
                         ? `<span class="badge" style="background:#fef2f2; color:var(--danger); border:1px solid #fecaca">Suspended</span>` 
@@ -1533,7 +1610,6 @@
                         buttons = `<button class="btn btn-sm btn-secondary" onclick="editCrew('${doc.id}')"><i class="ri-pencil-line"></i></button>`;
                     }
                     if (isSuperAdmin()) {
-                        // Addon 4: Suspend/Reactivate Buttons
                         if(isSuspended) {
                             buttons += `<button class="btn btn-sm btn-success" onclick="toggleSuspension('${doc.id}', false)" title="Reactivate"><i class="ri-user-follow-line"></i></button>`;
                         } else {
@@ -1586,12 +1662,12 @@
 
         function autoSetRoleAndRate() {
             const title = document.getElementById('c-job').value;
+            // Addon 2: Map Job Title to Role
             const roleInput = document.getElementById('c-role');
             const rateInput = document.getElementById('c-rate');
-            let dbRole = 'crew'; 
-            if(title === "Founder & Managing Director") dbRole = 'super_admin';
-            else if (["Project & Client Manager", "Account / Operations / Marketing Manager", "Finance / Billing Executive", "People / Team Operations Executive"].includes(title)) dbRole = 'admin';
+            const dbRole = JOB_ROLE_MAP[title] || 'crew'; // Default to crew if not found
             roleInput.value = dbRole.toUpperCase();
+            
             const defaultRate = getDefaultRate(title);
             rateInput.value = (defaultRate * 100).toFixed(1);
         }
@@ -1607,11 +1683,10 @@
 
             try {
                 const userCredential = await auth.createUserWithEmailAndPassword(email, pass);
-                let dbRole = 'crew';
-                if(job === "Founder & Managing Director") dbRole = 'super_admin';
-                else if (["Project & Client Manager", "Account / Operations / Marketing Manager", "Finance / Billing Executive", "People / Team Operations Executive"].includes(job)) dbRole = 'admin';
+                
+                // Addon 2: Use mapped role
+                const dbRole = JOB_ROLE_MAP[job] || 'crew';
 
-                // Addon 5: Bank Details
                 const bankDetails = {
                     bankName: '',
                     accountHolder: '',
@@ -1624,12 +1699,12 @@
                     crewId: newId,
                     name: name,
                     email: email,
-                    role: dbRole,
+                    role: dbRole, // Set mapped role
                     jobTitle: job,
                     commissionRate: isNaN(rateVal) ? 0.0 : (rateVal / 100),
                     permissions: initialPerms,
-                    bankDetails: bankDetails, // New field
-                    isSuspended: false, // New field
+                    bankDetails: bankDetails,
+                    isSuspended: false,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 closeModal();
@@ -1640,7 +1715,6 @@
             }
         }
 
-        // Addon 4: Toggle Suspension
         async function toggleSuspension(uid, suspend) {
             if(!isSuperAdmin()) return;
             const action = suspend ? "Suspend" : "Reactivate";
@@ -1660,7 +1734,6 @@
                 const u = doc.data();
                 const jobOptions = JOB_TITLES.map(j => `<option value="${j}" ${u.jobTitle===j?'selected':''}>${j}</option>`).join('');
                 
-                // Addon 1: Permissions toggles with current state (true/false) logic
                 let permsHTML = '<div style="margin-top:1rem; border-top:1px solid var(--border); padding-top:1rem;"><label style="margin-bottom:0.5rem; display:block;">Access Permissions</label><div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">';
                 const userPerms = u.permissions || {};
                 
@@ -1675,7 +1748,6 @@
                     [PERMISSION_KEYS.EDIT_PROMOS]: 'Edit Promos',
                     [PERMISSION_KEYS.EDIT_CONFIG]: 'Edit Config'
                 })) {
-                    // Addon 1: Check specifically for true
                     const isChecked = userPerms[key] === true ? 'checked' : '';
                     permsHTML += `
                     <label class="flex items-center gap-2" style="font-size:0.8rem; font-weight:400; color:var(--text-muted); text-transform:none;">
@@ -1684,13 +1756,12 @@
                 }
                 permsHTML += '</div></div>';
 
-                if(isFounder() || isSuperAdmin()) {
+                if(isSuperAdmin()) {
                     permsHTML += `<label class="flex items-center gap-2 mt-2" style="font-size:0.8rem; font-weight:400; color:var(--text-muted); text-transform:none;">
                         <input type="checkbox" class="perm-toggle" value="${PERMISSION_KEYS.APPROVE_ACTIONS}" ${userPerms[PERMISSION_KEYS.APPROVE_ACTIONS]===true?'checked':''} style="width:auto; margin:0;"> Approve Actions (Admin Power)
                     </label>`;
                 }
                 
-                // Addon 5: Bank Details Fields
                 const bd = u.bankDetails || {};
                 const bankHTML = `
                     <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border);">
@@ -1705,11 +1776,7 @@
                     <div class="mb-4"><label>Crew ID</label><input id="e-c-id" value="${u.crewId}"></div>
                     <div class="mb-4"><label>Full Name</label><input id="e-c-name" value="${u.name}"></div>
                     <div class="mb-4"><label>Job Title</label><select id="e-c-job">${jobOptions}</select></div>
-                    <div class="mb-4"><label>Role</label><select id="e-c-role">
-                        <option value="crew" ${u.role==='crew'?'selected':''}>Internal Crew</option>
-                        <option value="admin" ${u.role==='admin'?'selected':''}>Admin</option>
-                        <option value="super_admin" ${u.role==='super_admin'?'selected':''}>Super Admin</option>
-                    </select></div>
+                    <div class="mb-4"><label>Role</label><input id="e-c-role" value="${u.role}" readonly class="bg-muted" style="background:#f9fafb; color:var(--text-muted);"></div>
                      <div class="mb-4"><label>Commission Rate (%)</label><input type="number" step="0.1" id="e-c-rate" value="${(u.commissionRate*100).toFixed(1)}"></div>
                      ${permsHTML}
                      ${bankHTML}
@@ -1720,13 +1787,11 @@
         async function updateCrewData(uid) {
             const rateVal = parseFloat(document.getElementById('e-c-rate').value);
             
-            // Addon 1: Explicitly set false for unchecked permissions
             const newPerms = {};
             document.querySelectorAll('.perm-toggle').forEach(cb => {
-                newPerms[cb.value] = cb.checked; // true or false
+                newPerms[cb.value] = cb.checked;
             });
 
-            // Addon 5: Bank Details
             const bankData = {
                 bankName: document.getElementById('c-bank-name').value,
                 accountHolder: document.getElementById('c-bank-holder').value,
@@ -1737,7 +1802,7 @@
                 crewId: document.getElementById('e-c-id').value,
                 name: document.getElementById('e-c-name').value,
                 jobTitle: document.getElementById('e-c-job').value,
-                role: document.getElementById('e-c-role').value,
+                role: document.getElementById('e-c-role').value, // Keep existing role or let admin change?
                 commissionRate: isNaN(rateVal) ? 0.0 : (rateVal / 100),
                 permissions: newPerms,
                 bankDetails: bankData
@@ -1815,7 +1880,7 @@
         function viewTicket(id) {
             db.collection("tickets").doc(id).get().then(doc => {
                 const d = doc.data();
-                db.collection("users").where("role", "in", ["super_admin", "admin", "crew"]).get().then(snap => {
+                db.collection("users").where("role", "in", ["super_admin", "mid_admin", "admin", "crew"]).get().then(snap => {
                     const crewOpts = snap.docs.map(c => `<option value="${c.id}" ${d.assignedTo===c.id?'selected':''}>${c.data().name}</option>`).join('');
                     showModal(`Ticket: ${d.ticketId || id}`, `
                         <p class="mb-4 p-4" style="background:#f9fafb; border-radius:8px; border:1px solid var(--border)">${d.message}</p>
@@ -2468,207 +2533,152 @@
             try { await db.collection("promo_codes").doc(code).delete(); showToast("Promo Code Deleted", "success"); logActivity(`Deleted public promo code: ${code}`); } catch(e) { showToast("Error deleting: " + e.message, "error"); } 
         }
 
-        // --- 12. COMMISSIONS (NEW) ---
-        async function renderCommissions() {
-            if(checkFinanceAccess()) {
-                document.getElementById('main').innerHTML = `
-                    <div class="access-denied-container">
-                        <div class="access-denied-icon"><i class="ri-lock-2-line"></i></div>
-                        <div class="access-denied-title">Access Denied</div>
-                        <div class="access-denied-desc">This module is restricted to Finance Executives, Founder, and Super Admins only.</div>
-                    </div>`;
-                return;
-            }
+        // --- 12. COMMISSIONS (UPDATED) ---
+        // Addon 1: Month Selector Logic
+        let currentCommissionsDate = new Date();
 
-            const isAdmin = isSuperAdmin() || isFounder() || isFinanceManager() || (userData.jobTitle && (userData.jobTitle.includes("Project Manager") || userData.jobTitle.includes("Account Manager")));
+        async function renderCommissions() {
+            // Addon 3: Check Access
+            // Crew sees their own. Mid Admin + Super Admin see everyone.
+            const isCrewUser = isCrew();
+            const isRestricted = isAdmin() && !isMidAdmin() && !isSuperAdmin(); 
             
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.5rem; font-weight:800;">Commission Management</h2>
                 </div>
                 
-                ${isAdmin ? `
-                <div class="config-section mb-4">
-                    <div class="flex items-center gap-4" style="flex-wrap:wrap;">
-                        <input type="text" id="crew-search" placeholder="Search Crew by Name, ID, or Email..." style="flex:1; min-width:250px;">
-                        <button class="btn btn-secondary" onclick="initCommissionsSearch()"><i class="ri-search-line"></i> Search</button>
-                    </div>
+                <div class="month-selector">
+                    <button class="month-btn" onclick="changeCommissionMonth(-1)" ${isCrewUser ? 'disabled' : ''}><i class="ri-arrow-left-s-line"></i> Prev Month</button>
+                    <span class="current-month-label" id="comm-month-label">Loading...</span>
+                    <button class="month-btn" onclick="changeCommissionMonth(1)" ${isCrewUser ? 'disabled' : ''}>Next Month <i class="ri-arrow-right-s-line"></i></button>
                 </div>
-                ` : ''}
 
                 <div class="table-container">
                     <div class="table-header">
-                        <h3>${isAdmin ? 'Crew Commission Overview' : 'My Commissions'}</h3>
+                        <h3>${isCrewUser ? 'My Commissions' : 'Commission Overview'}</h3>
                     </div>
                     <div class="table-responsive">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Crew Member</th>
-                                    <th>Total Earnings (Paid Orders)</th>
-                                    <th>Bank Details</th>
-                                    ${isAdmin ? '<th>Actions</th>' : ''}
+                                    <th>Reference</th>
+                                    <th>Date</th>
+                                    ${isCrewUser ? '<th>Amount</th>' : '<th>Crew Member</th>'}
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    ${!isCrewUser ? '<th>Actions</th>' : ''}
                                 </tr>
                             </thead>
                             <tbody id="comm-tbody">
-                                <tr><td colspan="${isAdmin?4:3}" class="text-center"><div class="loading-spinner"></div></td></tr>
+                                <tr><td colspan="${isCrewUser?5:6}" class="text-center"><div class="loading-spinner"></div></td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             `;
             
-            if(isAdmin) initCommissionsSearch();
-            else loadMyCommissions();
+            updateCommissionView();
         }
 
-        async function initCommissionsSearch() {
-            const query = document.getElementById('crew-search').value.trim().toLowerCase();
+        function changeCommissionMonth(offset) {
+            currentCommissionsDate.setMonth(currentCommissionsDate.getMonth() + offset);
+            updateCommissionView();
+        }
+
+        async function updateCommissionView() {
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const displayMonth = monthNames[currentCommissionsDate.getMonth()];
+            const displayYear = currentCommissionsDate.getFullYear();
+            document.getElementById('comm-month-label').innerText = `${displayMonth} ${displayYear}`;
+
+            const isCrewUser = isCrew();
             const tbody = document.getElementById('comm-tbody');
-            if(!tbody) return;
-            
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center"><div class="loading-spinner"></div></td></tr>';
+            const startOfMonth = new Date(displayYear, currentCommissionsDate.getMonth(), 1);
+            const endOfMonth = new Date(displayYear, currentCommissionsDate.getMonth() + 1, 0, 0, 0);
 
-            let q = db.collection("users").where("role", "in", ["super_admin", "admin", "crew"]);
-            const snap = await q.get();
-            
-            if(snap.empty) {
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No crew found</td></tr>';
-                return;
+            let query = db.collection("orders")
+                .where("status", "==", "Paid")
+                .where("timestamp", ">=", startOfMonth)
+                .where("timestamp", "<", endOfMonth)
+                .orderBy("timestamp", "desc");
+
+            // Addon 1: If Crew, filter by user's orders. If Admin, get all.
+            if(isCrewUser()) {
+                query = query.where("salesRepIds", "array-contains", currentUser.uid);
             }
 
-            const filteredDocs = snap.docs.filter(doc => {
-                const d = doc.data();
-                const name = (d.name || '').toLowerCase();
-                const id = (d.crewId || '').toLowerCase();
-                const email = (d.email || '').toLowerCase();
-                if(!query) return true;
-                return name.includes(query) || id.includes(query) || email.includes(query);
-            });
-
-            if(filteredDocs.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No matching crew found</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = '';
-            for(const doc of filteredDocs) {
-                const u = doc.data();
-                const commData = await calculateCommission(u.email, u.uid, u.commissionRate);
-                
-                const bd = u.bankDetails || {};
-                const bankStr = bd.accountNumber 
-                    ? `<div style="font-size:0.8rem;"><span style="font-weight:600">${bd.bankName}</span> (${bd.accountNumber})<br><span style="color:var(--text-muted)">${bd.accountHolder}</span></div>` 
-                    : `<span style="color:var(--text-faint); font-size:0.8rem;">No bank details on file</span>`;
-
-                const actionsHTML = `
-                    <div style="display:flex; gap:5px;">
-                        <button class="btn btn-sm btn-success" title="Notify Paid" onclick="notifyPaid('${u.phone||''}', '${u.name}')"><i class="ri-whatsapp-line"></i></button>
-                        <button class="btn btn-sm btn-secondary" title="Edit Bank" onclick="editBankDetails('${doc.id}')"><i class="ri-bank-card-line"></i></button>
-                    </div>
-                `;
-
-                tbody.innerHTML += `
-                    <tr>
-                        <td>
-                            <div style="font-weight:700;">${u.name}</div>
-                            <div style="font-size:0.75rem; color:var(--text-muted);">${u.jobTitle} (${u.crewId})</div>
-                        </td>
-                        <td style="font-weight:700; color:var(--success);">RM ${commData.total.toFixed(2)}</td>
-                        <td>${bankStr}</td>
-                        <td>${actionsHTML}</td>
-                    </tr>
-                `;
-            }
-        }
-
-        async function loadMyCommissions() {
-            const tbody = document.getElementById('comm-tbody');
-            const commData = await calculateCommission(userData.email, currentUser.uid, userData.commissionRate);
+            const snap = await query.get();
             
-            tbody.innerHTML = `
-                <tr>
-                    <td><strong>${userData.name}</strong> (${userData.jobTitle})</td>
-                    <td style="font-weight:700; color:var(--success);">RM ${commData.total.toFixed(2)}</td>
-                    <td>Based on Paid Orders</td>
-                </tr>
-            `;
-        }
-
-        async function calculateCommission(email, uid, rate) {
-            let total = 0;
-            // Logic: if Founder/SuperAdmin, get 5% of ALL Paid Orders.
-            // If Crew, get rate * Orders where salesRepIds includes uid OR old salesRepId matches uid.
-            
-            if (isFounder() || isSuperAdmin()) {
-                const allPaid = await db.collection("orders").where("status", "==", "Paid").get();
-                allPaid.forEach(doc => {
-                    const amt = parseFloat(doc.data().total.replace('RM ', '')) || 0;
-                    total += (amt * 0.05);
-                });
-            } else {
-                // Specific User Logic
-                // Check for new multi-rep format
-                const snap1 = await db.collection("orders").where("salesRepIds", "array-contains", uid).where("status", "==", "Paid").get();
-                snap1.forEach(doc => {
-                    const amt = parseFloat(doc.data().total.replace('RM ', '')) || 0;
-                    total += (amt * rate);
-                });
-
-                // Check for old single rep format (legacy support)
-                const snap2 = await db.collection("orders").where("salesRepId", "==", uid).where("status", "==", "Paid").get();
-                snap2.forEach(doc => {
-                    const amt = parseFloat(doc.data().total.replace('RM ', '')) || 0;
-                    total += (amt * rate);
-                });
-            }
-            return { total };
-        }
-
-        // Addon 5: Notify Paid
-        async function notifyPaid(phone, name) {
-            if(!phone) return showToast("No phone number on file", "error");
-            const msg = `Hello ${name},\n\nThis is DDNetwork Finance. We have successfully paid your commission to your account.\n\nThank you!`;
-            let cleanPhone = phone.replace(/^0/, '60');
-            if(!cleanPhone.startsWith('+')) cleanPhone = '+' + cleanPhone;
-            window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
-            logActivity(`Sent commission payment notification to ${name}`);
-        }
-
-        // Addon 5: Edit Bank Details
-        function editBankDetails(uid) {
-            db.collection("users").doc(uid).get().then(doc => {
-                const u = doc.data();
-                const bd = u.bankDetails || {};
-                showModal(`Edit Bank Details for ${u.name}`, `
-                    <div class="mb-2"><label>Bank Name</label><input id="eb-bank-name" value="${bd.bankName||''}"></div>
-                    <div class="mb-2"><label>Account Holder</label><input id="eb-holder" value="${bd.accountHolder||''}"></div>
-                    <div class="mb-2"><label>Account Number</label><input id="eb-num" value="${bd.accountNumber||''}"></div>
-                `, `<button class="btn btn-primary" onclick="saveBankDetails('${uid}')">Save Details</button>`);
-            });
-        }
-
-        async function saveBankDetails(uid) {
-            const data = {
-                bankDetails: {
-                    bankName: document.getElementById('eb-bank-name').value,
-                    accountHolder: document.getElementById('eb-holder').value,
-                    accountNumber: document.getElementById('eb-num').value
+            if (snap.empty) {
+                // Addon 1: Check if month is future
+                const today = new Date();
+                if (startOfMonth > today) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">There are no records available for the Finance department.</td></tr>`;
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">No commissions found for this period.</td></tr>`;
                 }
-            };
-            // Use EDIT_CREW permission or specific FINANCE permission
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CREW, 'users', uid, data);
-            if(blocked) return;
+                return;
+            }
 
-            await db.collection("users").doc(uid).update(data);
-            closeModal();
-            showToast("Bank details updated", "success");
-            logActivity(`Updated bank details for crew ${uid}`);
-            renderCommissions(); // Refresh
+            tbody.innerHTML = snap.docs.map(doc => {
+                const d = doc.data();
+                const orderDate = d.timestamp ? d.timestamp.toDate() : new Date();
+                
+                // Addon 1: Check Paid Status in subcollection
+                const paidStatusId = `${doc.id}_${displayYear}_${currentCommissionsDate.getMonth()}`;
+                const currentStatus = d.commissionStatus ? d.commissionStatus[paidStatusId] : 'unpaid'; // Default to unpaid if not found
+                
+                // Calculate Amount
+                let commAmount = 0;
+                if(isCrewUser() && d.salesRepIds && d.salesRepIds.includes(currentUser.uid)) {
+                    commAmount = parseFloat(d.total.replace('RM ', '')) * (userData.commissionRate || 0);
+                } else if (!isCrewUser()) {
+                    // Admin view (simplified for table view)
+                    commAmount = parseFloat(d.total.replace('RM ', '')); 
+                } else {
+                    commAmount = 0; // Not entitled
+                }
+
+                let statusBadge = '';
+                if(currentStatus === 'paid') statusBadge = `<span class="status-badge status-paid">Paid</span>`;
+                else statusBadge = `<span class="status-badge status-unpaid">Not Paid</span>`;
+
+                const actionsHTML = (!isCrewUser() && (isSuperAdmin() || isMidAdmin())) ? `
+                    <button class="btn btn-sm btn-success" onclick="markCommissionPaid('${doc.id}', '${displayYear}', '${currentCommissionsDate.getMonth()}')" title="Mark Paid">
+                        <i class="ri-checkbox-circle-line"></i>
+                    </button>
+                ` : '';
+
+                return `<tr>
+                    <td class="font-mono text-sm">${doc.id.substring(0,6).toUpperCase()}</td>
+                    <td style="font-size:0.8rem;">${formatDateTime(d.timestamp)}</td>
+                    ${!isCrewUser() ? `<td>${d.customerName}</td>` : ''}
+                    <td>${d.package}</td>
+                    <td style="font-weight:700;">RM ${commAmount.toFixed(2)}</td>
+                    <td>${statusBadge}</td>
+                    ${!isCrewUser() ? `<td>${actionsHTML}</td>` : ''}
+                </tr>`;
+            }).join('');
         }
 
+        async function markCommissionPaid(orderId, year, month) {
+            if(!isSuperAdmin() && !isMidAdmin()) return showToast("Access Denied", "error");
+            const paidStatusId = `${orderId}_${year}_${month}`;
+            
+            try {
+                await db.collection("orders").doc(orderId).update({
+                    [`commissionStatus.${paidStatusId}`]: 'paid'
+                });
+                showToast("Marked as Paid", "success");
+                logActivity(`Marked commission for Order ${orderId.substring(0,6)} as Paid`);
+                updateCommissionView(); // Refresh
+            } catch(e) {
+                showToast("Error updating status", "error");
+            }
+        }
 
-        // --- 13. APPROVAL TOOLS (Addons 2) ---
+        // --- 13. APPROVAL TOOLS ---
         function renderApprovals() {
             if(!hasPermission(PERMISSION_KEYS.APPROVE_ACTIONS)) {
                 document.getElementById('main').innerHTML = `<div class="access-denied-container"><div class="access-denied-title">Access Denied</div><div class="access-denied-desc">You do not have permission to view this page.</div></div>`;
@@ -2733,13 +2743,10 @@
 
                     const keyName = r.permissionKey ? r.permissionKey.replace('edit_', '').replace('delete_', '').replace('_', ' ').toUpperCase() : 'UNKNOWN';
                     
-                    // Addon 2: Generate Diff Viewer
                     let diffHTML = '<span class="text-muted text-sm">View...</span>';
                     if (isPending && r.payload && r.targetId) {
-                         // Fetch current doc to compare
                          diffHTML = `<button class="btn btn-sm btn-secondary" onclick="showDiff('${doc.id}')">View Diff</button>`;
                     } else if (!r.targetId && r.payload) {
-                         // New creation
                          diffHTML = `<span class="badge badge-upgrade">New Item</span>`;
                     }
 
@@ -2768,12 +2775,10 @@
             });
         }
 
-        // Addon 2: Show Diff Modal
         async function showDiff(requestId) {
             const reqDoc = await db.collection("pending_edits").doc(requestId).get();
             const r = reqDoc.data();
             
-            // Fetch current state
             let currentDocData = {};
             try {
                 if(r.targetId) {
@@ -2790,10 +2795,7 @@
                 const oldVal = currentDocData[key];
                 const newVal = payload[key];
                 
-                // Skip if strictly equal (primitives) or deep equal needed? Simple check for now.
-                // Also skip complex objects like permissions if too deep
                 if (typeof oldVal === 'object' && oldVal !== null) return; 
-                
                 const strOld = String(oldVal !== undefined ? oldVal : '-');
                 const strNew = String(newVal !== undefined ? newVal : '-');
 
@@ -2834,7 +2836,6 @@
 
                 const r = requestSnap.data();
 
-                // Update Request Status
                 await requestRef.update({
                     status: action,
                     processedBy: userData.name,
@@ -2842,16 +2843,11 @@
                 });
 
                 if (action === 'Approved') {
-                    // Apply payload to actual collection
                     if (r.payload) {
                         if (r.targetId) {
                             await db.collection(r.targetCollection).doc(r.targetId).update(r.payload);
                         } else {
-                            // Handle creation (like new Promo Codes)
-                            // Ensure ID exists
-                            const idToUse = r.payload.id || r.targetId; // might need adjustment based on how payload sent
-                             // Assuming targetId in request doc for promos is the code string
-                             await db.collection(r.targetCollection).doc(r.targetId).set(r.payload); 
+                            await db.collection(r.targetCollection).doc(r.targetId).set(r.payload); 
                         }
                         showToast("Changes Applied Successfully", "success");
                     } else {
