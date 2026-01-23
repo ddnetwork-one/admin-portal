@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>New Portal v2.5 (Enterprise Edition)</title>
+    <title>HQ-DDNetwork-portal.v2.5</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2551,6 +2551,11 @@
 
             let activeTab = 'commission';
         
+            // Determine Colspan for empty rows based on columns shown
+            // Admin: Ref, Date, Crew, Status, Amount, PaidDate, PaidBy, Actions (8 cols)
+            // Crew: Ref, Date, Status, Amount, PaidDate, PaidBy (6 cols)
+            const colCount = isCrewUser ? 6 : 8;
+
             main.innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.5rem; font-weight:800;">Finance Department</h2>
@@ -2582,15 +2587,16 @@
                                     <tr>
                                         <th>Reference</th>
                                         <th>Date</th>
-                                        ${isCrewUser ? '<th>Amount</th>' : '<th>Crew Member</th>'}
+                                        ${!isCrewUser ? '<th>Crew Member</th>' : ''} 
                                         <th>Status</th>
+                                        <th>Commission Amount</th>
                                         <th>Paid Date</th>
                                         <th>Paid By</th>
                                         ${canManageFinance && !isCrewUser ? '<th>Actions</th>' : ''}
                                     </tr>
                                 </thead>
                                 <tbody id="comm-tbody">
-                                    <tr><td colspan="${isCrewUser?6:7}" class="text-center"><div class="loading-spinner"></div></td></tr>
+                                    <tr><td colspan="${colCount}" class="text-center"><div class="loading-spinner"></div></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -2627,7 +2633,7 @@
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.getElementById(`tab-content-${tabName}`).classList.add('active');
 
-            // CRITICAL FIX: Reload data when switching to commission tab
+            // Reload data when switching to commission tab
             if(tabName === 'commission') {
                 updateCommissionView();
             }
@@ -2640,37 +2646,42 @@
             
             if(!tbody || !totalEl) return; 
 
-            // 1. Security: Ensure element exists before running query
-            if(!document.getElementById('comm-tbody')) return;
+            // FIX: Ensure User is Authenticated
+            if (!currentUser || !currentUser.uid) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Authentication Error. Please reload.</td></tr>`;
+                return;
+            }
 
-            // 2. Setup Query based on Role
+            // Determine Colspan based on visibility
+            const colCount = isCrewUser ? 6 : 8;
+
+            // Setup Query
             let query = db.collection("commission_overview").orderBy("orderDate", "desc");
 
             // FIX: If Crew, STRICTLY filter by current user's UID
-            if(isCrewUser && currentUser) {
+            if(isCrewUser) {
                 query = query.where("crewId", "==", currentUser.uid);
             }
 
-            // 3. Fetch Data
+            // Fetch Data with Error Handling
             try {
                 const snap = await query.get();
                 
                 let totalSum = 0;
 
                 if (snap.empty) {
-                    tbody.innerHTML = `<tr><td colspan="${isCrewUser?6:7}" class="text-center text-muted">No commissions found.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="${colCount}" class="text-center text-muted">No commissions found.</td></tr>`;
                     totalEl.innerText = 'RM 0.00';
                     return;
                 }
 
-                // 4. Calculate Total ONLY from visible (filtered) results
-                // This ensures Crew see only THEIR total, Admin sees ALL total
+                // Calculate Total ONLY from visible (filtered) results
                 snap.forEach(doc => {
                     const d = doc.data();
                     totalSum += (d.amount || 0);
                 });
 
-                // 5. Render Table
+                // Render Table
                 tbody.innerHTML = snap.docs.map(doc => {
                     const d = doc.data();
                     const status = d.status || 'unpaid';
@@ -2687,7 +2698,7 @@
 
                     const canManageFinance = canAccessFinanceTools();
                     
-                    // 6. Render Actions (Only for Admins/Mid-Admins, NOT Crew)
+                    // Actions (Only for Admins/Mid-Admins, NOT Crew)
                     let actionsHTML = '';
                     if(!isCrewUser && canManageFinance) {
                         actionsHTML = `
@@ -2700,18 +2711,23 @@
                         `;
                     }
 
-                    // Dynamic Column Rendering: Crew sees Amount, Admin sees Crew Name
-                    const dynamicColHTML = isCrewUser 
-                        ? `<td style="font-weight:700;">RM ${d.amount.toFixed(2)}</td>`
-                        : `<td>${d.crewName}</td>`;
+                    // Column: Crew Member (Only show if Admin)
+                    const crewMemberCol = !isCrewUser 
+                        ? `<td style="font-weight:600;">${d.crewName}</td>` 
+                        : '';
 
+                    // Column: Commission Amount (Visible to ALL)
+                    const amountCol = `<td style="font-weight:700;">RM ${d.amount.toFixed(2)}</td>`;
+
+                    // Column: Actions (Only if Admin)
                     const actionColHTML = (!isCrewUser) ? `<td>${actionsHTML}</td>` : '';
 
                     return `<tr>
                         <td class="font-mono text-sm">${orderRef}</td>
                         <td style="font-size:0.8rem;">${formatDateTime(orderDate)}</td>
-                        ${dynamicColHTML}
+                        ${crewMemberCol}
                         <td>${statusBadge}</td>
+                        ${amountCol}
                         <td style="font-size:0.8rem;">${paidDateDisplay}</td>
                         <td style="font-size:0.8rem;">${paidByDisplay}</td>
                         ${actionColHTML}
@@ -2723,14 +2739,19 @@
 
             } catch (error) {
                 console.error("Error loading commissions:", error);
-                tbody.innerHTML = `<tr><td colspan="${isCrewUser?6:7}" class="text-center text-danger">Error loading data.</td></tr>`;
+                // Helpful error message for debugging
+                let errorMsg = "Error loading data.";
+                if(error.code === 'permission-denied') {
+                    errorMsg = "Permission Denied. Ask Admin to update Firestore Rules.";
+                }
+                tbody.innerHTML = `<tr><td colspan="${colCount}" class="text-center text-danger">${errorMsg}</td></tr>`;
+                showToast(errorMsg, "error");
             }
         }
 
         async function markCommissionPaid(docId, crewId) {
             if(!canAccessFinanceTools()) return showToast("Access Denied", "error");
             
-            // --- UPDATE: Using 'commission_overview' collection ---
             const docRef = db.collection("commission_overview").doc(docId);
             const docSnap = await docRef.get();
             if(!docSnap.exists) return;
