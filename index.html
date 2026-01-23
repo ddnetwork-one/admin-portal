@@ -2211,7 +2211,7 @@
         async function sendMaintenanceWA() {
             if(!isSuperAdmin()) return;
             
-            const msg = `Message from IT Support Team:\n\nWe are currently addressing reported portal issues and working to implement the necessary fixes.\n\n ${currentMaintenanceConfig.message || 'portal under maintenance'}.\n\n>[Auto-generate from Dev/IT System]`;
+            const msg = `Message from IT Support Team:\n\nWe are currently addressing reported portal issues and working to implement the necessary fixes.\n\n ${currentMaintenanceConfig.message || 'portal under maintenance'}.\n\n> [Auto-generate from Dev/IT System]`;
             
             // Fetch all crew with phone numbers
             const snap = await db.collection("users").where("role", "in", ["admin", "mid_admin", "crew"]).get();
