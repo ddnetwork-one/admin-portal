@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>New Portal v2.5 (Enterprise Edition)</title>
+    <title>Portal-DDNet-v2.5</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1238,10 +1238,10 @@
             `, `<button class="btn btn-primary" onclick="updateOrderDetails('${id}')">Save Changes</button>`);
         }
 
-        // --- COMMISSION GENERATION LOGIC (Core Logic) ---
+        // --- COMMISSION GENERATION LOGIC (Core Logic - Updated for 'commission_overview') ---
         async function generateCommissionsForOrder(orderId, orderData) {
             // 1. Delete existing commissions for this order to prevent dupes on updates
-            const existingCommSnap = await db.collection("Commission_Management").where("orderId", "==", orderId).get();
+            const existingCommSnap = await db.collection("commission_overview").where("orderId", "==", orderId).get();
             const batch = db.batch();
             existingCommSnap.forEach(doc => {
                 batch.delete(doc.ref);
@@ -1267,7 +1267,7 @@
                         const rate = rep.commissionRate || 0;
                         const amount = orderTotal * rate;
                         
-                        const newCommRef = db.collection("Commission_Management").doc();
+                        const newCommRef = db.collection("commission_overview").doc();
                         commBatch.set(newCommRef, {
                             orderId: orderId,
                             crewId: repId,
@@ -1283,7 +1283,7 @@
                 });
 
                 await commBatch.commit();
-                console.log(`Generated ${repIds.length} commission records for order ${orderId}`);
+                console.log(`Generated ${repIds.length} commission records for order ${orderId} in 'commission_overview'`);
                 showToast(`Generated ${repIds.length} commission records.`, "success");
             }
         }
@@ -1313,7 +1313,7 @@
             const freshDoc = await db.collection("orders").doc(id).get();
             const freshData = freshDoc.data();
 
-            // 3. Logic: If Paid, generate commissions. 
+            // 3. Logic: If Paid, generate commissions in 'commission_overview'
             if(freshData.status === 'Paid') {
                 await generateCommissionsForOrder(id, freshData);
             }
@@ -2583,7 +2583,8 @@
             // IMPORTANT FIX: Check if element exists before running query
             if(!document.getElementById('comm-tbody')) return;
 
-            let query = db.collection("Commission_Management").orderBy("orderDate", "desc");
+            // --- UPDATE: Target collection is 'commission_overview' ---
+            let query = db.collection("commission_overview").orderBy("orderDate", "desc");
 
             // If Crew, filter by user's UID
             if(isCrewUser()) {
@@ -2642,7 +2643,8 @@
         async function markCommissionPaid(docId, crewId) {
             if(!canAccessFinanceTools()) return showToast("Access Denied", "error");
             
-            const docRef = db.collection("Commission_Management").doc(docId);
+            // --- UPDATE: Using 'commission_overview' collection ---
+            const docRef = db.collection("commission_overview").doc(docId);
             const docSnap = await docRef.get();
             if(!docSnap.exists) return;
 
