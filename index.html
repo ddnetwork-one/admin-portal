@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Portal-DDNet-v2.5</title>
+    <title>New Portal v2.5 (Enterprise Edition)</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -577,38 +577,56 @@
         };
         let db, auth, currentUser, userData = null;
         
-        try { firebase.initializeApp(firebaseConfig); db = firebase.firestore(); auth = firebase.auth(); } catch(e) { console.log("Firebase init error", e); }
+        try { 
+            firebase.initializeApp(firebaseConfig); 
+            db = firebase.firestore(); 
+            auth = firebase.auth(); 
+            
+            // --- ADDED SAFETY CHECK ---
+            // Ensure DB and Auth are ready before proceeding
+            if(db && auth) {
+                console.log("Firebase initialized successfully.");
+            } else {
+                console.error("Firebase initialization failed.");
+            }
+        } catch(e) { console.log("Firebase init error", e); }
 
         // --- AUTO CREATE CONFIG ---
         async function initializeDatabase() {
-            const configRef = db.collection("config").doc("site_settings");
-            const doc = await configRef.get();
-            if (!doc.exists) {
-                await configRef.set({
-                    maintenance_active: false,
-                    maintenance_message: "IT Department currently fix Portal Bugs",
-                    prices: { html: 199, frontend:599 },
-                    packageDetails: {
-                        frontend: ["Up to 5 Pages", "Animations", "Contact Forms", "WhatsApp Integration"],
-                        ai: ["All Front-End Features", "AI Chatbot Integration", "Lead Auto-Response", "Smart Analytics"]
-                    },
-                    discountActive: false,
-                    discountPercent: 0.1,
-                    disabled_menus: [] 
-                });
-            }
-            const pmSnapshot = await db.collection("payment_methods").limit(1).get();
-            if (pmSnapshot.empty) {
-                const defaults = [
-                    { id: 'tng', name: 'TNG eWallet', link: 'https://payment.tngdigital.com.my/sc/bDLob7YcpG', active: true },
-                    { id: 'fpx', name: 'Online Banking (FPX)', link: 'https://toyyibpay.com', active: true }
-                ];
-                defaults.forEach(pm => db.collection("payment_methods").add(pm));
+            try {
+                const configRef = db.collection("config").doc("site_settings");
+                const doc = await configRef.get();
+                if (!doc.exists) {
+                    console.log("Creating default config...");
+                    await configRef.set({
+                        maintenance_active: false,
+                        maintenance_message: "IT Department currently fix Portal Bugs",
+                        prices: { html: 199, frontend:599 },
+                        packageDetails: {
+                            frontend: ["Up to 5 Pages", "Animations", "Contact Forms", "WhatsApp Integration"],
+                            ai: ["All Front-End Features", "AI Chatbot Integration", "Lead Auto-Response", "Smart Analytics"]
+                        },
+                        discountActive: false,
+                        discountPercent: 0.1,
+                        disabled_menus: [] 
+                    });
+                }
+                const pmSnapshot = await db.collection("payment_methods").limit(1).get();
+                if (pmSnapshot.empty) {
+                    console.log("Creating default payment methods...");
+                    const defaults = [
+                        { id: 'tng', name: 'TNG eWallet', link: 'https://payment.tngdigital.com.my/sc/bDLob7YcpG', active: true },
+                        { id: 'fpx', name: 'Online Banking (FPX)', link: 'https://toyyibpay.com', active: true }
+                    ];
+                    defaults.forEach(pm => db.collection("payment_methods").add(pm));
+                }
+            } catch (error) {
+                console.error("Error initializing database defaults:", error);
             }
         }
 
         function logActivity(msg) {
-            if(!currentUser) return; 
+            if(!currentUser || !db) return; 
             db.collection("activity_logs").add({
                 message: msg,
                 actor: userData.email,
@@ -722,7 +740,8 @@
                             listenForNotifications(); 
                         }
 
-                        initRouter();
+                        // --- FIXED: Force render initial route ---
+                        initRouter(); 
                         initializeDatabase();
                         listenForMaintenanceChanges(); 
                     } else {
@@ -878,7 +897,12 @@
                     });
                 }
 
-                renderFn();
+                // Ensure main element exists before rendering
+                const mainEl = document.getElementById('main');
+                if(mainEl) {
+                    mainEl.innerHTML = ''; 
+                    renderFn();
+                }
 
                 if(window.innerWidth <= 1024) {
                     document.getElementById('sidebar').classList.remove('mobile-open');
@@ -888,6 +912,9 @@
         }
 
         function initRouter() {
+            const mainEl = document.getElementById('main');
+            if(!mainEl) return;
+
             const path = window.location.pathname;
             const basePath = path.replace(/\/[^/]+\.html$/, '') || '/';
             if (routes[basePath]) {
@@ -947,6 +974,8 @@
         // --- 1. OVERVIEW ---
         function renderOverview() {
             const main = document.getElementById('main');
+            if(!main) return;
+            
             main.innerHTML = `
                 <div class="flex justify-between items-center mb-4" style="flex-wrap: wrap; gap:10px;">
                     <h2 style="font-size:1.5rem; font-weight:800; letter-spacing:-0.5px;">Dashboard Overview</h2>
@@ -1021,7 +1050,10 @@
 
         // --- 2. ORDERS ---
         function renderOrders() {
-            document.getElementById('main').innerHTML = `
+            const main = document.getElementById('main');
+            if(!main) return;
+
+            main.innerHTML = `
                 <div class="table-container">
                     <div class="table-header">
                         <h3>Order Management</h3>
@@ -1334,7 +1366,10 @@
 
         // --- 3. CLIENTS ---
         function renderClients() {
-            document.getElementById('main').innerHTML = `
+            const main = document.getElementById('main');
+            if(!main) return;
+
+            main.innerHTML = `
                 <div class="table-container">
                     <div class="table-header">
                         <h3>Client Directory</h3>
@@ -1406,8 +1441,11 @@
 
         // --- 4. CREW MANAGEMENT ---
         function renderCrew() {
+            const main = document.getElementById('main');
+            if(!main) return;
+
             const canEdit = checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CREW);
-            document.getElementById('main').innerHTML = `
+            main.innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:800;">Internal Crew</h2>
                     ${canEdit ? `<button class="btn btn-primary" onclick="openAddCrewModal()"><i class="ri-add-line"></i> Add Crew</button>` : ''}
@@ -1684,8 +1722,11 @@
 
         // --- 5. SUPPORT ---
         function renderSupport() {
+            const main = document.getElementById('main');
+            if(!main) return;
+
             const canDelete = checkAccessOrActionAllowed(PERMISSION_KEYS.DELETE_SUPPORT);
-            document.getElementById('main').innerHTML = `
+            main.innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <button class="btn btn-secondary" onclick="openCreateTicket()"><i class="ri-add-line"></i> Create New Ticket</button>
                     <input type="text" id="ticketSearch" placeholder="Search ID, Client..." style="width:200px;" onkeyup="filterTable('supp-tbody', this.value)">
@@ -1772,8 +1813,11 @@
 
         // --- 6. VOUCHERS ---
         async function renderVouchers() {
+            const main = document.getElementById('main');
+            if(!main) return;
+
             const canEdit = checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_VOUCHERS);
-            document.getElementById('main').innerHTML = `
+            main.innerHTML = `
                 <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
                     <h3 style="font-size:1.25rem; font-weight:800;">Voucher Management</h3>
                     <div class="flex gap-2">
@@ -1962,8 +2006,11 @@
 
         // --- 7. CONTENT & PACKAGES ---
         function renderContent() {
+            const main = document.getElementById('main');
+            if(!main) return;
+
             const canEdit = checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CONTENT);
-            document.getElementById('main').innerHTML = `
+            main.innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:800;">Content & Packages</h2>
                     ${canEdit ? `<button class="btn btn-primary" onclick="saveContentChanges()"><i class="ri-save-line"></i> Save Changes</button>` : ''}
@@ -2011,11 +2058,14 @@
 
         // --- 8. CONFIG (Updated with Maintenance) ---
         async function renderConfig() {
+            const main = document.getElementById('main');
+            if(!main) return;
+
             const canEdit = checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CONFIG);
             // Only Super Admin sees Maintenance toggles
             const isSA = isSuperAdmin(); 
 
-            document.getElementById('main').innerHTML = `
+            main.innerHTML = `
                 <h2 style="font-size:1.25rem; font-weight:800; margin-bottom:1.5rem;">System Configuration</h2>
                 
                 ${isSA ? `
@@ -2246,8 +2296,11 @@
 
         // --- 9. PORTFOLIO ---
         function renderPortfolio() {
+            const main = document.getElementById('main');
+            if(!main) return;
+
             const canEdit = checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_PORTFOLIO);
-            document.getElementById('main').innerHTML = `
+            main.innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:800;">Client Portfolio</h2>
                     ${canEdit ? `<button class="btn btn-primary" onclick="openAddPortfolioModal()"><i class="ri-add-line"></i> Add Project</button>` : ''}
@@ -2344,8 +2397,11 @@
 
         // --- 10. CUSTOMER REQUESTS ---
         function renderRequests() {
+            const main = document.getElementById('main');
+            if(!main) return;
+
             const canDelete = checkAccessOrActionAllowed(PERMISSION_KEYS.DELETE_REQUESTS);
-            document.getElementById('main').innerHTML = `
+            main.innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:800;">Customer Requests</h2>
                     <input type="text" id="reqSearch" placeholder="Search Client..." style="width:200px;" onkeyup="filterTable('req-tbody', this.value)">
@@ -2423,8 +2479,11 @@
 
         // --- 11. PUBLIC PROMO CODES ---
         function renderPublicPromos() {
+            const main = document.getElementById('main');
+            if(!main) return;
+
             const canEdit = checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_PROMOS);
-            document.getElementById('main').innerHTML = `
+            main.innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:800;">Public Promo Codes</h2>
                     ${canEdit ? `<button class="btn btn-primary" onclick="addPublicPromo()"><i class="ri-add-line"></i> Add Code</button>` : ''}
@@ -2479,12 +2538,15 @@
 
         // --- 12. FINANCE OVERVIEW (Refactored) ---
         function renderFinanceOverview() {
+            const main = document.getElementById('main');
+            if(!main) return;
+
             // Logic: If user is Crew, show Commission. If Admin, Show Tabs.
             const isCrewUser = isCrew();
             const canManageFinance = canAccessFinanceTools();
 
             if(!canManageFinance && !isCrewUser) {
-                document.getElementById('main').innerHTML = `<div class="access-denied-container"><div class="access-denied-title">Access Denied</div><div class="access-denied-desc">You do not have permission to view this page.</div></div>`;
+                main.innerHTML = `<div class="access-denied-container"><div class="access-denied-title">Access Denied</div><div class="access-denied-desc">You do not have permission to view this page.</div></div>`;
                 return;
             }
 
@@ -2492,7 +2554,7 @@
             let activeTab = 'commission';
             // Logic to switch tabs will be handled by JS functions
         
-            document.getElementById('main').innerHTML = `
+            main.innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.5rem; font-weight:800;">Finance Department</h2>
                 </div>
@@ -2688,12 +2750,15 @@
 
         // --- 13. APPROVAL TOOLS ---
         function renderApprovals() {
+            const main = document.getElementById('main');
+            if(!main) return;
+
             if(!hasPermission(PERMISSION_KEYS.APPROVE_ACTIONS)) {
-                document.getElementById('main').innerHTML = `<div class="access-denied-container"><div class="access-denied-title">Access Denied</div><div class="access-denied-desc">You do not have permission to view this page.</div></div>`;
+                main.innerHTML = `<div class="access-denied-container"><div class="access-denied-title">Access Denied</div><div class="access-denied-desc">You do not have permission to view this page.</div></div>`;
                 return;
             }
 
-            document.getElementById('main').innerHTML = `
+            main.innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.5rem; font-weight:800; color: var(--warning);"><i class="ri-shield-check-line"></i> Approval Tools</h2>
                 </div>
@@ -2874,7 +2939,10 @@
         }
 
         function renderMyProfile() {
-            document.getElementById('main').innerHTML = `
+            const main = document.getElementById('main');
+            if(!main) return;
+
+            main.innerHTML = `
                 <div class="p-4" style="background:var(--bg-surface); border:1px solid var(--border); border-radius:16px; max-width:500px; margin:0 auto;">
                     <div class="flex items-center gap-4 mb-6">
                         <div class="u-avatar" style="width:50px; height:50px; font-size:1.5rem;">${(userData.name || 'A').charAt(0)}</div>
