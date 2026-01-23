@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>portal-ddnet-v2.4</title>
+    <title>New Portal v2.5 (Enterprise Edition)</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,7 +17,7 @@
 
     <style>
         :root {
-            /* NEW PORTAL: Light Theme */
+            /* Light Theme */
             --bg-app: #f3f4f6;       
             --bg-sidebar: #ffffff;   
             --bg-surface: #ffffff;   
@@ -58,7 +58,7 @@
             --z-modal-overlay: 1000;
             --z-modal-content: 1010;
             --z-toast: 2000;
-            --z-invoice: 3000;
+            --z-maintenance: 9999;
         }
 
         /* RESET & BASE */
@@ -179,6 +179,29 @@
         }
         .btn-icon:hover { color: var(--text-main); background: rgba(0,0,0,0.05); }
 
+        /* TABS */
+        .tabs-container {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+        .tab-btn {
+            padding: 0.75rem 1rem;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { color: var(--primary); }
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
         /* FORMS */
         input, select, textarea {
             width:100%; 
@@ -253,6 +276,16 @@
         aside.collapsed .header-brand span { display: none; }
         aside.collapsed .btn-danger span { display: none; }
         aside.collapsed .user-mini-profile { padding: 1rem 0; justify-content: center; }
+
+        /* Disabled Menu State */
+        aside.maintenance-mode .nav-item:not([data-bypass="true"]) {
+            opacity: 0.4;
+            pointer-events: none;
+            filter: grayscale(100%);
+        }
+        aside.maintenance-mode .nav-section-title {
+            color: #ddd;
+        }
 
         /* HEADER */
         header {
@@ -441,7 +474,7 @@
             display: flex;
             flex-direction: column,
             align-items: center;
-            justify-content: center;
+            justify-content: center,
             text-align: center;
             color: var(--text-muted);
             padding: 2rem;
@@ -572,6 +605,38 @@
         .price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
         .gateway-card { background: #f9fafb; padding: 1rem; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 0.5rem; }
 
+        /* MAINTENANCE MARQUEE */
+        #maintenance-marquee {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background: var(--danger);
+            color: white;
+            display: flex;
+            align-items: center;
+            z-index: var(--z-maintenance);
+            overflow: hidden;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease-in-out;
+            border-bottom: 2px solid rgba(0,0,0,0.2);
+        }
+        #maintenance-marquee.active {
+            transform: translateY(0);
+        }
+        .marquee-content {
+            white-space: nowrap;
+            animation: scroll-left 15s linear infinite;
+            padding-left: 100%;
+        }
+        @keyframes scroll-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
         /* RESPONSIVENESS */
         @media(max-width: 1024px) {
             aside { transform: translateX(-100%); width: 280px; box-shadow: 20px 0 40px rgba(0,0,0,0.1); }
@@ -586,10 +651,15 @@
 </head>
 <body>
 
+    <!-- MAINTENANCE MARQUEE -->
+    <div id="maintenance-marquee">
+        <div class="marquee-content" id="marquee-text">System Maintenance Active...</div>
+    </div>
+
     <!-- AUTH SCREEN -->
     <div id="auth-screen">
         <div class="auth-card">
-            <h2 class="mb-4" style="color:var(--text-main); font-weight: 800; letter-spacing: -0.5px;">New Portal v2.4</h2>
+            <h2 class="mb-4" style="color:var(--text-main); font-weight: 800; letter-spacing: -0.5px;">New Portal v2.5</h2>
             <p class="mb-4 text-muted">Enterprise Edition</p>
             <form id="loginForm">
                 <input type="text" id="loginInput" class="mb-4" placeholder="Email or Crew ID" required>
@@ -608,7 +678,7 @@
             <div class="header-left">
                 <button class="btn-icon" onclick="toggleSidebar()" title="Toggle Menu"><i class="ri-menu-line" style="font-size: 1.4rem;"></i></button>
                 <div class="header-brand">
-                    <span>DDN v2.4 Ent</span>
+                    <span>DDN v2.5 Ent</span>
                 </div>
             </div>
             <div class="header-actions">
@@ -656,12 +726,9 @@
                 
                 <div class="nav-section-title"><span class="nav-text">System</span></div>
                 <div class="nav-item" onclick="navigateTo('/crew')"><i class="ri-team-line"></i> <span class="nav-text">Internal Crew</span></div>
-                <div class="nav-item" onclick="navigateTo('/config')"><i class="ri-settings-4-line"></i> <span class="nav-text">System Config</span></div>
+                <div class="nav-item" onclick="navigateTo('/commissions')"><i class="ri-money-dollar-circle-line"></i> <span class="nav-text">Finance & Comm</span></div>
+                <div class="nav-item" onclick="navigateTo('/config')" data-bypass="true"><i class="ri-settings-4-line"></i> <span class="nav-text">System Config</span></div>
                 <div class="nav-item hidden" id="nav-approvals" onclick="navigateTo('/approvals')"><i class="ri-shield-check-line" style="color: var(--warning)"></i> <span class="nav-text">Approval Tools</span></div>
-                
-                <!-- FINANCE -->
-                <div class="nav-section-title"><span class="nav-text">Finance</span></div>
-                <div class="nav-item" onclick="navigateTo('/commissions')"><i class="ri-money-dollar-circle-line"></i> <span class="nav-text">Commissions</span></div>
                 
                 <div class="nav-section-title"><span class="nav-text">Personal</span></div>
                 <div class="nav-item" onclick="navigateTo('/my-profile')"><i class="ri-user-settings-line"></i> <span class="nav-text">My Profile</span></div>
@@ -776,6 +843,31 @@
         
         try { firebase.initializeApp(firebaseConfig); db = firebase.firestore(); auth = firebase.auth(); } catch(e) { console.log("Firebase init error", e); }
 
+        // --- MAINTENANCE LISTENER ---
+        function listenForMaintenance() {
+            db.collection("config").doc("site_settings").onSnapshot(doc => {
+                const data = doc.data();
+                const marqueeEl = document.getElementById('maintenance-marquee');
+                const sidebar = document.getElementById('sidebar');
+                const marqueeText = document.getElementById('marquee-text');
+
+                if (data && data.internal_maintenance) {
+                    // Show Marquee
+                    marqueeText.innerText = data.maintenance_message || "IT Department currently fixing Portal Bugs";
+                    marqueeEl.classList.add('active');
+
+                    // Disable Menu Tabs (except Config)
+                    if(data.disable_menu_tabs) {
+                        sidebar.classList.add('maintenance-mode');
+                    }
+                } else {
+                    // Hide Marquee
+                    marqueeEl.classList.remove('active');
+                    sidebar.classList.remove('maintenance-mode');
+                }
+            }, (err) => console.error("Maintenance listener error:", err));
+        }
+
         // --- AUTO CREATE CONFIG ---
         async function initializeDatabase() {
             const configRef = db.collection("config").doc("site_settings");
@@ -784,6 +876,8 @@
                 await configRef.set({
                     maintenance_active: false,
                     maintenance_message: "We are currently performing scheduled maintenance.",
+                    internal_maintenance: false,
+                    disable_menu_tabs: false,
                     prices: { html: 199, frontend:599 },
                     packageDetails: {
                         frontend: ["Up to 5 Pages", "Animations", "Contact Forms", "WhatsApp Integration"],
@@ -918,6 +1012,9 @@
                             listenForNotifications(); 
                         }
 
+                        // Start Maintenance Listener
+                        listenForMaintenance();
+
                         initRouter();
                         initializeDatabase(); 
                     } else {
@@ -976,34 +1073,20 @@
 
         function hasPermission(key) {
             if(!userData) return false;
-            // Check if user has the specific permission key explicitly true
             if (userData.permissions && userData.permissions[key] === true) return true;
             return false;
         }
         
         function canAccessFinanceTools() {
-            // Role based access (Mid Admin or Founder)
             if(isMidAdmin() || isFounder()) return true;
-            // Permission based access
             if(hasPermission(PERMISSION_KEYS.FINANCE_TOOLS_ACCESS)) return true;
             return false;
         }
 
-        /**
-         * CORE WORKFLOW LOGIC
-         * Checks if user has permission OR bypass approval. 
-         * If not, checks if specific permission exists.
-         * If neither, returns false.
-         */
         function checkAccessOrActionAllowed(permissionKey) {
             if(!userData) return false; 
-
-            // 1. Bypass: Super Admin always bypasses (implicitly), or user explicitly has bypassApproval flag
             if (isSuperAdmin() || userData.bypassApproval === true) return true;
-
-            // 2. Explicit Permission Check (Unticked = No Access, regardless of role)
             if (hasPermission(permissionKey)) return true;
-
             return false; 
         }
 
@@ -1021,7 +1104,7 @@
             '/requests': renderRequests,
             '/my-profile': renderMyProfile,
             '/public-promos': renderPublicPromos,
-            '/commissions': renderCommissions,
+            '/commissions': renderFinance, // Updated to renderFinance
             '/approvals': renderApprovals
         };
 
@@ -1361,7 +1444,12 @@
             salesRepHTML += '</div>';
 
             const voucherDisplay = d.voucherCode ? `<div class="mb-4"><label>Voucher Used</label><input readonly value="${d.voucherCode}" style="color:var(--warning); border-color:var(--warning)"></div>` : '';
+            
+            // Warning indicator for Commission Generation
+            const commWarning = (d.status !== 'Paid') ? `<div class="req-approval-badge"><i class="ri-alert-line"></i> Change status to Paid to Generate Commissions</div>` : '';
+
             showModal(`Manage Order`, `
+                ${commWarning}
                 ${voucherDisplay}
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div><label class="text-muted text-sm">Name</label><input id="o-name" value="${d.customerName}"></div>
@@ -1400,6 +1488,8 @@
 
         // Core Logic: Generate Commissions when Order is Paid
         async function generateCommissionsForOrder(orderId, orderData) {
+            console.log(`Generating commissions for Order ${orderId}...`);
+            
             // 1. Delete existing commissions for this order to prevent dupes on updates
             const existingCommSnap = await db.collection("Commission_Management").where("orderId", "==", orderId).get();
             const batch = db.batch();
@@ -1445,6 +1535,7 @@
 
                 await commBatch.commit();
                 console.log(`Generated ${repIds.length} commission records for order ${orderId}`);
+                showToast(`Commissions generated for ${repIds.length} staff.`, "success");
             }
         }
 
@@ -1474,11 +1565,7 @@
             const freshDoc = await db.collection("orders").doc(id).get();
             const freshData = freshDoc.data();
 
-            // 3. Logic: Only generate commissions if status is PAID. 
-            // If status changed AWAY from Paid (e.g. Cancelled), existing commissions are kept but effectively void in status checks if we wanted to hide them, 
-            // but here we strictly generate/delete based on 'Paid' status logic.
-            // Logic implemented: If Paid, generate. If !Paid, we could delete, but standard accounting keeps them. 
-            // Let's stick to the requirement: "fix, after order status change to Paid... user can see the earning commissions".
+            // 3. Logic: Only generate commissions if status is PAID.
             if(freshData.status === 'Paid') {
                 await generateCommissionsForOrder(id, freshData);
             }
@@ -1913,9 +2000,6 @@
         }
         
         async function saveTicketDetails(id) {
-            // No specific permission for ticket updates other than being logged in crew/admin, 
-            // but let's enforce order edit permission as a proxy for "manage operations" or just allow general crew.
-            // Assuming general crew access is fine.
             const data = {
                 status: document.getElementById('tk-status').value,
                 assignedTo: document.getElementById('tk-assign').value || null,
@@ -2166,11 +2250,46 @@
         // --- 8. CONFIG ---
         function renderConfig() {
             const canEdit = checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CONFIG);
+            const superAdminOnly = isSuperAdmin();
+
             document.getElementById('main').innerHTML = `
                 <h2 style="font-size:1.25rem; font-weight:800; margin-bottom:1.5rem;">System Configuration</h2>
+                
+                ${superAdminOnly ? `
+                <div class="config-section" style="border: 2px solid var(--danger); background: #fff5f5;">
+                    <div class="config-header flex justify-between" style="color: var(--danger);">
+                        <span><i class="ri-alarm-warning-line"></i> SuperAdmin Maintenance Mode</span>
+                    </div>
+                    <p class="text-sm text-muted mb-4">Control internal portal access and visibility for all users.</p>
+                    
+                    <div class="flex items-center gap-2 mb-4">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="maint-internal-toggle" onchange="toggleInternalMaintenance()">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="font-bold">Activate Internal Maintenance</span>
+                    </div>
+
+                    <div id="internal-maint-controls" class="hidden">
+                         <div class="mb-4">
+                            <label>Marquee Message</label>
+                            <input id="internal-maint-msg" value="IT Department currently fix Portal Bugs">
+                        </div>
+                        <div class="flex items-center gap-2 mb-4">
+                            <input type="checkbox" id="maint-disable-menu">
+                            <label style="font-size:0.8rem; font-weight:400; text-transform:none; color:var(--text-main);">Disable Sidebar Menu Tabs (System Config accessible)</label>
+                        </div>
+                        <div class="flex gap-2">
+                             <button class="btn btn-warning" onclick="sendMaintenanceAlertWA()"><i class="ri-whatsapp-line"></i> Copy Alert to Clipboard</button>
+                             <button class="btn btn-primary" onclick="saveInternalMaintenanceSettings()">Apply Settings</button>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+
                 <div class="config-section">
                     <div class="config-header flex justify-between">
-                        <span>Maintenance Mode</span>
+                        <span>Public Site Maintenance Mode</span>
                         ${canEdit ? `
                         <label class="toggle-switch">
                             <input type="checkbox" id="maint-toggle" onchange="toggleMaintenance()">
@@ -2179,7 +2298,7 @@
                     </div>
                     <p class="text-muted text-sm mb-4">Toggle a warning banner on main site and restrict access.</p>
                     <div class="mb-4">
-                        <label>Maintenance Message</label>
+                        <label>Public Maintenance Message</label>
                         <textarea id="maint-msg" class="mb-2" rows="3" ${canEdit?'':'readonly'}>We are currently performing scheduled maintenance.</textarea>
                         ${canEdit ? `<button class="btn btn-sm btn-secondary" onclick="saveMaintMsg()">Update Message</button>` : ''}
                     </div>
@@ -2201,6 +2320,20 @@
                     <div id="gateway-list" class="flex flex-col gap-4"></div>
                 </div>
             `;
+            
+            // Load SuperAdmin Settings
+            if(superAdminOnly) {
+                db.collection("config").doc("site_settings").get().then(doc => {
+                    const data = doc.data();
+                    if(data.internal_maintenance) {
+                        document.getElementById('maint-internal-toggle').checked = true;
+                        document.getElementById('internal-maint-controls').classList.remove('hidden');
+                        document.getElementById('internal-maint-msg').value = data.maintenance_message || '';
+                        document.getElementById('maint-disable-menu').checked = data.disable_menu_tabs || false;
+                    }
+                });
+            }
+
             db.collection("config").doc("site_settings").get().then(doc => {
                 if(doc.exists) {
                     const d = doc.data();
@@ -2236,6 +2369,46 @@
                 });
             });
         }
+
+        // SuperAdmin Maintenance Logic
+        async function toggleInternalMaintenance() {
+            const isActive = document.getElementById('maint-internal-toggle').checked;
+            const controls = document.getElementById('internal-maint-controls');
+            if(isActive) {
+                controls.classList.remove('hidden');
+            } else {
+                controls.classList.add('hidden');
+                // Auto disable if unchecked
+                await db.collection("config").doc("site_settings").update({ internal_maintenance: false, disable_menu_tabs: false });
+                showToast("Internal Maintenance Disabled", "success");
+            }
+        }
+
+        async function saveInternalMaintenanceSettings() {
+            const msg = document.getElementById('internal-maint-msg').value;
+            const disableMenu = document.getElementById('maint-disable-menu').checked;
+            
+            await db.collection("config").doc("site_settings").update({
+                internal_maintenance: true,
+                maintenance_message: msg,
+                disable_menu_tabs: disableMenu
+            });
+            showToast("Internal Maintenance Settings Applied", "success");
+            logActivity(`Activated Internal Maintenance: ${disableMenu ? 'Menu Disabled' : 'Menu Active'}`);
+        }
+
+        function sendMaintenanceAlertWA() {
+            const msg = document.getElementById('internal-maint-msg').value;
+            const alertText = `🚨 ALERT: DDN Portal is currently under maintenance.\n\nReason: ${msg}\n\nPlease standby for further instructions. - IT Dept`;
+            
+            navigator.clipboard.writeText(alertText).then(() => {
+                showToast("Alert message copied to clipboard! Please send to Crew WhatsApp Group.", "success");
+                logActivity("Prepared Maintenance Alert for WhatsApp");
+            }).catch(err => {
+                showToast("Failed to copy text", "error");
+            });
+        }
+
         async function toggleMaintenance() { 
             if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CONFIG)) return showToast("Access Denied", "error");
 
@@ -2471,7 +2644,6 @@
             });
         }
         function updateRequestStatus(id, newStatus = null, fromModal = false) {
-            // Request update doesn't have a specific perm in the list, assuming general crew access is allowed
             const statusToSet = newStatus || document.getElementById('req-status-select').value;
             const data = { status: statusToSet };
             db.collection("customer_requests").doc(id).update(data).then(() => {
@@ -2481,8 +2653,6 @@
             }).catch(err => { showToast("Error updating: " + err.message, "error"); });
         }
         function deleteItem(collection, id) {
-            // Delete permission varies by type (support, requests)
-            // Simplified for this check
             if(!hasPermission(PERMISSION_KEYS.DELETE_REQUESTS) && !hasPermission(PERMISSION_KEYS.DELETE_SUPPORT)) return showToast("Access Denied.", "error");
             if(!confirm("Delete this item permanently?")) return;
             db.collection(collection).doc(id).delete().then(() => { showToast("Item deleted", "success"); logActivity(`Deleted item from ${collection}`); });
@@ -2544,11 +2714,11 @@
             try { await db.collection("promo_codes").doc(code).delete(); showToast("Promo Code Deleted", "success"); logActivity(`Deleted public promo code: ${code}`); } catch(e) { showToast("Error deleting: " + e.message, "error"); } 
         }
 
-        // --- 12. COMMISSIONS (UPDATED) ---
-        async function renderCommissions() {
-            // Access Logic: Crew sees own. Admin/Mid/Super see all.
-            const isCrewUser = isCrew();
+        // --- 12. FINANCE & COMMISSIONS (NEW) ---
+        function renderFinance() {
+            // This is the Main Container for the new Tab System
             const canManageFinance = canAccessFinanceTools();
+            const isCrewUser = isCrew();
 
             if(!canManageFinance && !isCrewUser) {
                 document.getElementById('main').innerHTML = `<div class="access-denied-container"><div class="access-denied-title">Access Denied</div><div class="access-denied-desc">You do not have permission to view this page.</div></div>`;
@@ -2557,9 +2727,46 @@
 
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
-                    <h2 style="font-size:1.5rem; font-weight:800;">Commission Management</h2>
+                    <h2 style="font-size:1.5rem; font-weight:800;">Finance Center</h2>
+                </div>
+                
+                <!-- TABS -->
+                <div class="tabs-container">
+                    <button class="tab-btn active" onclick="switchFinanceTab('commissions', this)">Commissions</button>
+                    ${canManageFinance ? `<button class="tab-btn" onclick="switchFinanceTab('tools', this)">Finance Tools</button>` : ''}
                 </div>
 
+                <!-- CONTENT AREA -->
+                <div id="finance-content-area"></div>
+            `;
+
+            // Default Load Commissions
+            renderFinanceCommissionsTab();
+        }
+
+        function switchFinanceTab(tab, btn) {
+            // Update Tab UI
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Render Content
+            const area = document.getElementById('finance-content-area');
+            area.innerHTML = '<div class="page-loader" style="height:300px"><div class="loading-spinner"></div></div>';
+
+            if(tab === 'commissions') {
+                renderFinanceCommissionsTab();
+            } else if (tab === 'tools') {
+                renderFinanceToolsTab();
+            }
+        }
+
+        // --- TAB 1: COMMISSIONS ---
+        async function renderFinanceCommissionsTab() {
+            const isCrewUser = isCrew();
+            const canManageFinance = canAccessFinanceTools();
+            const area = document.getElementById('finance-content-area');
+
+            area.innerHTML = `
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-icon" style="color:var(--success); background:#ecfdf5"><i class="ri-money-dollar-circle-line"></i></div>
@@ -2603,10 +2810,8 @@
             const tbody = document.getElementById('comm-tbody');
             const totalEl = document.getElementById('comm-total-earnings');
             
-            // Query Commission_Management Collection
             let query = db.collection("Commission_Management").orderBy("orderDate", "desc");
 
-            // If Crew, filter by user's UID
             if(isCrewUser()) {
                 query = query.where("crewId", "==", currentUser.uid);
             }
@@ -2633,11 +2838,9 @@
                 const orderDate = d.orderDate ? d.orderDate.toDate() : new Date();
                 const orderRef = d.orderId ? d.orderId.substring(0,6).toUpperCase() : 'N/A';
                 
-                // Data for Paid By and Paid Date
                 const paidDateDisplay = d.paidAt ? formatDateTime(d.paidAt) : '-';
                 const paidByDisplay = d.paidBy ? d.paidBy : '-';
 
-                // Actions: Only Finance Team can mark paid
                 const canManageFinance = canAccessFinanceTools();
                 const actionsHTML = (!isCrewUser() && canManageFinance) ? `
                     <button class="btn btn-sm ${status==='paid'?'btn-secondary':'btn-success'}" onclick="markCommissionPaid('${doc.id}', '${d.crewId}')" title="${status==='paid'?'Mark Unpaid':'Mark Paid'}">
@@ -2679,7 +2882,7 @@
                 await docRef.update(paidData);
                 showToast(`Marked as ${newStatus}`, "success");
                 logActivity(`Updated commission status to ${newStatus} for ${crewId}`);
-                updateCommissionView(); // Refresh
+                updateCommissionView(); 
             } catch(e) {
                 showToast("Error updating status", "error");
             }
@@ -2688,7 +2891,6 @@
         async function waCrewCommission(crewId, amount) {
             if(!canAccessFinanceTools()) return showToast("Access Denied", "error");
             
-            // Fetch Crew Phone Number
             try {
                 const crewSnap = await db.collection("users").doc(crewId).get();
                 if(!crewSnap.exists) return showToast("Crew not found", "error");
@@ -2708,10 +2910,81 @@
             }
         }
 
+        // --- TAB 2: FINANCE TOOLS ---
+        function renderFinanceToolsTab() {
+            const area = document.getElementById('finance-content-area');
+            area.innerHTML = `
+                <div class="list-group">
+                    <h3><i class="ri-tools-line"></i> Finance Toolbox</h3>
+                    <p class="mb-4 text-muted">Advanced tools for financial reporting and bulk operations.</p>
+                    
+                    <div class="config-section">
+                        <div class="config-header">Quick Reports</div>
+                        <div class="flex gap-2 mb-4">
+                            <button class="btn btn-secondary" onclick="showToast('Generating Report...', 'info')">Monthly Sales Report (PDF)</button>
+                            <button class="btn btn-secondary" onclick="showToast('Generating Report...', 'info')">Unpaid Commissions List</button>
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <div class="config-header">Bulk Actions</div>
+                        <button class="btn btn-warning" onclick="markAllCommissionsPaid()">Mark ALL Unpaid as Paid (TEST)</button>
+                        <p class="text-sm text-muted mt-2">Caution: This affects all unpaid records in the database.</p>
+                    </div>
+
+                    <div class="config-section">
+                        <div class="config-header">Bank Accounts Summary</div>
+                        <div id="finance-bank-list">Loading...</div>
+                    </div>
+                </div>
+            `;
+
+            loadFinanceBankList();
+        }
+
+        function loadFinanceBankList() {
+            const list = document.getElementById('finance-bank-list');
+            db.collection("users").where("role", "in", ["super_admin", "mid_admin", "admin", "crew"]).get().then(snap => {
+                let html = '<table class="table" style="font-size:0.8rem"><thead><tr><th>Name</th><th>Bank</th><th>Acc No</th></tr></thead><tbody>';
+                snap.forEach(doc => {
+                    const u = doc.data();
+                    const bd = u.bankDetails || {};
+                    if(bd.bankName) {
+                        html += `<tr>
+                            <td>${u.name}</td>
+                            <td>${bd.bankName}</td>
+                            <td class="font-mono">${bd.accountNumber || '-'}</td>
+                        </tr>`;
+                    }
+                });
+                html += '</tbody></table>';
+                if(list) list.innerHTML = html;
+            });
+        }
+
+        async function markAllCommissionsPaid() {
+            if(!confirm("Are you sure? This will mark ALL unpaid commissions as PAID right now.")) return;
+            const batch = db.batch();
+            const snap = await db.collection("Commission_Management").where("status", "==", "unpaid").get();
+            
+            snap.forEach(doc => {
+                batch.update(doc.ref, {
+                    status: 'paid',
+                    paidAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    paidBy: userData.name + ' (Bulk)'
+                });
+            });
+
+            await batch.commit();
+            showToast(`Marked ${snap.size} commissions as paid.`, "success");
+            logActivity("Bulk paid all commissions");
+        }
+
+
         // --- 13. APPROVAL TOOLS ---
         function renderApprovals() {
             if(!hasPermission(PERMISSION_KEYS.APPROVE_ACTIONS)) {
-                document.getElementById('main').innerHTML = `<div class="access-denied-container"><div class="access-denied-title">Access Denied</div><div class="access-denied-desc">You do not have permission to view this page.</div></div>`;
+                document.getElementById('main').innerHTML = `<div class="access-denied-title">Access Denied</div><div class="access-denied-desc">You do not have permission to view this page.</div></div>`;
                 return;
             }
 
