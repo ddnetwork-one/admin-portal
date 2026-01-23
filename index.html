@@ -495,7 +495,7 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- JAVASCRIPT -->
-    <script>
+<script>
         // --- CONSTANTS & CONFIG ---
         const JOB_TITLES = [
             "Founder & Managing Director", 
@@ -2536,30 +2536,28 @@
             try { await db.collection("promo_codes").doc(code).delete(); showToast("Promo Code Deleted", "success"); logActivity(`Deleted public promo code: ${code}`); } catch(e) { showToast("Error deleting: " + e.message, "error"); } 
         }
 
-        // --- 12. FINANCE OVERVIEW (Refactored - FIXED PERMISSIONS) ---
+        // --- 12. FINANCE OVERVIEW (FIXED) ---
         function renderFinanceOverview() {
             const main = document.getElementById('main');
             if(!main) return;
 
-            const isCrewUser = isCrew(); // Basic Crew Role
-            // FIX: Determine if user is a standard Admin (not Super/Mid)
-            // Assuming role map: 'super_admin', 'mid_admin' are top levels.
-            // 'admin' (standard) and 'crew' are lower levels.
-            const isStandardAdmin = isAdmin() && !isMidAdmin(); 
-            const isTopAdmin = isSuperAdmin() || isMidAdmin();
+            // Check if user is Crew
+            const isCrewUser = isCrew();
+            
+            // Check if user has Finance Access (SuperAdmin, MidAdmin, Finance Manager)
+            const canManageFinance = canAccessFinanceTools();
 
-            // Access Check: Crew and Standard Admin can see this page.
-            // Super and Mid Admin can also see this page.
-            // Effectively: Everyone except users with restricted roles (if any) can see their own stats.
-            if(!currentUser) return; 
+            // ACCESS DENIED LOGIC
+            // If Crew AND (NOT Finance Access AND NOT Crew) -> Deny
+            if(!canManageFinance && !isCrewUser) {
+                main.innerHTML = `<div class="access-denied-container"><div class="access-denied-title">Access Denied</div><div class="access-denied-desc">You do not have permission to view this page.</div></div>`;
+                return;
+            }
 
-            // Determine if the user is viewing EVERYONE's data (Only Super/Mid Admin)
-            const canViewAll = isTopAdmin;
-
-            // Colspan Calculation
-            // Top Admin sees: Ref, Date, Crew, Status, Amount, PaidDate, PaidBy, Actions (8 cols)
-            // Standard Admin/Crew sees: Ref, Date, Status, Amount, PaidDate, PaidBy (6 cols)
-            const colCount = canViewAll ? 8 : 6;
+            // Determine Colspan for empty rows based on columns shown
+            // Admin: Ref, Date, Crew, Status, Amount, PaidDate, PaidBy, Actions (8 cols)
+            // Crew: Ref, Date, Status, Amount, PaidDate, PaidBy (6 cols)
+            const colCount = isCrewUser ? 6 : 8;
 
             main.innerHTML = `
                 <div class="flex justify-between items-center mb-4">
@@ -2568,7 +2566,7 @@
 
                 <div class="tabs-nav">
                     <button class="tab-btn active" onclick="switchFinanceTab('commission')" id="tab-btn-commission">Commission Overview</button>
-                    ${canViewAll ? `<button class="tab-btn" onclick="switchFinanceTab('tools')" id="tab-btn-tools">Finance Tools</button>` : ''}
+                    ${canManageFinance ? `<button class="tab-btn" onclick="switchFinanceTab('tools')" id="tab-btn-tools">Finance Tools</button>` : ''}
                 </div>
 
                 <div id="tab-content-commission" class="tab-content active">
@@ -2577,14 +2575,14 @@
                             <div class="stat-icon" style="color:var(--success); background:#ecfdf5"><i class="ri-money-dollar-circle-line"></i></div>
                             <div class="stat-info">
                                 <div class="stat-val" id="comm-total-earnings">RM 0.00</div>
-                                <div class="stat-label">${canViewAll ? 'Total Payouts (All)' : 'My Total Earnings'}</div>
+                                <div class="stat-label">${isCrewUser ? 'My Total Earnings' : 'Total Payouts'}</div>
                             </div>
                         </div>
                     </div>
 
                     <div class="table-container">
                         <div class="table-header">
-                            <h3>${canViewAll ? 'All Commissions' : 'My Commissions'}</h3>
+                            <h3>${isCrewUser ? 'My Commissions' : 'Commission Overview'}</h3>
                         </div>
                         <div class="table-responsive">
                             <table>
@@ -2592,12 +2590,12 @@
                                     <tr>
                                         <th>Reference</th>
                                         <th>Date</th>
-                                        ${canViewAll ? '<th>Crew Member</th>' : ''} 
+                                        ${!isCrewUser ? '<th>Crew Member</th>' : ''} 
                                         <th>Status</th>
                                         <th>Commission Amount</th>
                                         <th>Paid Date</th>
                                         <th>Paid By</th>
-                                        ${canViewAll ? '<th>Actions</th>' : ''}
+                                        ${canManageFinance && !isCrewUser ? '<th>Actions</th>' : ''}
                                     </tr>
                                 </thead>
                                 <tbody id="comm-tbody">
@@ -2631,10 +2629,21 @@
             updateCommissionView();
         }
 
-        async function updateCommissionView() {
-            const isTopAdmin = isSuperAdmin() || isMidAdmin();
-            const canViewAll = isTopAdmin;
+        function switchFinanceTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tab-btn-${tabName}`).classList.add('active');
             
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(`tab-content-${tabName}`).classList.add('active');
+
+            // Reload data when switching to commission tab
+            if(tabName === 'commission') {
+                updateCommissionView();
+            }
+        }
+
+        async function updateCommissionView() {
+            const isCrewUser = isCrew();
             const tbody = document.getElementById('comm-tbody');
             const totalEl = document.getElementById('comm-total-earnings');
             
@@ -2646,16 +2655,15 @@
                 return;
             }
 
-            // FIX: Determine Colspan dynamically based on role
-            const colCount = canViewAll ? 8 : 6;
+            // Determine Colspan based on visibility
+            const colCount = isCrewUser ? 6 : 8;
 
             // Setup Query
             let query = db.collection("commission_overview").orderBy("orderDate", "desc");
 
-            // FIX: Strict Filtering Logic
-            // If NOT a Top Admin (Super/Mid), then ONLY show records where crewId matches current user UID.
-            // This restricts 'admin' and 'crew' roles to see only their own data.
-            if(!canViewAll) {
+            // FIX: If Crew, STRICTLY filter by current user's UID
+            // Super Admin/Mid Admin see all by default (no where clause)
+            if(isCrewUser) {
                 query = query.where("crewId", "==", currentUser.uid);
             }
 
@@ -2692,10 +2700,11 @@
                     const paidDateDisplay = d.paidAt ? formatDateTime(d.paidAt) : '-';
                     const paidByDisplay = d.paidBy ? d.paidBy : '-';
 
-                    // FIX: Actions (Only for Top Admins)
-                    // Regular Admins and Crew cannot mark paid/trigger WA for others.
+                    const canManageFinance = canAccessFinanceTools();
+                    
+                    // Actions (Only for Admins/Mid-Admins, NOT Crew)
                     let actionsHTML = '';
-                    if(canViewAll) {
+                    if(!isCrewUser && canManageFinance) {
                         actionsHTML = `
                             <button class="btn btn-sm ${status==='paid'?'btn-secondary':'btn-success'}" onclick="markCommissionPaid('${doc.id}', '${d.crewId}')" title="${status==='paid'?'Mark Unpaid':'Mark Paid'}">
                                 <i class="${status==='paid'?'ri-arrow-go-back-line':'ri-checkbox-circle-line'}"></i> ${status==='paid'?'Undo':'Pay'}
@@ -2706,20 +2715,23 @@
                         `;
                     }
 
-                    // Column: Crew Member (Only show if Top Admin)
-                    const crewMemberCol = canViewAll 
+                    // Column: Crew Member (Only show if Admin)
+                    const crewMemberCol = !isCrewUser 
                         ? `<td style="font-weight:600;">${d.crewName}</td>` 
                         : '';
 
-                    // Column: Actions (Only if Top Admin)
-                    const actionColHTML = canViewAll ? `<td>${actionsHTML}</td>` : '';
+                    // Column: Commission Amount (Visible to ALL)
+                    const amountCol = `<td style="font-weight:700;">RM ${d.amount.toFixed(2)}</td>`;
+
+                    // Column: Actions (Only if Admin)
+                    const actionColHTML = (!isCrewUser) ? `<td>${actionsHTML}</td>` : '';
 
                     return `<tr>
                         <td class="font-mono text-sm">${orderRef}</td>
                         <td style="font-size:0.8rem;">${formatDateTime(orderDate)}</td>
                         ${crewMemberCol}
                         <td>${statusBadge}</td>
-                        <td style="font-weight:700;">RM ${d.amount.toFixed(2)}</td>
+                        ${amountCol}
                         <td style="font-size:0.8rem;">${paidDateDisplay}</td>
                         <td style="font-size:0.8rem;">${paidByDisplay}</td>
                         ${actionColHTML}
@@ -2731,12 +2743,58 @@
 
             } catch (error) {
                 console.error("Error loading commissions:", error);
+                // Helpful error message for debugging
                 let errorMsg = "Error loading data.";
                 if(error.code === 'permission-denied') {
                     errorMsg = "Permission Denied. Ask Admin to update Firestore Rules.";
                 }
                 tbody.innerHTML = `<tr><td colspan="${colCount}" class="text-center text-danger">${errorMsg}</td></tr>`;
                 showToast(errorMsg, "error");
+            }
+        }
+
+        async function markCommissionPaid(docId, crewId) {
+            if(!canAccessFinanceTools()) return showToast("Access Denied", "error");
+            
+            const docRef = db.collection("commission_overview").doc(docId);
+            const docSnap = await docRef.get();
+            if(!docSnap.exists) return;
+
+            const currentStatus = docSnap.data().status || 'unpaid';
+            const newStatus = currentStatus === 'unpaid' ? 'paid' : 'unpaid';
+            const paidData = newStatus === 'paid' 
+                ? { status: newStatus, paidAt: firebase.firestore.FieldValue.serverTimestamp(), paidBy: userData.name }
+                : { status: newStatus, paidAt: null, paidBy: null };
+            
+            try {
+                await docRef.update(paidData);
+                showToast(`Marked as ${newStatus}`, "success");
+                logActivity(`Updated commission status to ${newStatus} for ${crewId}`);
+                updateCommissionView(); // Refresh
+            } catch(e) {
+                showToast("Error updating status", "error");
+            }
+        }
+
+        async function waCrewCommission(crewId, amount) {
+            if(!canAccessFinanceTools()) return showToast("Access Denied", "error");
+            
+            try {
+                const crewSnap = await db.collection("users").doc(crewId).get();
+                if(!crewSnap.exists) return showToast("Crew not found", "error");
+                const crewData = crewSnap.data();
+                const phone = crewData.phone;
+
+                if(!phone) return showToast("Crew has no phone number", "error");
+
+                let cleanPhone = phone.replace(/^0/, '60');
+                if(!cleanPhone.startsWith('+')) cleanPhone = '+' + cleanPhone;
+
+                const msg = `Hi ${crewData.name}, this is Finance. Your commission of ${amount} has been processed. Please check your bank account.`;
+                window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+            } catch(e) {
+                console.error(e);
+                showToast("Error fetching crew details", "error");
             }
         }
 
