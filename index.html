@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HQ-DDNetwork-portal.v2.5</title>
+    <title>HQ-DDNetwork-portal.v2.7</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -576,6 +576,7 @@
             appId: "1:699127560990:web:50cfd61ff620bc85fb670f"
         };
         let db, auth, currentUser, userData = null;
+        let rawFinanceData = []; // Cache for filtering
         
         try { 
             firebase.initializeApp(firebaseConfig); 
@@ -2536,27 +2537,21 @@
             try { await db.collection("promo_codes").doc(code).delete(); showToast("Promo Code Deleted", "success"); logActivity(`Deleted public promo code: ${code}`); } catch(e) { showToast("Error deleting: " + e.message, "error"); } 
         }
 
-        // --- 12. FINANCE OVERVIEW (FIXED) ---
+        // --- 12. FINANCE OVERVIEW (UPDATED WITH FILTERS & ACTIONS) ---
+        
         function renderFinanceOverview() {
             const main = document.getElementById('main');
             if(!main) return;
 
-            // CRITICAL FIX: Logic changed to 'Can I Manage Finance?'
-            // If YES (SuperAdmin/MidAdmin/Finance) -> See Everyone
-            // If NO (Admin/Crew) -> See Only Self
+            // Logic: Can I Manage Finance? (SuperAdmin/MidAdmin/Finance)
             const canManageFinance = canAccessFinanceTools(); 
-            const isMyView = !canManageFinance; // If I can't manage, it's my personal view.
+            const isMyView = !canManageFinance; // If I can't manage, I see my own.
 
-            // ACCESS DENIED LOGIC
-            // If neither a Finance Manager NOR a user with a valid ID
             if(!canManageFinance && (!currentUser || !currentUser.uid)) {
                 main.innerHTML = `<div class="access-denied-container"><div class="access-denied-title">Access Denied</div><div class="access-denied-desc">You are not logged in or do not have access.</div></div>`;
                 return;
             }
 
-            // Determine Colspan based on columns shown
-            // Manager View (See All): Ref, Date, Crew, Status, Amount, PaidDate, PaidBy, Actions (8 cols)
-            // My View (See Self): Ref, Date, Status, Amount, PaidDate, PaidBy (6 cols)
             const colCount = isMyView ? 6 : 8;
 
             main.innerHTML = `
@@ -2581,9 +2576,27 @@
                     </div>
 
                     <div class="table-container">
-                        <div class="table-header">
+                        <div class="table-header" style="flex-direction:column; align-items:stretch; gap:1rem;">
                             <h3>${isMyView ? 'My Commissions' : 'Commission Overview'}</h3>
+                            
+                            <!-- FILTERS UI -->
+                            <div style="background:#f9fafb; padding:1rem; border-radius:8px; border:1px solid var(--border);">
+                                <div class="flex gap-2 mb-2" style="flex-wrap:wrap;">
+                                    <input type="text" id="filter-ref" placeholder="Search Ref / Name..." style="flex:1; min-width:200px;" onkeyup="applyFilters()">
+                                    <select id="filter-status" onchange="applyFilters()" style="flex:1; min-width:120px;">
+                                        <option value="">All Status</option>
+                                        <option value="paid">Paid</option>
+                                        <option value="unpaid">Unpaid</option>
+                                    </select>
+                                </div>
+                                <div class="flex gap-2" style="flex-wrap:wrap;">
+                                    <input type="date" id="filter-date-start" placeholder="Start Date" onchange="applyFilters()">
+                                    <input type="date" id="filter-date-end" placeholder="End Date" onchange="applyFilters()">
+                                    <input type="text" id="filter-amount" placeholder="Min Amount (RM)" style="width:120px;" onkeyup="applyFilters()">
+                                </div>
+                            </div>
                         </div>
+                        
                         <div class="table-responsive">
                             <table>
                                 <thead>
@@ -2636,9 +2649,7 @@
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.getElementById(`tab-content-${tabName}`).classList.add('active');
 
-            // Reload data when switching to commission tab
             if(tabName === 'commission') {
-                // Re-calculate isMyView to be sure
                 const isMyView = !canAccessFinanceTools();
                 updateCommissionView(isMyView);
             }
@@ -2650,111 +2661,209 @@
             
             if(!tbody || !totalEl) return; 
 
-            // FIX: Ensure User is Authenticated
             if (!currentUser || !currentUser.uid) {
                 tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Authentication Error. Please login.</td></tr>`;
                 return;
             }
 
-            // Determine Colspan
             const colCount = isMyView ? 6 : 8;
 
-            // Setup Query
+            // 1. Fetch Data
             let query = db.collection("commission_overview").orderBy("orderDate", "desc");
 
-            // FIX: Logic to filter strictly for NON-Managers (Admin, Crew, etc.)
-            // If isMyView is true (User is Admin or Crew), we MUST filter by their UID.
             if (isMyView) {
                 query = query.where("crewId", "==", currentUser.uid);
             }
 
-            // Fetch Data with Error Handling
             try {
                 const snap = await query.get();
                 
-                let totalSum = 0;
-
                 if (snap.empty) {
+                    rawFinanceData = []; // Clear cache
                     tbody.innerHTML = `<tr><td colspan="${colCount}" class="text-center text-muted">No commissions found.</td></tr>`;
                     totalEl.innerText = 'RM 0.00';
                     return;
                 }
 
-                // Calculate Total ONLY from visible (filtered) results
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    totalSum += (d.amount || 0);
-                });
+                // 2. Store in global cache for filtering
+                rawFinanceData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-                // Render Table
-                tbody.innerHTML = snap.docs.map(doc => {
-                    const d = doc.data();
-                    const status = d.status || 'unpaid';
-
-                    const statusBadge = status === 'paid' 
-                        ? `<span class="status-badge status-paid">Paid</span>`
-                        : `<span class="status-badge status-unpaid">Unpaid</span>`;
-
-                    const orderDate = d.orderDate ? d.orderDate.toDate() : new Date();
-                    const orderRef = d.orderId ? d.orderId.substring(0,6).toUpperCase() : 'N/A';
-                    
-                    const paidDateDisplay = d.paidAt ? formatDateTime(d.paidAt) : '-';
-                    const paidByDisplay = d.paidBy ? d.paidBy : '-';
-
-                    // Actions (Only for Managers, NOT for Admin/Crew)
-                    let actionsHTML = '';
-                    if(!isMyView && canAccessFinanceTools()) {
-                        actionsHTML = `
-                            <button class="btn btn-sm ${status==='paid'?'btn-secondary':'btn-success'}" onclick="markCommissionPaid('${doc.id}', '${d.crewId}')" title="${status==='paid'?'Mark Unpaid':'Mark Paid'}">
-                                <i class="${status==='paid'?'ri-arrow-go-back-line':'ri-checkbox-circle-line'}"></i> ${status==='paid'?'Undo':'Pay'}
-                            </button>
-                            <button class="btn btn-sm btn-info" onclick="waCrewCommission('${d.crewId}', 'RM ${d.amount.toFixed(2)}')" title="WhatsApp Crew">
-                                <i class="ri-whatsapp-line"></i> WA
-                            </button>
-                        `;
-                    }
-
-                    // Column: Crew Member (Only show if Manager View)
-                    const crewMemberCol = !isMyView 
-                        ? `<td style="font-weight:600;">${d.crewName}</td>` 
-                        : '';
-
-                    // Column: Commission Amount
-                    const amountCol = `<td style="font-weight:700;">RM ${d.amount.toFixed(2)}</td>`;
-
-                    // Column: Actions (Only if Manager View)
-                    const actionColHTML = (!isMyView) ? `<td>${actionsHTML}</td>` : '';
-
-                    return `<tr>
-                        <td class="font-mono text-sm">${orderRef}</td>
-                        <td style="font-size:0.8rem;">${formatDateTime(orderDate)}</td>
-                        ${crewMemberCol}
-                        <td>${statusBadge}</td>
-                        ${amountCol}
-                        <td style="font-size:0.8rem;">${paidDateDisplay}</td>
-                        <td style="font-size:0.8rem;">${paidByDisplay}</td>
-                        ${actionColHTML}
-                    </tr>`;
-                }).join('');
-
-                // Update Total Card
-                if(totalEl) totalEl.innerText = `RM ${totalSum.toFixed(2)}`;
+                // 3. Apply Filters and Render
+                applyFilters();
 
             } catch (error) {
                 console.error("Error loading commissions:", error);
-                // Detailed Error Display
                 let errorMsg = "Error loading data.";
-                
-                if(error.code === 'permission-denied') {
-                    errorMsg = "Permission Denied. You do not have access to view commissions.";
-                } else if (error.code === 'failed-precondition') {
-                    errorMsg = "Database Index Missing. (Ask Dev to create index for commission_overview)";
-                } else {
-                    errorMsg = `Error: ${error.message}`;
-                }
-                
+                if(error.code === 'permission-denied') errorMsg = "Permission Denied.";
+                if(error.code === 'failed-precondition') errorMsg = "Database Index Missing.";
                 tbody.innerHTML = `<tr><td colspan="${colCount}" class="text-center text-danger">${errorMsg}</td></tr>`;
                 showToast(errorMsg, "error");
+            }
+        }
+
+        // --- NEW: FILTER LOGIC ---
+        function applyFilters() {
+            const tbody = document.getElementById('comm-tbody');
+            const totalEl = document.getElementById('comm-total-earnings');
+            if(!tbody || !totalEl) return;
+
+            // Get Filter Values
+            const filterRef = document.getElementById('filter-ref').value.toLowerCase();
+            const filterStatus = document.getElementById('filter-status').value;
+            const filterStart = document.getElementById('filter-date-start').value;
+            const filterEnd = document.getElementById('filter-date-end').value;
+            const filterAmount = document.getElementById('filter-amount').value;
+
+            // Filter Data
+            const filteredData = rawFinanceData.filter(item => {
+                const d = item;
+                const dateObj = d.orderDate ? d.orderDate.toDate() : new Date(0);
+                const dateStr = formatDateTime(dateObj).toLowerCase();
+                const refStr = (d.orderId || '').substring(0,6).toLowerCase();
+                const crewName = (d.crewName || '').toLowerCase();
+                const paidBy = (d.paidBy || '').toLowerCase();
+                const status = (d.status || '').toLowerCase();
+
+                // Search Logic (Covers Ref, Crew Member, Paid By)
+                const matchesSearch = !filterRef || 
+                                    refStr.includes(filterRef) || 
+                                    crewName.includes(filterRef) || 
+                                    paidBy.includes(filterRef);
+
+                // Status Logic
+                const matchesStatus = !filterStatus || status === filterStatus;
+
+                // Amount Logic
+                const matchesAmount = !filterAmount || d.amount >= parseFloat(filterAmount);
+
+                // Date Logic
+                let matchesDate = true;
+                if(filterStart) {
+                    const startObj = new Date(filterStart);
+                    if (dateObj < startObj) matchesDate = false;
+                }
+                if(filterEnd) {
+                    const endObj = new Date(filterEnd);
+                    // Include the full end day
+                    endObj.setHours(23, 59, 59, 999);
+                    if (dateObj > endObj) matchesDate = false;
+                }
+
+                return matchesSearch && matchesStatus && matchesAmount && matchesDate;
+            });
+
+            // Render Table HTML
+            renderFinanceTable(filteredData);
+
+            // Update Total based on filtered data
+            const totalSum = filteredData.reduce((sum, item) => sum + (item.amount || 0), 0);
+            if(totalEl) totalEl.innerText = `RM ${totalSum.toFixed(2)}`;
+        }
+
+        function renderFinanceTable(data) {
+            const tbody = document.getElementById('comm-tbody');
+            if(!tbody) return;
+
+            const isMyView = !canAccessFinanceTools();
+            const colCount = isMyView ? 6 : 8;
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${colCount}" class="text-center text-muted">No matching records found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = data.map(item => {
+                const d = item;
+                const status = d.status || 'unpaid';
+                const isPaid = status === 'paid';
+
+                const statusBadge = isPaid 
+                    ? `<span class="status-badge status-paid">Paid</span>`
+                    : `<span class="status-badge status-unpaid">Unpaid</span>`;
+
+                const orderDate = d.orderDate ? d.orderDate.toDate() : new Date();
+                const orderRef = d.orderId ? d.orderId.substring(0,6).toUpperCase() : 'N/A';
+                const paidDateDisplay = d.paidAt ? formatDateTime(d.paidAt) : '-';
+                const paidByDisplay = d.paidBy ? d.paidBy : '-';
+
+                // Actions Column
+                let actionsHTML = '';
+                if(!isMyView && canAccessFinanceTools()) {
+                    actionsHTML = `
+                        <button class="btn btn-sm ${isPaid?'btn-secondary':'btn-success'}" onclick="markCommissionPaid('${d.id}', '${d.crewId}')" title="${isPaid?'Mark Unpaid':'Mark Paid'}">
+                            <i class="${isPaid?'ri-arrow-go-back-line':'ri-checkbox-circle-line'}"></i> ${isPaid?'Undo':'Pay'}
+                        </button>
+                        <button class="btn btn-sm btn-info" onclick="waCrewCommission('${d.crewId}', 'RM ${d.amount.toFixed(2)}')" title="WhatsApp Crew">
+                            <i class="ri-whatsapp-line"></i> WA
+                        </button>
+                    `;
+                }
+
+                const crewMemberCol = !isMyView ? `<td style="font-weight:600;">${d.crewName}</td>` : '';
+                const actionColHTML = (!isMyView) ? `<td>${actionsHTML}</td>` : '';
+
+                return `<tr>
+                    <td class="font-mono text-sm">${orderRef}</td>
+                    <td style="font-size:0.8rem;">${formatDateTime(orderDate)}</td>
+                    ${crewMemberCol}
+                    <td>${statusBadge}</td>
+                    <td style="font-weight:700;">RM ${d.amount.toFixed(2)}</td>
+                    <td style="font-size:0.8rem;">${paidDateDisplay}</td>
+                    <td style="font-size:0.8rem;">${paidByDisplay}</td>
+                    ${actionColHTML}
+                </tr>`;
+            }).join('');
+        }
+
+        // --- ACTIONS: MARK PAID / UNDO ---
+        async function markCommissionPaid(docId, crewId) {
+            if(!canAccessFinanceTools()) return showToast("Access Denied", "error");
+            
+            const docRef = db.collection("commission_overview").doc(docId);
+            const docSnap = await docRef.get();
+            if(!docSnap.exists) return;
+
+            const currentStatus = docSnap.data().status || 'unpaid';
+            const newStatus = currentStatus === 'unpaid' ? 'paid' : 'unpaid';
+            
+            const paidData = newStatus === 'paid' 
+                ? { status: newStatus, paidAt: firebase.firestore.FieldValue.serverTimestamp(), paidBy: userData.name }
+                : { status: newStatus, paidAt: null, paidBy: null };
+            
+            try {
+                await docRef.update(paidData);
+                showToast(`Marked as ${newStatus}`, "success");
+                logActivity(`Updated commission status to ${newStatus} for ${crewId}`);
+                
+                // Refresh Data and re-apply filters
+                const isMyView = !canAccessFinanceTools();
+                await updateCommissionView(isMyView); 
+                // Note: updateCommissionView will re-fetch data and call applyFilters automatically
+            } catch(e) {
+                showToast("Error updating status", "error");
+            }
+        }
+
+        // --- ACTIONS: WHATSAPP ---
+        async function waCrewCommission(crewId, amount) {
+            if(!canAccessFinanceTools()) return showToast("Access Denied", "error");
+            
+            try {
+                const crewSnap = await db.collection("users").doc(crewId).get();
+                if(!crewSnap.exists) return showToast("Crew not found", "error");
+                const crewData = crewSnap.data();
+                const phone = crewData.phone;
+
+                if(!phone) return showToast("Crew has no phone number", "error");
+
+                let cleanPhone = phone.replace(/^0/, '60');
+                if(!cleanPhone.startsWith('+')) cleanPhone = '+' + cleanPhone;
+
+                const msg = `Hi ${crewData.name}, this is Finance. Your commission of ${amount} has been processed. Please check your bank account.`;
+                window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+            } catch(e) {
+                console.error(e);
+                showToast("Error fetching crew details", "error");
             }
         }
 
