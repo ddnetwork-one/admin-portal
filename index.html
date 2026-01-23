@@ -2541,7 +2541,6 @@
             const main = document.getElementById('main');
             if(!main) return;
 
-            // Logic: If user is Crew, show Commission. If Admin, Show Tabs.
             const isCrewUser = isCrew();
             const canManageFinance = canAccessFinanceTools();
 
@@ -2550,29 +2549,25 @@
                 return;
             }
 
-            // Determine which tab to show by default
             let activeTab = 'commission';
-            // Logic to switch tabs will be handled by JS functions
         
             main.innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.5rem; font-weight:800;">Finance Department</h2>
                 </div>
 
-                <!-- TABS -->
                 <div class="tabs-nav">
                     <button class="tab-btn active" onclick="switchFinanceTab('commission')" id="tab-btn-commission">Commission Overview</button>
                     ${canManageFinance ? `<button class="tab-btn" onclick="switchFinanceTab('tools')" id="tab-btn-tools">Finance Tools</button>` : ''}
                 </div>
 
-                <!-- TAB CONTENT: COMMISSION -->
                 <div id="tab-content-commission" class="tab-content active">
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-icon" style="color:var(--success); background:#ecfdf5"><i class="ri-money-dollar-circle-line"></i></div>
                             <div class="stat-info">
                                 <div class="stat-val" id="comm-total-earnings">RM 0.00</div>
-                                <div class="stat-label">Total Earnings</div>
+                                <div class="stat-label">${isCrewUser ? 'My Total Earnings' : 'Total Payouts'}</div>
                             </div>
                         </div>
                     </div>
@@ -2602,7 +2597,6 @@
                     </div>
                 </div>
 
-                <!-- TAB CONTENT: FINANCE TOOLS -->
                 <div id="tab-content-tools" class="tab-content">
                     <div class="config-section">
                         <h3 style="margin-bottom:1rem;">Financial Operations (Authorized Only)</h3>
@@ -2622,17 +2616,21 @@
                 </div>
             `;
             
+            // Initial Load
             updateCommissionView();
         }
 
         function switchFinanceTab(tabName) {
-            // Update Buttons
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(`tab-btn-${tabName}`).classList.add('active');
             
-            // Update Content
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.getElementById(`tab-content-${tabName}`).classList.add('active');
+
+            // CRITICAL FIX: Reload data when switching to commission tab
+            if(tabName === 'commission') {
+                updateCommissionView();
+            }
         }
 
         async function updateCommissionView() {
@@ -2640,66 +2638,93 @@
             const tbody = document.getElementById('comm-tbody');
             const totalEl = document.getElementById('comm-total-earnings');
             
-            if(!tbody) return; // If tab switched
+            if(!tbody || !totalEl) return; 
 
-            // IMPORTANT FIX: Check if element exists before running query
+            // 1. Security: Ensure element exists before running query
             if(!document.getElementById('comm-tbody')) return;
 
-            // --- UPDATE: Target collection is 'commission_overview' ---
+            // 2. Setup Query based on Role
             let query = db.collection("commission_overview").orderBy("orderDate", "desc");
 
-            // If Crew, filter by user's UID
-            if(isCrewUser()) {
+            // FIX: If Crew, STRICTLY filter by current user's UID
+            if(isCrewUser && currentUser) {
                 query = query.where("crewId", "==", currentUser.uid);
             }
 
-            const snap = await query.get();
-            
-            let totalSum = 0;
-
-            if (snap.empty) {
-                tbody.innerHTML = `<tr><td colspan="${isCrewUser?6:7}" class="text-center text-muted">No commissions found.</td></tr>`;
-                totalEl.innerText = 'RM 0.00';
-                return;
-            }
-
-            tbody.innerHTML = snap.docs.map(doc => {
-                const d = doc.data();
-                const status = d.status || 'unpaid';
-                totalSum += d.amount || 0;
-
-                const statusBadge = status === 'paid' 
-                    ? `<span class="status-badge status-paid">Paid</span>`
-                    : `<span class="status-badge status-unpaid">Unpaid</span>`;
-
-                const orderDate = d.orderDate ? d.orderDate.toDate() : new Date();
-                const orderRef = d.orderId ? d.orderId.substring(0,6).toUpperCase() : 'N/A';
+            // 3. Fetch Data
+            try {
+                const snap = await query.get();
                 
-                const paidDateDisplay = d.paidAt ? formatDateTime(d.paidAt) : '-';
-                const paidByDisplay = d.paidBy ? d.paidBy : '-';
+                let totalSum = 0;
 
-                const canManageFinance = canAccessFinanceTools();
-                const actionsHTML = (!isCrewUser() && canManageFinance) ? `
-                    <button class="btn btn-sm ${status==='paid'?'btn-secondary':'btn-success'}" onclick="markCommissionPaid('${doc.id}', '${d.crewId}')" title="${status==='paid'?'Mark Unpaid':'Mark Paid'}">
-                        <i class="${status==='paid'?'ri-arrow-go-back-line':'ri-checkbox-circle-line'}"></i> ${status==='paid'?'Undo':'Pay'}
-                    </button>
-                    <button class="btn btn-sm btn-info" onclick="waCrewCommission('${d.crewId}', 'RM ${d.amount.toFixed(2)}')" title="WhatsApp Crew">
-                        <i class="ri-whatsapp-line"></i> WA
-                    </button>
-                ` : '';
+                if (snap.empty) {
+                    tbody.innerHTML = `<tr><td colspan="${isCrewUser?6:7}" class="text-center text-muted">No commissions found.</td></tr>`;
+                    totalEl.innerText = 'RM 0.00';
+                    return;
+                }
 
-                return `<tr>
-                    <td class="font-mono text-sm">${orderRef}</td>
-                    <td style="font-size:0.8rem;">${formatDateTime(orderDate)}</td>
-                    ${isCrewUser() ? `<td style="font-weight:700;">RM ${d.amount.toFixed(2)}</td>` : `<td>${d.crewName}</td>`}
-                    <td>${statusBadge}</td>
-                    <td style="font-size:0.8rem;">${paidDateDisplay}</td>
-                    <td style="font-size:0.8rem;">${paidByDisplay}</td>
-                    ${!isCrewUser() ? `<td>${actionsHTML}</td>` : ''}
-                </tr>`;
-            }).join('');
+                // 4. Calculate Total ONLY from visible (filtered) results
+                // This ensures Crew see only THEIR total, Admin sees ALL total
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    totalSum += (d.amount || 0);
+                });
 
-            if(totalEl) totalEl.innerText = `RM ${totalSum.toFixed(2)}`;
+                // 5. Render Table
+                tbody.innerHTML = snap.docs.map(doc => {
+                    const d = doc.data();
+                    const status = d.status || 'unpaid';
+
+                    const statusBadge = status === 'paid' 
+                        ? `<span class="status-badge status-paid">Paid</span>`
+                        : `<span class="status-badge status-unpaid">Unpaid</span>`;
+
+                    const orderDate = d.orderDate ? d.orderDate.toDate() : new Date();
+                    const orderRef = d.orderId ? d.orderId.substring(0,6).toUpperCase() : 'N/A';
+                    
+                    const paidDateDisplay = d.paidAt ? formatDateTime(d.paidAt) : '-';
+                    const paidByDisplay = d.paidBy ? d.paidBy : '-';
+
+                    const canManageFinance = canAccessFinanceTools();
+                    
+                    // 6. Render Actions (Only for Admins/Mid-Admins, NOT Crew)
+                    let actionsHTML = '';
+                    if(!isCrewUser && canManageFinance) {
+                        actionsHTML = `
+                            <button class="btn btn-sm ${status==='paid'?'btn-secondary':'btn-success'}" onclick="markCommissionPaid('${doc.id}', '${d.crewId}')" title="${status==='paid'?'Mark Unpaid':'Mark Paid'}">
+                                <i class="${status==='paid'?'ri-arrow-go-back-line':'ri-checkbox-circle-line'}"></i> ${status==='paid'?'Undo':'Pay'}
+                            </button>
+                            <button class="btn btn-sm btn-info" onclick="waCrewCommission('${d.crewId}', 'RM ${d.amount.toFixed(2)}')" title="WhatsApp Crew">
+                                <i class="ri-whatsapp-line"></i> WA
+                            </button>
+                        `;
+                    }
+
+                    // Dynamic Column Rendering: Crew sees Amount, Admin sees Crew Name
+                    const dynamicColHTML = isCrewUser 
+                        ? `<td style="font-weight:700;">RM ${d.amount.toFixed(2)}</td>`
+                        : `<td>${d.crewName}</td>`;
+
+                    const actionColHTML = (!isCrewUser) ? `<td>${actionsHTML}</td>` : '';
+
+                    return `<tr>
+                        <td class="font-mono text-sm">${orderRef}</td>
+                        <td style="font-size:0.8rem;">${formatDateTime(orderDate)}</td>
+                        ${dynamicColHTML}
+                        <td>${statusBadge}</td>
+                        <td style="font-size:0.8rem;">${paidDateDisplay}</td>
+                        <td style="font-size:0.8rem;">${paidByDisplay}</td>
+                        ${actionColHTML}
+                    </tr>`;
+                }).join('');
+
+                // Update the Total Card
+                if(totalEl) totalEl.innerText = `RM ${totalSum.toFixed(2)}`;
+
+            } catch (error) {
+                console.error("Error loading commissions:", error);
+                tbody.innerHTML = `<tr><td colspan="${isCrewUser?6:7}" class="text-center text-danger">Error loading data.</td></tr>`;
+            }
         }
 
         async function markCommissionPaid(docId, crewId) {
