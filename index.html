@@ -495,6 +495,7 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- JAVASCRIPT -->
+    <!-- JAVASCRIPT -->
 <script>
         // --- CONSTANTS & CONFIG ---
         const JOB_TITLES = [
@@ -514,6 +515,7 @@
             "Support Operations Executive"
         ];
 
+        // Maps specific Job Titles to System Roles
         const JOB_ROLE_MAP = {
             "Founder & Managing Director": "super_admin",
             "Project & Client Manager": "mid_admin",
@@ -531,6 +533,7 @@
             "Support Operations Executive": "crew"
         };
 
+        // Default Commission Rates
         const DEFAULT_COMMISSION_RATES = {
             "Founder & Managing Director": 0.05,
             "Project & Client Manager": 0.04,
@@ -548,22 +551,39 @@
             "Support Operations Executive": 0.025
         };
 
+        // --- IMPROVED PERMISSION SYSTEM ---
+        // Added more granular keys for better access control
         const PERMISSION_KEYS = {
+            // Order & Client Management
             EDIT_ORDERS: 'edit_orders',
             EDIT_CLIENTS: 'edit_clients',
+            VIEW_FINANCE: 'view_finance',
+            
+            // Ticket & Request Management
             DELETE_REQUESTS: 'delete_requests',
             DELETE_SUPPORT: 'delete_support',
+            APPROVE_REQUESTS: 'approve_requests', // New
+            
+            // Content & CMS
             EDIT_VOUCHERS: 'edit_vouchers',
             EDIT_PORTFOLIO: 'edit_portfolio',
             EDIT_CONTENT: 'edit_content',
             EDIT_PROMOS: 'edit_promos',
+            
+            // System & User Management
             EDIT_CREW: 'edit_crew',
             EDIT_CONFIG: 'edit_config',
-            VIEW_FINANCE: 'view_finance',
+            MANAGE_USERS: 'manage_users', // New
+            
+            // Finance Tools
             FINANCE_TOOLS_ACCESS: 'finance_tools_access',
-            APPROVE_ACTIONS: 'approve_actions' 
+            
+            // Approvals & System
+            APPROVE_ACTIONS: 'approve_actions', 
+            BYPASS_APPROVAL: 'bypass_approval'
         };
 
+        // Helper to get default rate
         function getDefaultRate(title) { return DEFAULT_COMMISSION_RATES[title] || 0.0; }
 
         // --- FIREBASE SETUP ---
@@ -582,14 +602,8 @@
             firebase.initializeApp(firebaseConfig); 
             db = firebase.firestore(); 
             auth = firebase.auth(); 
-            
-            // --- ADDED SAFETY CHECK ---
-            // Ensure DB and Auth are ready before proceeding
-            if(db && auth) {
-                console.log("Firebase initialized successfully.");
-            } else {
-                console.error("Firebase initialization failed.");
-            }
+            if(db && auth) { console.log("Firebase initialized successfully."); }
+            else { console.error("Firebase initialization failed."); }
         } catch(e) { console.log("Firebase init error", e); }
 
         // --- AUTO CREATE CONFIG ---
@@ -741,7 +755,6 @@
                             listenForNotifications(); 
                         }
 
-                        // --- FIXED: Force render initial route ---
                         initRouter(); 
                         initializeDatabase();
                         listenForMaintenanceChanges(); 
@@ -838,17 +851,19 @@
 
         function hasPermission(key) {
             if(!userData) return false;
+            // Explicit permission check
             if (userData.permissions && userData.permissions[key] === true) return true;
             return false;
         }
         
+        // Check if user can manage finances (Explicit perm + Role check)
         function canAccessFinanceTools() {
-            // Logic: Explicit permission, SuperAdmin, MidAdmin, or Finance Manager
             if(isSuperAdmin() || isMidAdmin() || isFinanceManager()) return true;
             if(hasPermission(PERMISSION_KEYS.FINANCE_TOOLS_ACCESS)) return true;
             return false;
         }
 
+        // Central check for Edit Actions
         function checkAccessOrActionAllowed(permissionKey) {
             if(!userData) return false; 
             if (isSuperAdmin() || userData.bypassApproval === true) return true;
@@ -898,7 +913,6 @@
                     });
                 }
 
-                // Ensure main element exists before rendering
                 const mainEl = document.getElementById('main');
                 if(mainEl) {
                     mainEl.innerHTML = ''; 
@@ -1444,7 +1458,7 @@
             if(confirm(`Send reset email to ${email}?`)) { auth.sendPasswordResetEmail(email).then(() => showToast("Reset email sent", "success")); }
         }
 
-        // --- 4. CREW MANAGEMENT ---
+        // --- 4. CREW MANAGEMENT (UPDATED) ---
         function renderCrew() {
             const main = document.getElementById('main');
             if(!main) return;
@@ -1457,7 +1471,7 @@
                 </div>
                 <div class="table-container">
                     <div class="table-responsive">
-                        <table><thead><tr><th>Crew ID</th><th>Name</th><th>Email</th><th>Role</th><th>Job Title</th><th>Comm. Rate</th><th>Status</th><th>Actions</th></tr></thead><tbody id="crew-tbody">
+                        <table><thead><tr><th>Crew ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Job Title</th><th>Comm. Rate</th><th>Status</th><th>Actions</th></tr></thead><tbody id="crew-tbody">
                         <tr><td colspan="9" class="text-center"><div class="loading-spinner"></div></td></tr>
                         </tbody></table>
                     </div>
@@ -1490,6 +1504,7 @@
                         <td class="font-mono" style="color:var(--primary)">${u.crewId || 'N/A'}</td>
                         <td>${u.name}</td>
                         <td>${u.email}</td>
+                        <td>${u.phone || '-'}</td>
                         <td><span class="badge badge-${u.role==='super_admin'?'admin':(u.role==='admin'?'admin':'crew')}">${u.role}</span></td>
                         <td>${u.jobTitle||'-'}</td>
                         <td><span class="badge" style="background:#ecfdf5; color:var(--success)">${rate}</span></td>
@@ -1510,6 +1525,7 @@
                 <div class="mb-4"><label>Crew ID</label><input id="c-id" value="${newCrewId}" readonly></div>
                 <div class="mb-4"><label>Full Name</label><input id="c-name"></div>
                 <div class="mb-4"><label>Email Address</label><input type="email" id="c-email"></div>
+                <div class="mb-4"><label>Phone Number (Optional)</label><input type="tel" id="c-phone" placeholder="01XXXXXXXXX"></div>
                 <div class="mb-4">
                     <label>Job Title (Auto-Sets Role)</label>
                     <select id="c-job" onchange="autoSetRoleAndRate()">
@@ -1531,6 +1547,7 @@
             `, `<button class="btn btn-primary" onclick="saveCrew('${newCrewId}')">Create Crew</button>`);
         }
 
+        // --- AUTOMATED ROLE & RATE LOGIC ---
         function autoSetRoleAndRate() {
             const title = document.getElementById('c-job').value;
             const roleInput = document.getElementById('c-role');
@@ -1547,11 +1564,12 @@
 
             const name = document.getElementById('c-name').value;
             const email = document.getElementById('c-email').value;
+            const phone = document.getElementById('c-phone').value; // Added Phone
             const pass = document.getElementById('c-pass').value;
             const job = document.getElementById('c-job').value;
             const rateVal = parseFloat(document.getElementById('c-rate').value);
 
-            if(!name || !email || !pass || !job) return showToast("Please fill all fields", "error");
+            if(!name || !email || !pass || !job) return showToast("Please fill all required fields", "error");
 
             try {
                 const userCredential = await auth.createUserWithEmailAndPassword(email, pass);
@@ -1563,6 +1581,7 @@
                     crewId: newId,
                     name: name,
                     email: email,
+                    phone: phone, // Save Phone
                     role: dbRole, 
                     jobTitle: job,
                     commissionRate: isNaN(rateVal) ? 0.0 : (rateVal / 100),
@@ -1613,7 +1632,8 @@
                     [PERMISSION_KEYS.EDIT_PORTFOLIO]: 'Edit Portfolio',
                     [PERMISSION_KEYS.EDIT_CONTENT]: 'Edit Content',
                     [PERMISSION_KEYS.EDIT_PROMOS]: 'Edit Promos',
-                    [PERMISSION_KEYS.EDIT_CONFIG]: 'Edit Config'
+                    [PERMISSION_KEYS.EDIT_CONFIG]: 'Edit Config',
+                    [PERMISSION_KEYS.APPROVE_REQUESTS]: 'Approve Requests' // New
                 })) {
                     const isChecked = userPerms[key] === true ? 'checked' : '';
                     permsHTML += `
@@ -1658,15 +1678,21 @@
                     </div>
                 `;
 
-                // Determine if Founder is editing Founder (or Founder editing self)
-                // Only Super Admins (or founders with full powers) should be able to change Role.
-                // We will make the Role Input READABLE for everyone, but WRITABLE only for SuperAdmins.
                 const canEditRole = isSuperAdmin();
 
                 showModal("Edit Crew Member", `
                     <div class="mb-4"><label>Crew ID</label><input id="e-c-id" value="${u.crewId}"></div>
                     <div class="mb-4"><label>Full Name</label><input id="e-c-name" value="${u.name}"></div>
-                    <div class="mb-4"><label>Job Title</label><select id="e-c-job">${jobOptions}</select></div>
+                    <div class="mb-4"><label>Email Address</label><input id="e-c-email" value="${u.email}"></div>
+                    <div class="mb-4"><label>Phone Number</label><input id="e-c-phone" value="${u.phone||''}"></div>
+                    <div class="mb-4">
+                        <label>Job Title (Auto-Sets Role & Rate)</label>
+                        <select id="e-c-job" onchange="autoSetEditRoleAndRate()">
+                            <option value="">Select Job Title...</option>
+                            ${jobOptions}
+                        </select>
+                        <small style="color:var(--info)">Changing Job Title will auto-update Role and Commission Rate.</small>
+                    </div>
                     <div class="mb-4">
                         <label>System Role</label>
                         <select id="e-c-role" ${!canEditRole?'disabled':''} style="${!canEditRole?'background:#f3f4f6; cursor:not-allowed;':''}">
@@ -1682,6 +1708,19 @@
                      ${bankHTML}
                 `, `<button class="btn btn-primary" onclick="updateCrewData('${uid}')">Save</button>`);
             });
+        }
+
+        // New Function to handle Auto-update in Edit Modal
+        function autoSetEditRoleAndRate() {
+            const title = document.getElementById('e-c-job').value;
+            const roleSelect = document.getElementById('e-c-role');
+            const rateInput = document.getElementById('e-c-rate');
+            
+            const dbRole = JOB_ROLE_MAP[title] || 'crew'; 
+            roleSelect.value = dbRole;
+            
+            const defaultRate = getDefaultRate(title);
+            rateInput.value = (defaultRate * 100).toFixed(1);
         }
 
         async function updateCrewData(uid) {
@@ -1707,10 +1746,11 @@
                 accountNumber: document.getElementById('c-bank-num').value
             };
 
-            // Only update Role if the user is SuperAdmin (to prevent Crew from promoting themselves)
             let updatePayload = {
                 crewId: document.getElementById('e-c-id').value,
                 name: document.getElementById('e-c-name').value,
+                email: document.getElementById('e-c-email').value,
+                phone: document.getElementById('e-c-phone').value, // Update Phone
                 jobTitle: document.getElementById('e-c-job').value,
                 commissionRate: isNaN(rateVal) ? 0.0 : (rateVal / 100),
                 permissions: newPerms,
@@ -1978,7 +2018,7 @@
                     <div class="mb-4"><label>Code</label><input id="v-code" value="${autoCode}"></div>
                     <div class="flex gap-4 mb-4">
                         <div style="flex:1"><label>Type</label><select id="v-val-type"><option value="fixed">Fixed (RM)</option><option value="percent">Percent (%)</option></select></div>
-                        <div style="flex:1"><label>Value</label><input type="number" id="v-val"></div>
+                        <div style="flex:1"><label>Value</label><input type="number" id="v-val"></input></div>
                     </div>
                     <label>Expiry Date</label><input type="date" id="v-exp" class="mb-4">
                 `, `<button class="btn btn-primary" onclick="submitAssignVoucher()">Assign</button>`);
