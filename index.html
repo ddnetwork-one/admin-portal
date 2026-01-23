@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DDNET-Portal v2.4</title>
+    <title>portal-ddnet-v2.4</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -976,67 +976,35 @@
 
         function hasPermission(key) {
             if(!userData) return false;
-            if(isSuperAdmin() || isFounder()) return true; 
-            
-            if(isAdmin()) {
-                const basicPerms = [PERMISSION_KEYS.EDIT_ORDERS, PERMISSION_KEYS.VIEW_FINANCE];
-                return basicPerms.includes(key);
-            }
-            if(isMidAdmin()) return true; 
-            if(isCrew()) return [PERMISSION_KEYS.VIEW_FINANCE].includes(key);
-
-            return userData.permissions && userData.permissions[key] === true;
+            // Check if user has the specific permission key explicitly true
+            if (userData.permissions && userData.permissions[key] === true) return true;
+            return false;
         }
-
-        // Finance Access Helper
+        
         function canAccessFinanceTools() {
-            if(isSuperAdmin() || isMidAdmin()) return true;
-            if(isFinanceManager()) return true;
-            return hasPermission(PERMISSION_KEYS.FINANCE_TOOLS_ACCESS);
+            // Role based access (Mid Admin or Founder)
+            if(isMidAdmin() || isFounder()) return true;
+            // Permission based access
+            if(hasPermission(PERMISSION_KEYS.FINANCE_TOOLS_ACCESS)) return true;
+            return false;
         }
 
         /**
          * CORE WORKFLOW LOGIC
+         * Checks if user has permission OR bypass approval. 
+         * If not, checks if specific permission exists.
+         * If neither, returns false.
          */
-        async function checkAccessOrRequestApproval(permissionKey, targetCollection, targetId, payload, modalClose = true) {
-            if(!userData) return true; 
+        function checkAccessOrActionAllowed(permissionKey) {
+            if(!userData) return false; 
 
-            const hasKey = hasPermission(permissionKey);
-            if(!hasKey) {
-                showToast("Permission denied. Role does not allow this action.", "error");
-                return true; 
-            }
+            // 1. Bypass: Super Admin always bypasses (implicitly), or user explicitly has bypassApproval flag
+            if (isSuperAdmin() || userData.bypassApproval === true) return true;
 
-            const bypass = userData.bypassApproval === true || isSuperAdmin();
-            
-            if(bypass) {
-                return false; 
-            }
+            // 2. Explicit Permission Check (Unticked = No Access, regardless of role)
+            if (hasPermission(permissionKey)) return true;
 
-            showToast("Approval Required. Request sent to SuperAdmin.", "warning");
-            const collectionName = permissionKey.replace('edit_', '').replace('delete_', '').toUpperCase();
-            
-            try {
-                const requestRef = await db.collection("pending_edits").add({
-                    requesterId: currentUser.uid,
-                    requesterName: userData.name,
-                    requesterEmail: userData.email,
-                    permissionKey: permissionKey,
-                    targetCollection: targetCollection,
-                    targetId: targetId,
-                    payload: payload, 
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: 'Pending'
-                });
-                
-                if(modalClose) closeModal();
-                logActivity(`Submitted approval request for ${collectionName} (${targetId})`);
-                return true; 
-            } catch(e) {
-                console.error(e);
-                showToast("Error sending request: " + e.message, "error");
-                return true; 
-            }
+            return false; 
         }
 
         // --- ROUTING SYSTEM ---
@@ -1149,10 +1117,10 @@
                     <div class="list-group">
                         <h3><i class="ri-pulse-line" style="color:var(--success)"></i> Quick Actions</h3>
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
-                            ${hasPermission(PERMISSION_KEYS.EDIT_ORDERS) ? `<button class="btn btn-secondary" onclick="navigateTo('/orders')"><i class="ri-shopping-bag-line"></i> New Order</button>` : ''}
+                            ${checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_ORDERS) ? `<button class="btn btn-secondary" onclick="navigateTo('/orders')"><i class="ri-shopping-bag-line"></i> New Order</button>` : ''}
                             <button class="btn btn-secondary" onclick="navigateTo('/support')"><i class="ri-ticket-line"></i> Check Tickets</button>
                             <button class="btn btn-secondary" onclick="navigateTo('/requests')"><i class="ri-database-2-line"></i> Requests</button>
-                            ${hasPermission(PERMISSION_KEYS.EDIT_CREW) ? `<button class="btn btn-secondary" onclick="navigateTo('/crew')"><i class="ri-user-add-line"></i> Add Crew</button>` : ''}
+                            ${checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CREW) ? `<button class="btn btn-secondary" onclick="navigateTo('/crew')"><i class="ri-user-add-line"></i> Add Crew</button>` : ''}
                         </div>
                     </div>
                     <div class="list-group">
@@ -1259,6 +1227,17 @@
                     if(d.status === 'Paid') statusColor = 'var(--primary)';
                     if(d.status === 'Cancelled') statusColor = 'var(--danger)';
                     
+                    // Actions based on strict permissions
+                    let actions = '';
+                    if(checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_ORDERS)) {
+                        actions += `<button class="btn btn-sm btn-secondary" onclick="viewOrder('${doc.id}')">Manage</button>`;
+                        actions += `<button class="btn btn-sm btn-info" title="Generate Invoice" onclick="generateInvoice('${doc.id}')"><i class="ri-file-list-2-line"></i> PDF</button>`;
+                        actions += `<button class="btn btn-sm btn-success" title="Send WhatsApp Remainder" onclick="sendPaymentReminder('${doc.id}')"><i class="ri-whatsapp-line"></i> WA</button>`;
+                    }
+                    if(isSuperAdmin()) {
+                        actions += `<button class="btn btn-sm btn-danger" onclick="deleteOrder('${doc.id}')"><i class="ri-delete-bin-line"></i></button>`;
+                    }
+
                     return `<tr>
                         <td style="white-space:nowrap;">${formatDateTime(d.timestamp)}</td>
                         <td><strong>${d.customerName}</strong><br>${domainDisplay}</td>
@@ -1266,12 +1245,7 @@
                         <td>${d.total}</td>
                         <td><span class="badge" style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}25">${d.status}</span></td>
                         <td>
-                            <div style="display:flex; gap:5px; flex-wrap:wrap;">
-                                ${hasPermission(PERMISSION_KEYS.EDIT_ORDERS) ? `<button class="btn btn-sm btn-secondary" onclick="viewOrder('${doc.id}')">Manage</button>` : ''}
-                                ${hasPermission(PERMISSION_KEYS.EDIT_ORDERS) ? `<button class="btn btn-sm btn-info" title="Generate Invoice" onclick="generateInvoice('${doc.id}')"><i class="ri-file-list-2-line"></i> PDF</button>` : ''}
-                                <button class="btn btn-sm btn-success" title="Send WhatsApp Remainder" onclick="sendPaymentReminder('${doc.id}')"><i class="ri-whatsapp-line"></i> WA</button>
-                                ${isSuperAdmin() ? `<button class="btn btn-sm btn-danger" onclick="deleteOrder('${doc.id}')"><i class="ri-delete-bin-line"></i></button>` : ''}
-                            </div>
+                            <div style="display:flex; gap:5px; flex-wrap:wrap;">${actions}</div>
                         </td>
                     </tr>`;
                 }).join('');
@@ -1358,6 +1332,10 @@
         }
 
         async function viewOrder(id) {
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_ORDERS)) {
+                return showToast("Access Denied: You do not have Edit Orders permission.", "error");
+            }
+
             const doc = await db.collection("orders").doc(id).get();
             const d = doc.data();
             
@@ -1471,6 +1449,11 @@
         }
 
         async function updateOrderDetails(id) {
+            // Check Permission
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_ORDERS)) {
+                return showToast("Access Denied. You cannot edit orders.", "error");
+            }
+
             const updateData = {
                 customerName: document.getElementById('o-name').value,
                 customerEmail: document.getElementById('o-email').value,
@@ -1484,10 +1467,6 @@
             const selectedIds = Array.from(checkboxes).map(cb => cb.value);
             updateData.salesRepIds = selectedIds;
 
-            // Permission Check
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_ORDERS, 'orders', id, updateData);
-            if(blocked) return; 
-
             // 1. Update Order
             await db.collection("orders").doc(id).update(updateData);
             
@@ -1495,7 +1474,11 @@
             const freshDoc = await db.collection("orders").doc(id).get();
             const freshData = freshDoc.data();
 
-            // 3. Check if order is paid. If so, generate Commissions.
+            // 3. Logic: Only generate commissions if status is PAID. 
+            // If status changed AWAY from Paid (e.g. Cancelled), existing commissions are kept but effectively void in status checks if we wanted to hide them, 
+            // but here we strictly generate/delete based on 'Paid' status logic.
+            // Logic implemented: If Paid, generate. If !Paid, we could delete, but standard accounting keeps them. 
+            // Let's stick to the requirement: "fix, after order status change to Paid... user can see the earning commissions".
             if(freshData.status === 'Paid') {
                 await generateCommissionsForOrder(id, freshData);
             }
@@ -1540,7 +1523,7 @@
                     const vCode = u.personalVoucher ? u.personalVoucher.code : '-';
                     
                     let buttons = '';
-                    if(hasPermission(PERMISSION_KEYS.EDIT_CLIENTS)) {
+                    if(checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CLIENTS)) {
                         buttons += `<button class="btn btn-sm btn-secondary" onclick="editClient('${doc.id}')">Edit</button>`;
                         buttons += `<button class="btn btn-sm btn-primary" onclick="openAssignVoucherModal('${doc.id}', '${u.name}')">Assign Voucher</button>`;
                     }
@@ -1560,6 +1543,8 @@
             });
         }
         function editClient(uid) {
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CLIENTS)) return showToast("Access Denied", "error");
+
             db.collection("users").doc(uid).get().then(doc => {
                 const u = doc.data();
                 showModal("Edit Client", `
@@ -1571,14 +1556,13 @@
             });
         }
         async function saveClient(uid) {
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CLIENTS)) return showToast("Access Denied", "error");
+
             const data = { 
                 name: document.getElementById('e-name').value, 
                 phone: document.getElementById('e-phone').value, 
                 company: document.getElementById('e-comp').value 
             };
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CLIENTS, 'users', uid, data);
-            if(blocked) return;
-
             db.collection("users").doc(uid).update(data).then(() => { closeModal(); showToast("Client Updated", "success"); logActivity("Updated client details"); });
         }
         function resetPassword(email) {
@@ -1587,7 +1571,7 @@
 
         // --- 4. CREW MANAGEMENT ---
         function renderCrew() {
-            const canEdit = hasPermission(PERMISSION_KEYS.EDIT_CREW);
+            const canEdit = checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CREW);
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:800;">Internal Crew</h2>
@@ -1639,6 +1623,8 @@
         }
 
         async function openAddCrewModal() {
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CREW)) return showToast("Access Denied", "error");
+
             const newCrewId = await getNextId('crew');
             const jobOptions = JOB_TITLES.map(j => `<option value="${j}">${j}</option>`).join('');
             
@@ -1679,6 +1665,8 @@
         }
 
         async function saveCrew(newId) {
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CREW)) return showToast("Access Denied", "error");
+
             const name = document.getElementById('c-name').value;
             const email = document.getElementById('c-email').value;
             const pass = document.getElementById('c-pass').value;
@@ -1729,6 +1717,8 @@
         }
 
         function editCrew(uid) {
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CREW)) return showToast("Access Denied", "error");
+
             db.collection("users").doc(uid).get().then(doc => {
                 const u = doc.data();
                 const jobOptions = JOB_TITLES.map(j => `<option value="${j}" ${u.jobTitle===j?'selected':''}>${j}</option>`).join('');
@@ -1805,6 +1795,8 @@
         }
 
         async function updateCrewData(uid) {
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CREW)) return showToast("Access Denied", "error");
+
             const rateVal = parseFloat(document.getElementById('e-c-rate').value);
             
             const newPerms = {};
@@ -1838,15 +1830,12 @@
                 bypassApproval: bypassVal 
             };
 
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CREW, 'users', uid, data);
-            if(blocked) return;
-
             db.collection("users").doc(uid).update(data).then(() => { closeModal(); showToast("Crew details updated", "success"); logActivity(`Updated crew member details`); });
         }
 
         // --- 5. SUPPORT ---
         function renderSupport() {
-            const canDelete = hasPermission(PERMISSION_KEYS.DELETE_SUPPORT);
+            const canDelete = checkAccessOrActionAllowed(PERMISSION_KEYS.DELETE_SUPPORT);
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <button class="btn btn-secondary" onclick="openCreateTicket()"><i class="ri-add-line"></i> Create New Ticket</button>
@@ -1924,20 +1913,20 @@
         }
         
         async function saveTicketDetails(id) {
+            // No specific permission for ticket updates other than being logged in crew/admin, 
+            // but let's enforce order edit permission as a proxy for "manage operations" or just allow general crew.
+            // Assuming general crew access is fine.
             const data = {
                 status: document.getElementById('tk-status').value,
                 assignedTo: document.getElementById('tk-assign').value || null,
                 assignedToName: document.getElementById('tk-assign').value ? document.getElementById('tk-assign').options[document.getElementById('tk-assign').selectedIndex].text : ""
             };
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_ORDERS, 'tickets', id, data);
-            if(blocked) return;
-
             db.collection("tickets").doc(id).update(data).then(() => { closeModal(); showToast("Ticket Updated", "success"); logActivity(`Updated Ticket #${id}`); });
         }
 
         // --- 6. VOUCHERS ---
         async function renderVouchers() {
-            const canEdit = hasPermission(PERMISSION_KEYS.EDIT_VOUCHERS);
+            const canEdit = checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_VOUCHERS);
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
                     <h3 style="font-size:1.25rem; font-weight:800;">Voucher Management</h3>
@@ -2030,6 +2019,8 @@
             if(movedCount > 0) showToast(`Synced ${movedCount} vouchers to history`, "success");
         }
         function editVoucher(uid, code) {
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_VOUCHERS)) return showToast("Access Denied", "error");
+
             db.collection("users").doc(uid).get().then(doc => {
                 const v = doc.data().personalVoucher;
                 const exp = v.expiryDate ? new Date(v.expiryDate.seconds*1000).toISOString().split('T')[0] : '';
@@ -2043,6 +2034,8 @@
             });
         }
         async function saveEditVoucher(uid) {
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_VOUCHERS)) return showToast("Access Denied", "error");
+
             const newCode = document.getElementById('e-v-code').value.toUpperCase();
             const newStatus = document.getElementById('e-v-status').value;            
             db.collection("users").doc(uid).get().then(doc => {
@@ -2054,11 +2047,7 @@
                     expiryDate: document.getElementById('e-v-exp').value ? new Date(document.getElementById('e-v-exp').value) : null, 
                     status: newStatus 
                 };
-                checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_VOUCHERS, 'users', uid, { personalVoucher: data })
-                .then(blocked => {
-                    if(blocked) return;
-                    db.collection("users").doc(uid).update({ personalVoucher: data }).then(() => { closeModal(); showToast("Voucher Updated", "success"); logActivity(`Edited voucher ${newCode}`); });
-                });
+                db.collection("users").doc(uid).update({ personalVoucher: data }).then(() => { closeModal(); showToast("Voucher Updated", "success"); logActivity(`Edited voucher ${newCode}`); });
             });
         }
         async function markRedeem(uid, code) {
@@ -2082,6 +2071,8 @@
             logActivity(`Disabled voucher ${code}`);
         }
         function openAssignVoucherModal(uid, userName) {
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_VOUCHERS)) return showToast("Access Denied", "error");
+
             const promise = uid ? Promise.resolve(null) : db.collection("users").where("role", "==", "user").get();
             promise.then(snap => {
                 let userSelect = '';
@@ -2111,9 +2102,6 @@
                     auditLog: [{ action: 'Created', by: userData.email, date: new Date().toISOString() }] 
                 }
             };
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_VOUCHERS, 'users', uid, data);
-            if(blocked) return;
-
             db.collection("users").doc(uid).update(data).then(() => { closeModal(); showToast(`Voucher ${code} Assigned!`, "success"); logActivity(`Assigned voucher ${code}`); });
         }
         function restoreVoucher(code, ownerUid) {
@@ -2128,7 +2116,7 @@
 
         // --- 7. CONTENT & PACKAGES ---
         function renderContent() {
-            const canEdit = hasPermission(PERMISSION_KEYS.EDIT_CONTENT);
+            const canEdit = checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CONTENT);
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:800;">Content & Packages</h2>
@@ -2155,6 +2143,8 @@
             });
         }
         async function saveContentChanges() {
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CONTENT)) return showToast("Access Denied", "error");
+
             const frontendLines = document.getElementById('content-frontend').value.split('\n').filter(l => l.trim() !== '');
             const aiLines = document.getElementById('content-ai').value.split('\n').filter(l => l.trim() !== '');
             const data = {
@@ -2163,9 +2153,6 @@
                     ai: { features: aiLines }
                 }
             };
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CONTENT, 'config', 'site_settings', data);
-            if(blocked) return;
-
             const btn = document.querySelector('button[onclick="saveContentChanges()"]');
             const originalHTML = btn.innerHTML;
             btn.innerHTML = `<div class="loading-spinner" style="width:16px; height:16px; border-width:2px;"></div> Saving...`;
@@ -2178,7 +2165,7 @@
 
         // --- 8. CONFIG ---
         function renderConfig() {
-            const canEdit = hasPermission(PERMISSION_KEYS.EDIT_CONFIG);
+            const canEdit = checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CONFIG);
             document.getElementById('main').innerHTML = `
                 <h2 style="font-size:1.25rem; font-weight:800; margin-bottom:1.5rem;">System Configuration</h2>
                 <div class="config-section">
@@ -2250,55 +2237,54 @@
             });
         }
         async function toggleMaintenance() { 
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CONFIG)) return showToast("Access Denied", "error");
+
             const isActive = document.getElementById('maint-toggle').checked;
             const data = { maintenance_active: isActive };
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CONFIG, 'config', 'site_settings', data);
-            if(blocked) return;
-
             db.collection("config").doc("site_settings").update(data).then(() => { showToast(`Maintenance Mode ${isActive ? 'Enabled' : 'Disabled'}`, isActive?'warning':'success'); logActivity(`Toggled maintenance mode to ${isActive}`); });
         }
         async function saveMaintMsg() { 
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CONFIG)) return showToast("Access Denied", "error");
+
             const data = { maintenance_message: document.getElementById('maint-msg').value };
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CONFIG, 'config', 'site_settings', data);
-            if(blocked) return;
             db.collection("config").doc("site_settings").update(data).then(() => showToast("Message Saved", "success")); 
         }
         async function savePrice(key, elemId) { 
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CONFIG)) return showToast("Access Denied", "error");
+
             const theVal = parseFloat(document.getElementById(elemId).value);
             if(!theVal) return showToast("Invalid price", "error");
             const data = { [`prices.${key}`]:theVal };
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CONFIG, 'config', 'site_settings', data);
-            if(blocked) return;
             db.collection("config").doc("site_settings").update(data).then(() => showToast("Price Updated", "success"));
         }
         function addGateway() { 
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CONFIG)) return showToast("Access Denied", "error");
+
             showModal("Add Payment Gateway", `<label>Gateway Name</label><input id="gw-name" class="mb-4"><label>Payment Link / URL</label><input id="gw-link" class="mb-4">`, `<button class="btn btn-primary" onclick="saveNewGateway()">Add</button>`); 
         }
         async function saveNewGateway() { 
             const name = document.getElementById('gw-name').value; 
             const link = document.getElementById('gw-link').value;
             const data = { name, link, active: true };
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CONFIG, 'payment_methods', null, data);
-            if(blocked) return;
-            
             await db.collection("payment_methods").add(data); 
             closeModal(); 
             showToast("Gateway Added", "success"); 
             logActivity(`Added payment gateway: ${name}`);
         }
         function editGateway(docId) { 
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CONFIG)) return showToast("Access Denied", "error");
+
             db.collection("payment_methods").doc(docId).get().then(doc => { 
                 const gw = doc.data(); 
                 showModal("Edit Payment Gateway", `<label>Gateway Name</label><input id="e-gw-name" value="${gw.name}" class="mb-4"><label>Payment Link / URL</label><input id="e-gw-link" value="${gw.link}" class="mb-4">`, `<button class="btn btn-primary" onclick="saveEditedGateway('${docId}')">Save</button>`); 
             }); 
         }
         async function saveEditedGateway(docId) { 
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CONFIG)) return showToast("Access Denied", "error");
+
             const name = document.getElementById('e-gw-name').value; 
             const link = document.getElementById('e-gw-link').value;
             const data = { name, link };
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CONFIG, 'payment_methods', docId, data);
-            if(blocked) return;
-            
             await db.collection("payment_methods").doc(docId).update(data); 
             closeModal(); 
             renderConfig(); 
@@ -2306,26 +2292,25 @@
             logActivity(`Edited payment gateway: ${name}`);
         }
         async function toggleGatewayStatus(docId) { 
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CONFIG)) return showToast("Access Denied", "error");
+
             const docRef = await db.collection("payment_methods").doc(docId).get(); 
             const currentStatus = docRef.data().active;
             const data = { active: !currentStatus };
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CONFIG, 'payment_methods', docId, data);
-            if(blocked) return;
-            
             await db.collection("payment_methods").doc(docId).update(data); 
             renderConfig(); 
         }
         async function deleteGateway(docId) { 
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CONFIG)) return showToast("Access Denied", "error");
+
             if(!confirm("Delete gateway?")) return; 
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_CONFIG, 'payment_methods', docId, null, true);
-            if(blocked) return;
             await db.collection("payment_methods").doc(docId).delete(); 
             renderConfig(); 
         }
 
         // --- 9. PORTFOLIO ---
         function renderPortfolio() {
-            const canEdit = hasPermission(PERMISSION_KEYS.EDIT_PORTFOLIO);
+            const canEdit = checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_PORTFOLIO);
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:800;">Client Portfolio</h2>
@@ -2360,6 +2345,8 @@
             });
         }
         function openAddPortfolioModal() { 
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_PORTFOLIO)) return showToast("Access Denied", "error");
+
             const initialId = generateDocIdFromName('');
             showModal("Add New Project", `
                 <div class="mb-4"><label>Project Name</label><input type="text" id="p-name" placeholder="e.g. Clinic Azam" oninput="updateDocIdPreview()"><small style="color:var(--text-faint)">ID will be generated from name</small></div>
@@ -2370,6 +2357,8 @@
             `, `<button class="btn btn-primary" onclick="saveNewPortfolio()">Create Project</button>`); 
         }
         async function saveNewPortfolio() { 
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_PORTFOLIO)) return showToast("Access Denied", "error");
+
             const name = document.getElementById('p-name').value; 
             const img = document.getElementById('p-img').value; 
             const link = document.getElementById('p-link').value; 
@@ -2377,11 +2366,11 @@
             const customId = document.getElementById('p-doc-id').value;
             if(!name || !img || !link) return showToast("Please fill in all fields.", "error");
             const data = { name, img, link, status, timestamp: firebase.firestore.FieldValue.serverTimestamp() };
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_PORTFOLIO, 'clients_portfolio', customId, data);
-            if(blocked) return;
             db.collection("clients_portfolio").doc(customId).set(data).then(() => { closeModal(); showToast("Project added successfully", "success"); logActivity(`Added portfolio project: ${name} (ID: ${customId})`); }).catch(err => { showToast("Error: " + err.message, "error"); }); 
         }
         function editPortfolio(docId) { 
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_PORTFOLIO)) return showToast("Access Denied", "error");
+
             db.collection("clients_portfolio").doc(docId).get().then(doc => {
                 const p = doc.data();
                 showModal("Edit Project", `
@@ -2393,37 +2382,33 @@
             });
         }
         async function updatePortfolio(docId) { 
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_PORTFOLIO)) return showToast("Access Denied", "error");
+
             const updates = { 
                 name: document.getElementById('e-p-name').value, 
                 img: document.getElementById('e-p-img').value, 
                 link: document.getElementById('e-p-link').value, 
                 status: document.getElementById('e-p-status').checked 
             };
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_PORTFOLIO, 'clients_portfolio', docId, updates);
-            if(blocked) return;
             db.collection("clients_portfolio").doc(docId).update(updates).then(() => { closeModal(); showToast("Project updated", "success"); logActivity(`Updated portfolio project: ${updates.name}`); }).catch(err => { showToast("Error updating: " + err.message, "error"); }); 
         }
         function togglePortfolioStatus(docId, newStatus) { 
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_PORTFOLIO)) return showToast("Access Denied", "error");
+
             const data = { status: newStatus };
-            checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_PORTFOLIO, 'clients_portfolio', docId, data)
-            .then(blocked => {
-                if(blocked) return;
-                const action = newStatus ? "Activated" : "Deactivated";
-                db.collection("clients_portfolio").doc(docId).update(data).then(() => { showToast(`Project ${action}`, "info"); logActivity(`${action} portfolio project`); });
-            });
+            const action = newStatus ? "Activated" : "Deactivated";
+            db.collection("clients_portfolio").doc(docId).update(data).then(() => { showToast(`Project ${action}`, "info"); logActivity(`${action} portfolio project`); });
         }
         function deletePortfolio(docId) { 
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_PORTFOLIO)) return showToast("Access Denied", "error");
+
             if(!confirm("Are you sure you want to delete this project?")) return; 
-            checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_PORTFOLIO, 'clients_portfolio', docId, null)
-            .then(blocked => {
-                if(blocked) return;
-                db.collection("clients_portfolio").doc(docId).delete().then(() => { showToast("Project deleted", "success"); logActivity(`Deleted portfolio project`); }).catch(err => { showToast("Error deleting: " + err.message, "error"); }); 
-            });
+            db.collection("clients_portfolio").doc(docId).delete().then(() => { showToast("Project deleted", "success"); logActivity(`Deleted portfolio project`); }).catch(err => { showToast("Error deleting: " + err.message, "error"); }); 
         }
 
         // --- 10. CUSTOMER REQUESTS ---
         function renderRequests() {
-            const canDelete = hasPermission(PERMISSION_KEYS.DELETE_REQUESTS);
+            const canDelete = checkAccessOrActionAllowed(PERMISSION_KEYS.DELETE_REQUESTS);
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:800;">Customer Requests</h2>
@@ -2486,31 +2471,26 @@
             });
         }
         function updateRequestStatus(id, newStatus = null, fromModal = false) {
+            // Request update doesn't have a specific perm in the list, assuming general crew access is allowed
             const statusToSet = newStatus || document.getElementById('req-status-select').value;
             const data = { status: statusToSet };
-            
-            checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_ORDERS, 'customer_requests', id, data)
-            .then(blocked => {
-                if(blocked) {
-                    if(fromModal) closeModal();
-                    return;
-                }
-                db.collection("customer_requests").doc(id).update(data).then(() => {
-                    if(fromModal) closeModal();
-                    showToast("Request Status Updated", "success");
-                    logActivity(`Updated request status to ${statusToSet}`);
-                }).catch(err => { showToast("Error updating: " + err.message, "error"); });
-            });
+            db.collection("customer_requests").doc(id).update(data).then(() => {
+                if(fromModal) closeModal();
+                showToast("Request Status Updated", "success");
+                logActivity(`Updated request status to ${statusToSet}`);
+            }).catch(err => { showToast("Error updating: " + err.message, "error"); });
         }
         function deleteItem(collection, id) {
-            if(!hasPermission(PERMISSION_KEYS.APPROVE_ACTIONS)) return showToast("Access Denied. Only Founder/SuperAdmin can delete.", "error");
+            // Delete permission varies by type (support, requests)
+            // Simplified for this check
+            if(!hasPermission(PERMISSION_KEYS.DELETE_REQUESTS) && !hasPermission(PERMISSION_KEYS.DELETE_SUPPORT)) return showToast("Access Denied.", "error");
             if(!confirm("Delete this item permanently?")) return;
             db.collection(collection).doc(id).delete().then(() => { showToast("Item deleted", "success"); logActivity(`Deleted item from ${collection}`); });
         }
 
         // --- 11. PUBLIC PROMO CODES ---
         function renderPublicPromos() {
-            const canEdit = hasPermission(PERMISSION_KEYS.EDIT_PROMOS);
+            const canEdit = checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_PROMOS);
             document.getElementById('main').innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:800;">Public Promo Codes</h2>
@@ -2544,22 +2524,23 @@
             });
         }
         function addPublicPromo() { 
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_PROMOS)) return showToast("Access Denied", "error");
+
             showModal("Add Public Promo Code", `<div class="mb-4"><label>Promo Code (ID)</label><input type="text" id="pub-promo-code" placeholder="e.g. WELCOME10" style="text-transform:uppercase;"><small class="text-muted">Users will enter this exact code.</small></div><div class="mb-4"><label>Discount Percentage</label><input type="number" id="pub-promo-discount" placeholder="0.1 for 10%"><small class="text-muted">Decimal (e.g., 0.10 = 10%)</small></div>`, `<button class="btn btn-primary" onclick="savePublicPromo()">Create Code</button>`); 
         }
         async function savePublicPromo() { 
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_PROMOS)) return showToast("Access Denied", "error");
+
             const code = document.getElementById('pub-promo-code').value.trim().toUpperCase(); 
             const discount = parseFloat(document.getElementById('pub-promo-discount').value);
             if(!code || isNaN(discount)) return showToast("Invalid Input", "error");
             const data = { discount: discount };
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_PROMOS, 'promo_codes', code, data);
-            if(blocked) return;
-
             try { await db.collection("promo_codes").doc(code).set(data); closeModal(); showToast("Promo Code Created", "success"); logActivity(`Created public promo code: ${code}`); } catch(e) { showToast("Error: " + e.message, "error"); } 
         }
         async function deletePublicPromo(code) { 
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_PROMOS)) return showToast("Access Denied", "error");
+
             if(!confirm(`Delete promo code ${code}?`)) return; 
-            const blocked = await checkAccessOrRequestApproval(PERMISSION_KEYS.EDIT_PROMOS, 'promo_codes', code, null, true);
-            if(blocked) return;
             try { await db.collection("promo_codes").doc(code).delete(); showToast("Promo Code Deleted", "success"); logActivity(`Deleted public promo code: ${code}`); } catch(e) { showToast("Error deleting: " + e.message, "error"); } 
         }
 
