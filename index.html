@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HQ-DDNetwork-portal.v2.6</title>
+    <title>HQ-DDNetwork-portal.v2.5</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2541,23 +2541,23 @@
             const main = document.getElementById('main');
             if(!main) return;
 
-            // Check if user is Crew
-            const isCrewUser = isCrew();
-            
-            // Check if user has Finance Access (SuperAdmin, MidAdmin, Finance Manager)
-            const canManageFinance = canAccessFinanceTools();
+            // CRITICAL FIX: Logic changed to 'Can I Manage Finance?'
+            // If YES (SuperAdmin/MidAdmin/Finance) -> See Everyone
+            // If NO (Admin/Crew) -> See Only Self
+            const canManageFinance = canAccessFinanceTools(); 
+            const isMyView = !canManageFinance; // If I can't manage, it's my personal view.
 
             // ACCESS DENIED LOGIC
-            // If Crew AND (NOT Finance Access AND NOT Crew) -> Deny
-            if(!canManageFinance && !isCrewUser) {
-                main.innerHTML = `<div class="access-denied-container"><div class="access-denied-title">Access Denied</div><div class="access-denied-desc">You do not have permission to view this page.</div></div>`;
+            // If neither a Finance Manager NOR a user with a valid ID
+            if(!canManageFinance && (!currentUser || !currentUser.uid)) {
+                main.innerHTML = `<div class="access-denied-container"><div class="access-denied-title">Access Denied</div><div class="access-denied-desc">You are not logged in or do not have access.</div></div>`;
                 return;
             }
 
-            // Determine Colspan for empty rows based on columns shown
-            // Admin: Ref, Date, Crew, Status, Amount, PaidDate, PaidBy, Actions (8 cols)
-            // Crew: Ref, Date, Status, Amount, PaidDate, PaidBy (6 cols)
-            const colCount = isCrewUser ? 6 : 8;
+            // Determine Colspan based on columns shown
+            // Manager View (See All): Ref, Date, Crew, Status, Amount, PaidDate, PaidBy, Actions (8 cols)
+            // My View (See Self): Ref, Date, Status, Amount, PaidDate, PaidBy (6 cols)
+            const colCount = isMyView ? 6 : 8;
 
             main.innerHTML = `
                 <div class="flex justify-between items-center mb-4">
@@ -2575,14 +2575,14 @@
                             <div class="stat-icon" style="color:var(--success); background:#ecfdf5"><i class="ri-money-dollar-circle-line"></i></div>
                             <div class="stat-info">
                                 <div class="stat-val" id="comm-total-earnings">RM 0.00</div>
-                                <div class="stat-label">${isCrewUser ? 'My Total Earnings' : 'Total Payouts'}</div>
+                                <div class="stat-label">${isMyView ? 'My Total Earnings' : 'Total Payouts'}</div>
                             </div>
                         </div>
                     </div>
 
                     <div class="table-container">
                         <div class="table-header">
-                            <h3>${isCrewUser ? 'My Commissions' : 'Commission Overview'}</h3>
+                            <h3>${isMyView ? 'My Commissions' : 'Commission Overview'}</h3>
                         </div>
                         <div class="table-responsive">
                             <table>
@@ -2590,12 +2590,12 @@
                                     <tr>
                                         <th>Reference</th>
                                         <th>Date</th>
-                                        ${!isCrewUser ? '<th>Crew Member</th>' : ''} 
+                                        ${!isMyView ? '<th>Crew Member</th>' : ''} 
                                         <th>Status</th>
                                         <th>Commission Amount</th>
                                         <th>Paid Date</th>
                                         <th>Paid By</th>
-                                        ${canManageFinance && !isCrewUser ? '<th>Actions</th>' : ''}
+                                        ${!isMyView ? '<th>Actions</th>' : ''}
                                     </tr>
                                 </thead>
                                 <tbody id="comm-tbody">
@@ -2626,7 +2626,7 @@
             `;
             
             // Initial Load
-            updateCommissionView();
+            updateCommissionView(isMyView);
         }
 
         function switchFinanceTab(tabName) {
@@ -2638,12 +2638,13 @@
 
             // Reload data when switching to commission tab
             if(tabName === 'commission') {
-                updateCommissionView();
+                // Re-calculate isMyView to be sure
+                const isMyView = !canAccessFinanceTools();
+                updateCommissionView(isMyView);
             }
         }
 
-        async function updateCommissionView() {
-            const isCrewUser = isCrew();
+        async function updateCommissionView(isMyView) {
             const tbody = document.getElementById('comm-tbody');
             const totalEl = document.getElementById('comm-total-earnings');
             
@@ -2651,19 +2652,19 @@
 
             // FIX: Ensure User is Authenticated
             if (!currentUser || !currentUser.uid) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Authentication Error. Please reload.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Authentication Error. Please login.</td></tr>`;
                 return;
             }
 
-            // Determine Colspan based on visibility
-            const colCount = isCrewUser ? 6 : 8;
+            // Determine Colspan
+            const colCount = isMyView ? 6 : 8;
 
             // Setup Query
             let query = db.collection("commission_overview").orderBy("orderDate", "desc");
 
-            // FIX: If Crew, STRICTLY filter by current user's UID
-            // Super Admin/Mid Admin see all by default (no where clause)
-            if(isCrewUser) {
+            // FIX: Logic to filter strictly for NON-Managers (Admin, Crew, etc.)
+            // If isMyView is true (User is Admin or Crew), we MUST filter by their UID.
+            if (isMyView) {
                 query = query.where("crewId", "==", currentUser.uid);
             }
 
@@ -2700,11 +2701,9 @@
                     const paidDateDisplay = d.paidAt ? formatDateTime(d.paidAt) : '-';
                     const paidByDisplay = d.paidBy ? d.paidBy : '-';
 
-                    const canManageFinance = canAccessFinanceTools();
-                    
-                    // Actions (Only for Admins/Mid-Admins, NOT Crew)
+                    // Actions (Only for Managers, NOT for Admin/Crew)
                     let actionsHTML = '';
-                    if(!isCrewUser && canManageFinance) {
+                    if(!isMyView && canAccessFinanceTools()) {
                         actionsHTML = `
                             <button class="btn btn-sm ${status==='paid'?'btn-secondary':'btn-success'}" onclick="markCommissionPaid('${doc.id}', '${d.crewId}')" title="${status==='paid'?'Mark Unpaid':'Mark Paid'}">
                                 <i class="${status==='paid'?'ri-arrow-go-back-line':'ri-checkbox-circle-line'}"></i> ${status==='paid'?'Undo':'Pay'}
@@ -2715,16 +2714,16 @@
                         `;
                     }
 
-                    // Column: Crew Member (Only show if Admin)
-                    const crewMemberCol = !isCrewUser 
+                    // Column: Crew Member (Only show if Manager View)
+                    const crewMemberCol = !isMyView 
                         ? `<td style="font-weight:600;">${d.crewName}</td>` 
                         : '';
 
-                    // Column: Commission Amount (Visible to ALL)
+                    // Column: Commission Amount
                     const amountCol = `<td style="font-weight:700;">RM ${d.amount.toFixed(2)}</td>`;
 
-                    // Column: Actions (Only if Admin)
-                    const actionColHTML = (!isCrewUser) ? `<td>${actionsHTML}</td>` : '';
+                    // Column: Actions (Only if Manager View)
+                    const actionColHTML = (!isMyView) ? `<td>${actionsHTML}</td>` : '';
 
                     return `<tr>
                         <td class="font-mono text-sm">${orderRef}</td>
@@ -2738,63 +2737,24 @@
                     </tr>`;
                 }).join('');
 
-                // Update the Total Card
+                // Update Total Card
                 if(totalEl) totalEl.innerText = `RM ${totalSum.toFixed(2)}`;
 
             } catch (error) {
                 console.error("Error loading commissions:", error);
-                // Helpful error message for debugging
+                // Detailed Error Display
                 let errorMsg = "Error loading data.";
+                
                 if(error.code === 'permission-denied') {
-                    errorMsg = "Permission Denied. Ask Admin to update Firestore Rules.";
+                    errorMsg = "Permission Denied. You do not have access to view commissions.";
+                } else if (error.code === 'failed-precondition') {
+                    errorMsg = "Database Index Missing. (Ask Dev to create index for commission_overview)";
+                } else {
+                    errorMsg = `Error: ${error.message}`;
                 }
+                
                 tbody.innerHTML = `<tr><td colspan="${colCount}" class="text-center text-danger">${errorMsg}</td></tr>`;
                 showToast(errorMsg, "error");
-            }
-        }
-
-        async function markCommissionPaid(docId, crewId) {
-            if(!canAccessFinanceTools()) return showToast("Access Denied", "error");
-            
-            const docRef = db.collection("commission_overview").doc(docId);
-            const docSnap = await docRef.get();
-            if(!docSnap.exists) return;
-
-            const currentStatus = docSnap.data().status || 'unpaid';
-            const newStatus = currentStatus === 'unpaid' ? 'paid' : 'unpaid';
-            const paidData = newStatus === 'paid' 
-                ? { status: newStatus, paidAt: firebase.firestore.FieldValue.serverTimestamp(), paidBy: userData.name }
-                : { status: newStatus, paidAt: null, paidBy: null };
-            
-            try {
-                await docRef.update(paidData);
-                showToast(`Marked as ${newStatus}`, "success");
-                logActivity(`Updated commission status to ${newStatus} for ${crewId}`);
-                updateCommissionView(); // Refresh
-            } catch(e) {
-                showToast("Error updating status", "error");
-            }
-        }
-
-        async function waCrewCommission(crewId, amount) {
-            if(!canAccessFinanceTools()) return showToast("Access Denied", "error");
-            
-            try {
-                const crewSnap = await db.collection("users").doc(crewId).get();
-                if(!crewSnap.exists) return showToast("Crew not found", "error");
-                const crewData = crewSnap.data();
-                const phone = crewData.phone;
-
-                if(!phone) return showToast("Crew has no phone number", "error");
-
-                let cleanPhone = phone.replace(/^0/, '60');
-                if(!cleanPhone.startsWith('+')) cleanPhone = '+' + cleanPhone;
-
-                const msg = `Hi ${crewData.name}, this is Finance. Your commission of ${amount} has been processed. Please check your bank account.`;
-                window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
-            } catch(e) {
-                console.error(e);
-                showToast("Error fetching crew details", "error");
             }
         }
 
