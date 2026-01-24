@@ -495,7 +495,6 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- JAVASCRIPT -->
-        <!-- JAVASCRIPT -->
 <script>
         // --- CONSTANTS & CONFIG ---
         const JOB_TITLES = [
@@ -552,38 +551,25 @@
         };
 
         // --- IMPROVED PERMISSION SYSTEM ---
-        // Added more granular keys for better access control
         const PERMISSION_KEYS = {
-            // Order & Client Management
             EDIT_ORDERS: 'edit_orders',
             EDIT_CLIENTS: 'edit_clients',
             VIEW_FINANCE: 'view_finance',
-            
-            // Ticket & Request Management
             DELETE_REQUESTS: 'delete_requests',
             DELETE_SUPPORT: 'delete_support',
-            APPROVE_REQUESTS: 'approve_requests', // New
-            
-            // Content & CMS
+            APPROVE_REQUESTS: 'approve_requests', 
             EDIT_VOUCHERS: 'edit_vouchers',
             EDIT_PORTFOLIO: 'edit_portfolio',
             EDIT_CONTENT: 'edit_content',
             EDIT_PROMOS: 'edit_promos',
-            
-            // System & User Management
             EDIT_CREW: 'edit_crew',
             EDIT_CONFIG: 'edit_config',
-            MANAGE_USERS: 'manage_users', // New
-            
-            // Finance Tools
+            MANAGE_USERS: 'manage_users', 
             FINANCE_TOOLS_ACCESS: 'finance_tools_access',
-            
-            // Approvals & System
             APPROVE_ACTIONS: 'approve_actions', 
             BYPASS_APPROVAL: 'bypass_approval'
         };
 
-        // Helper to get default rate
         function getDefaultRate(title) { return DEFAULT_COMMISSION_RATES[title] || 0.0; }
 
         // --- FIREBASE SETUP ---
@@ -596,7 +582,7 @@
             appId: "1:699127560990:web:50cfd61ff620bc85fb670f"
         };
         let db, auth, currentUser, userData = null;
-        let rawFinanceData = []; // Cache for filtering
+        let rawFinanceData = []; 
         
         try { 
             firebase.initializeApp(firebaseConfig); 
@@ -739,8 +725,34 @@
                         
                         document.getElementById('side-name').innerText = userData.name || 'User';
                         document.getElementById('side-job').innerText = `${userData.jobTitle} (${userData.role.toUpperCase()})`;
-                        document.getElementById('side-avatar').innerText = (userData.name || 'A').charAt(0).toUpperCase();
-                        document.getElementById('header-avatar').innerText = (userData.name || 'A').charAt(0).toUpperCase();
+                        
+                        // --- HEADER UPDATE (Name & Location) ---
+                        const userInitial = (userData.name || 'A').charAt(0).toUpperCase();
+                        const workLoc = userData.workLocation || 'HQ';
+                        const headerActions = document.querySelector('.header-actions');
+                        
+                        // Update Header with Name and Location
+                        // We replace the static avatar div with a flex container
+                        const profileHTML = `
+                            <div class="flex items-center gap-2">
+                                <div style="text-align:right; line-height:1.2;">
+                                    <div style="font-weight:700; font-size:0.85rem; color:var(--text-main);">${userData.name}</div>
+                                    <div style="font-size:0.7rem; color:var(--text-muted); font-weight:500; text-transform:uppercase;">${workLoc}</div>
+                                </div>
+                                <div class="u-avatar" style="width:32px; height:32px; font-size:0.85rem;">${userInitial}</div>
+                            </div>
+                        `;
+                        // Find and replace the avatar in the header
+                        const oldAvatar = headerActions.querySelector('#header-avatar');
+                        if(oldAvatar) {
+                            const container = document.createElement('div');
+                            container.innerHTML = profileHTML;
+                            headerActions.insertBefore(container, oldAvatar);
+                            oldAvatar.remove();
+                        }
+
+                        // Sidebar Info
+                        document.getElementById('side-avatar').innerText = userInitial;
 
                         if(hasPermission(PERMISSION_KEYS.APPROVE_ACTIONS)) {
                             document.getElementById('nav-approvals').classList.remove('hidden');
@@ -851,19 +863,16 @@
 
         function hasPermission(key) {
             if(!userData) return false;
-            // Explicit permission check
             if (userData.permissions && userData.permissions[key] === true) return true;
             return false;
         }
         
-        // Check if user can manage finances (Explicit perm + Role check)
         function canAccessFinanceTools() {
             if(isSuperAdmin() || isMidAdmin() || isFinanceManager()) return true;
             if(hasPermission(PERMISSION_KEYS.FINANCE_TOOLS_ACCESS)) return true;
             return false;
         }
 
-        // Central check for Edit Actions
         function checkAccessOrActionAllowed(permissionKey) {
             if(!userData) return false; 
             if (isSuperAdmin() || userData.bypassApproval === true) return true;
@@ -937,6 +946,15 @@
             } else {
                 navigateTo('/');
             }
+            
+            // Ensure Sidebar is Open by default on Desktop load
+            if(window.innerWidth > 1024) {
+                 const sb = document.getElementById('sidebar');
+                 const mn = document.getElementById('main');
+                 // Reset to default CSS values if needed (optional, but ensures consistency)
+                 sb.style.width = '';
+                 mn.style.marginLeft = '';
+            }
         }
 
         window.onpopstate = (event) => {
@@ -947,10 +965,24 @@
 
         function toggleSidebar() { 
             const sb = document.getElementById('sidebar');
+            const mn = document.getElementById('main');
             const ov = document.getElementById('sidebarOverlay');
-            // Desktop (> 1024px): Toggle Full Close/Close
+            
+            // Desktop (> 1024px): Total Hide Logic
             if(window.innerWidth > 1024) {
-                sb.classList.toggle('collapsed'); // 'collapsed' now translates to -100% (full hide)
+                // Check current width to determine state
+                const isClosed = sb.style.width === '0px';
+                
+                if (isClosed) {
+                    // OPEN: Restore default CSS width and margin
+                    sb.style.width = 'var(--sidebar-width)';
+                    mn.style.marginLeft = 'var(--sidebar-width)';
+                } else {
+                    // CLOSE: Total Hide
+                    sb.style.width = '0px';
+                    sb.style.overflow = 'hidden';
+                    mn.style.marginLeft = '0px';
+                }
             } 
             // Mobile: Slide in/out
             else {
@@ -1204,13 +1236,11 @@
                 const orderRef = id.substring(0,6).toUpperCase();
 
             let msg = "";
-            // 1. Pending Payment Reminder (For Pending/Cancelled/No Status orders)
             if (d.status === "Pending" || d.status === "Cancelled" || !d.status) {
-                msg = `Hi ${d.customerName},\n\nThis is a friendly reminder that we are still awaiting payment for your recent order with DDNetwork.\n\nOrder ID: #${orderRef}\nAmount: ${d.total}\n\nPlease proceed with the payment at your convenience so we can continue processing your order. If you’ve already made the payment, kindly ignore this message.\n\nThank you for your support.\n\n[Auto-generated from DDNet System]`;
+                msg = `Hi ${d.customerName},\n\nThis is a friendly reminder that we are still awaiting payment for your recent order with DDNetwork.\n\nOrder ID: #${orderRef}\nAmount: ${d.total}\n\nPlease proceed with payment at your convenience so we can continue processing your order. If you’ve already made the payment, kindly ignore this message.\n\nThank you for your support.\n\n[Auto-generated from DDNet System]`;
             } 
-            // Default fallback for other statuses
             else { 
-                msg = `Hi ${d.customerName},\n\nWe noticed that the payment for your recent order with DDNetwork was not completed successfully.\n\nOrder ID: #${orderRef}\nOutstanding Amount: ${d.total}\n\nTo avoid any delay or cancellation, please complete the payment as soon as possible. If you encountered any issues during payment, let us know and we will assist you.\n\nThank you for your understanding.\n\n[Auto-generated from DDNet System]`;
+                msg = `Hi ${d.customerName},\n\nWe noticed that payment for your recent order with DDNetwork was not completed successfully.\n\nOrder ID: #${orderRef}\nOutstanding Amount: ${d.total}\n\nTo avoid any delay or cancellation, please complete the payment as soon as possible. If you encountered any issues during payment, let us know and we will assist you.\n\nThank you for your understanding.\n\n[Auto-generated from DDNet System]`;
             }
 
                 
@@ -1292,9 +1322,8 @@
             `, `<button class="btn btn-primary" onclick="updateOrderDetails('${id}')">Save Changes</button>`);
         }
 
-        // --- COMMISSION GENERATION LOGIC (Core Logic - Updated for 'commission_overview') ---
+        // --- COMMISSION GENERATION LOGIC ---
         async function generateCommissionsForOrder(orderId, orderData) {
-            // 1. Delete existing commissions for this order to prevent dupes on updates
             const existingCommSnap = await db.collection("commission_overview").where("orderId", "==", orderId).get();
             const batch = db.batch();
             existingCommSnap.forEach(doc => {
@@ -1302,7 +1331,6 @@
             });
             await batch.commit();
 
-            // 2. If there are sales reps assigned, create new records
             if(orderData.salesRepIds && orderData.salesRepIds.length > 0) {
                 const commBatch = db.batch();
                 
@@ -1328,7 +1356,7 @@
                             crewName: rep.name,
                             amount: parseFloat(amount.toFixed(2)),
                             orderDate: orderDate,
-                            status: 'unpaid', // Default to unpaid until Finance approves
+                            status: 'unpaid', 
                             paidAt: null,
                             paidBy: null,
                             createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -1360,14 +1388,11 @@
             const selectedIds = Array.from(checkboxes).map(cb => cb.value);
             updateData.salesRepIds = selectedIds;
 
-            // 1. Update Order
             await db.collection("orders").doc(id).update(updateData);
             
-            // 2. Refresh doc to get full data with timestamp
             const freshDoc = await db.collection("orders").doc(id).get();
             const freshData = freshDoc.data();
 
-            // 3. Logic: If Paid, generate commissions in 'commission_overview'
             if(freshData.status === 'Paid') {
                 await generateCommissionsForOrder(id, freshData);
             }
@@ -1461,7 +1486,7 @@
             if(confirm(`Send reset email to ${email}?`)) { auth.sendPasswordResetEmail(email).then(() => showToast("Reset email sent", "success")); }
         }
 
-        // --- 4. CREW MANAGEMENT (UPDATED) ---
+        // --- 4. CREW MANAGEMENT ---
         function renderCrew() {
             const main = document.getElementById('main');
             if(!main) return;
@@ -1559,7 +1584,6 @@
             `, `<button class="btn btn-primary" onclick="saveCrew('${newCrewId}')">Create Crew</button>`);
         }
 
-        // --- AUTOMATED ROLE & RATE LOGIC ---
         function autoSetRoleAndRate() {
             const title = document.getElementById('c-job').value;
             const roleInput = document.getElementById('c-role');
@@ -1576,7 +1600,7 @@
 
             const name = document.getElementById('c-name').value;
             const email = document.getElementById('c-email').value;
-            const phone = document.getElementById('c-phone').value; // Added Phone
+            const phone = document.getElementById('c-phone').value; 
             const pass = document.getElementById('c-pass').value;
             const job = document.getElementById('c-job').value;
             const rateVal = parseFloat(document.getElementById('c-rate').value);
@@ -1594,11 +1618,11 @@
                     crewId: newId,
                     name: name,
                     email: email,
-                    phone: phone, // Save Phone
+                    phone: phone, 
                     role: dbRole, 
                     jobTitle: job,
                     commissionRate: isNaN(rateVal) ? 0.0 : (rateVal / 100),
-                    workLocation: workLoc, // Save Work Location
+                    workLocation: workLoc, 
                     permissions: {},
                     bankDetails: bankDetails,
                     isSuspended: false,
@@ -1648,7 +1672,7 @@
                     [PERMISSION_KEYS.EDIT_CONTENT]: 'Edit Content',
                     [PERMISSION_KEYS.EDIT_PROMOS]: 'Edit Promos',
                     [PERMISSION_KEYS.EDIT_CONFIG]: 'Edit Config',
-                    [PERMISSION_KEYS.APPROVE_REQUESTS]: 'Approve Requests' // New
+                    [PERMISSION_KEYS.APPROVE_REQUESTS]: 'Approve Requests' 
                 })) {
                     const isChecked = userPerms[key] === true ? 'checked' : '';
                     permsHTML += `
@@ -1732,7 +1756,6 @@
             });
         }
 
-        // New Function to handle Auto-update in Edit Modal
         function autoSetEditRoleAndRate() {
             const title = document.getElementById('e-c-job').value;
             const roleSelect = document.getElementById('e-c-role');
@@ -1772,13 +1795,13 @@
                 crewId: document.getElementById('e-c-id').value,
                 name: document.getElementById('e-c-name').value,
                 email: document.getElementById('e-c-email').value,
-                phone: document.getElementById('e-c-phone').value, // Update Phone
+                phone: document.getElementById('e-c-phone').value, 
                 jobTitle: document.getElementById('e-c-job').value,
                 commissionRate: isNaN(rateVal) ? 0.0 : (rateVal / 100),
                 permissions: newPerms,
                 bankDetails: bankData,
                 bypassApproval: bypassVal,
-                workLocation: document.getElementById('e-c-work-loc').value // Update Work Location
+                workLocation: document.getElementById('e-c-work-loc').value 
             };
 
             if (isSuperAdmin()) {
@@ -2130,7 +2153,6 @@
             if(!main) return;
 
             const canEdit = checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CONFIG);
-            // Only Super Admin sees Maintenance toggles
             const isSA = isSuperAdmin(); 
 
             main.innerHTML = `
@@ -2196,7 +2218,6 @@
                 </div>
             `;
             
-            // Maintenance Data Loading
             if(isSA) {
                 const snap = await db.collection("config").doc("site_settings").get();
                 if(snap.exists) {
@@ -2246,10 +2267,8 @@
             });
         }
 
-        // Maintenance Functions
         async function toggleMaintenance() { 
             if(!isSuperAdmin()) return showToast("Access Denied", "error");
-
             const isActive = document.getElementById('maint-toggle').checked;
             const data = { maintenance_active: isActive };
             await db.collection("config").doc("site_settings").update(data); 
@@ -2258,14 +2277,12 @@
         }
         async function saveMaintMsg() { 
             if(!isSuperAdmin()) return showToast("Access Denied", "error");
-
             const data = { maintenance_message: document.getElementById('maint-msg').value };
             await db.collection("config").doc("site_settings").update(data); 
             showToast("Message Saved", "success"); 
         }
         async function saveDisabledMenus() {
             if(!isSuperAdmin()) return showToast("Access Denied", "error");
-
             const checks = document.querySelectorAll('.menu-disable-check:checked');
             const disabledList = Array.from(checks).map(cb => cb.value);
             await db.collection("config").doc("site_settings").update({ disabled_menus: disabledList });
@@ -2276,7 +2293,6 @@
             
             const msg = `Message from IT Support Team:\n\nWe are currently addressing reported portal issues and working to implement the necessary fixes.\n\n${currentMaintenanceConfig.message || 'portal under maintenance'}.\n\n> [Auto-generate from Dev/IT System]`;
             
-            // Fetch all crew with phone numbers
             const snap = await db.collection("users").where("role", "in", ["admin", "mid_admin", "crew"]).get();
             
             if(snap.empty) return showToast("No crew found", "error");
@@ -2304,7 +2320,6 @@
 
         async function savePrice(key, elemId) { 
             if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CONFIG)) return showToast("Access Denied", "error");
-
             const theVal = parseFloat(document.getElementById(elemId).value);
             if(!theVal) return showToast("Invalid price", "error");
             const data = { [`prices.${key}`]:theVal };
@@ -2313,7 +2328,6 @@
         }
         function addGateway() { 
             if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CONFIG)) return showToast("Access Denied", "error");
-
             showModal("Add Payment Gateway", `<label>Gateway Name</label><input id="gw-name" class="mb-4"><label>Payment Link / URL</label><input id="gw-link" class="mb-4">`, `<button class="btn btn-primary" onclick="saveNewGateway()">Add</button>`); 
         }
         async function saveNewGateway() { 
@@ -2327,7 +2341,6 @@
         }
         function editGateway(docId) { 
             if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CONFIG)) return showToast("Access Denied", "error");
-
             db.collection("payment_methods").doc(docId).get().then(doc => { 
                 const gw = doc.data(); 
                 showModal("Edit Payment Gateway", `<label>Gateway Name</label><input id="e-gw-name" value="${gw.name}" class="mb-4"><label>Payment Link / URL</label><input id="e-gw-link" value="${gw.link}" class="mb-4">`, `<button class="btn btn-primary" onclick="saveEditedGateway('${docId}')">Save</button>`); 
@@ -2335,7 +2348,6 @@
         }
         async function saveEditedGateway(docId) { 
             if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CONFIG)) return showToast("Access Denied", "error");
-
             const name = document.getElementById('e-gw-name').value; 
             const link = document.getElementById('e-gw-link').value;
             const data = { name, link };
@@ -2347,7 +2359,6 @@
         }
         async function toggleGatewayStatus(docId) { 
             if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CONFIG)) return showToast("Access Denied", "error");
-
             const docRef = await db.collection("payment_methods").doc(docId).get(); 
             const currentStatus = docRef.data().active;
             const data = { active: !currentStatus };
@@ -2356,7 +2367,6 @@
         }
         async function deleteGateway(docId) { 
             if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CONFIG)) return showToast("Access Denied", "error");
-
             if(!confirm("Delete gateway?")) return; 
             await db.collection("payment_methods").doc(docId).delete(); 
             renderConfig(); 
@@ -2403,7 +2413,6 @@
         }
         function openAddPortfolioModal() { 
             if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_PORTFOLIO)) return showToast("Access Denied", "error");
-
             const initialId = generateDocIdFromName('');
             showModal("Add New Project", `
                 <div class="mb-4"><label>Project Name</label><input type="text" id="p-name" placeholder="e.g. Clinic Azam" oninput="updateDocIdPreview()"><small style="color:var(--text-faint)">ID will be generated from name</small></div>
@@ -2415,7 +2424,6 @@
         }
         async function saveNewPortfolio() { 
             if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_PORTFOLIO)) return showToast("Access Denied", "error");
-
             const name = document.getElementById('p-name').value; 
             const img = document.getElementById('p-img').value; 
             const link = document.getElementById('p-link').value; 
@@ -2427,7 +2435,6 @@
         }
         function editPortfolio(docId) { 
             if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_PORTFOLIO)) return showToast("Access Denied", "error");
-
             db.collection("clients_portfolio").doc(docId).get().then(doc => {
                 const p = doc.data();
                 showModal("Edit Project", `
@@ -2440,7 +2447,6 @@
         }
         async function updatePortfolio(docId) { 
             if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_PORTFOLIO)) return showToast("Access Denied", "error");
-
             const updates = { 
                 name: document.getElementById('e-p-name').value, 
                 img: document.getElementById('e-p-img').value, 
@@ -2451,14 +2457,12 @@
         }
         function togglePortfolioStatus(docId, newStatus) { 
             if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_PORTFOLIO)) return showToast("Access Denied", "error");
-
             const data = { status: newStatus };
             const action = newStatus ? "Activated" : "Deactivated";
             db.collection("clients_portfolio").doc(docId).update(data).then(() => { showToast(`Project ${action}`, "info"); logActivity(`${action} portfolio project`); });
         }
         function deletePortfolio(docId) { 
             if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_PORTFOLIO)) return showToast("Access Denied", "error");
-
             if(!confirm("Are you sure you want to delete this project?")) return; 
             db.collection("clients_portfolio").doc(docId).delete().then(() => { showToast("Project deleted", "success"); logActivity(`Deleted portfolio project`); }).catch(err => { showToast("Error deleting: " + err.message, "error"); }); 
         }
@@ -2585,12 +2589,10 @@
         }
         function addPublicPromo() { 
             if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_PROMOS)) return showToast("Access Denied", "error");
-
             showModal("Add Public Promo Code", `<div class="mb-4"><label>Promo Code (ID)</label><input type="text" id="pub-promo-code" placeholder="e.g. WELCOME10" style="text-transform:uppercase;"><small class="text-muted">Users will enter this exact code.</small></div><div class="mb-4"><label>Discount Percentage</label><input type="number" id="pub-promo-discount" placeholder="0.1 for 10%"><small class="text-muted">Decimal (e.g., 0.10 = 10%)</small></div>`, `<button class="btn btn-primary" onclick="savePublicPromo()">Create Code</button>`); 
         }
         async function savePublicPromo() { 
             if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_PROMOS)) return showToast("Access Denied", "error");
-
             const code = document.getElementById('pub-promo-code').value.trim().toUpperCase(); 
             const discount = parseFloat(document.getElementById('pub-promo-discount').value);
             if(!code || isNaN(discount)) return showToast("Invalid Input", "error");
@@ -2599,20 +2601,18 @@
         }
         async function deletePublicPromo(code) { 
             if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_PROMOS)) return showToast("Access Denied", "error");
-
             if(!confirm(`Delete promo code ${code}?`)) return; 
             try { await db.collection("promo_codes").doc(code).delete(); showToast("Promo Code Deleted", "success"); logActivity(`Deleted public promo code: ${code}`); } catch(e) { showToast("Error deleting: " + e.message, "error"); } 
         }
 
-        // --- 12. FINANCE OVERVIEW (UPDATED WITH FILTERS & ACTIONS) ---
+        // --- 12. FINANCE OVERVIEW ---
         
         function renderFinanceOverview() {
             const main = document.getElementById('main');
             if(!main) return;
 
-            // Logic: Can I Manage Finance? (SuperAdmin/MidAdmin/Finance)
             const canManageFinance = canAccessFinanceTools(); 
-            const isMyView = !canManageFinance; // If I can't manage, I see my own.
+            const isMyView = !canManageFinance; 
 
             if(!canManageFinance && (!currentUser || !currentUser.uid)) {
                 main.innerHTML = `<div class="access-denied-container"><div class="access-denied-title">Access Denied</div><div class="access-denied-desc">You are not logged in or do not have access.</div></div>`;
@@ -2646,7 +2646,6 @@
                         <div class="table-header" style="flex-direction:column; align-items:stretch; gap:1rem;">
                             <h3>${isMyView ? 'My Commissions' : 'Commission Overview'}</h3>
                             
-                            <!-- FILTERS UI -->
                             <div style="background:#f9fafb; padding:1rem; border-radius:8px; border:1px solid var(--border);">
                                 <div class="flex gap-2 mb-2" style="flex-wrap:wrap;">
                                     <input type="text" id="filter-ref" placeholder="Search Ref / Name..." style="flex:1; min-width:200px;" onkeyup="applyFilters()">
@@ -2705,7 +2704,6 @@
                 </div>
             `;
             
-            // Initial Load
             updateCommissionView(isMyView);
         }
 
@@ -2735,7 +2733,6 @@
 
             const colCount = isMyView ? 6 : 8;
 
-            // 1. Fetch Data
             let query = db.collection("commission_overview").orderBy("orderDate", "desc");
 
             if (isMyView) {
@@ -2746,16 +2743,14 @@
                 const snap = await query.get();
                 
                 if (snap.empty) {
-                    rawFinanceData = []; // Clear cache
+                    rawFinanceData = []; 
                     tbody.innerHTML = `<tr><td colspan="${colCount}" class="text-center text-muted">No commissions found.</td></tr>`;
                     totalEl.innerText = 'RM 0.00';
                     return;
                 }
 
-                // 2. Store in global cache for filtering
                 rawFinanceData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-                // 3. Apply Filters and Render
                 applyFilters();
 
             } catch (error) {
@@ -2768,20 +2763,17 @@
             }
         }
 
-        // --- NEW: FILTER LOGIC ---
         function applyFilters() {
             const tbody = document.getElementById('comm-tbody');
             const totalEl = document.getElementById('comm-total-earnings');
             if(!tbody || !totalEl) return;
 
-            // Get Filter Values
             const filterRef = document.getElementById('filter-ref').value.toLowerCase();
             const filterStatus = document.getElementById('filter-status').value;
             const filterStart = document.getElementById('filter-date-start').value;
             const filterEnd = document.getElementById('filter-date-end').value;
             const filterAmount = document.getElementById('filter-amount').value;
 
-            // Filter Data
             const filteredData = rawFinanceData.filter(item => {
                 const d = item;
                 const dateObj = d.orderDate ? d.orderDate.toDate() : new Date(0);
@@ -2791,19 +2783,15 @@
                 const paidBy = (d.paidBy || '').toLowerCase();
                 const status = (d.status || '').toLowerCase();
 
-                // Search Logic (Covers Ref, Crew Member, Paid By)
                 const matchesSearch = !filterRef || 
                                     refStr.includes(filterRef) || 
                                     crewName.includes(filterRef) || 
                                     paidBy.includes(filterRef);
 
-                // Status Logic
                 const matchesStatus = !filterStatus || status === filterStatus;
 
-                // Amount Logic
                 const matchesAmount = !filterAmount || d.amount >= parseFloat(filterAmount);
 
-                // Date Logic
                 let matchesDate = true;
                 if(filterStart) {
                     const startObj = new Date(filterStart);
@@ -2811,7 +2799,6 @@
                 }
                 if(filterEnd) {
                     const endObj = new Date(filterEnd);
-                    // Include the full end day
                     endObj.setHours(23, 59, 59, 999);
                     if (dateObj > endObj) matchesDate = false;
                 }
@@ -2819,10 +2806,8 @@
                 return matchesSearch && matchesStatus && matchesAmount && matchesDate;
             });
 
-            // Render Table HTML
             renderFinanceTable(filteredData);
 
-            // Update Total based on filtered data
             const totalSum = filteredData.reduce((sum, item) => sum + (item.amount || 0), 0);
             if(totalEl) totalEl.innerText = `RM ${totalSum.toFixed(2)}`;
         }
@@ -2853,7 +2838,6 @@
                 const paidDateDisplay = d.paidAt ? formatDateTime(d.paidAt) : '-';
                 const paidByDisplay = d.paidBy ? d.paidBy : '-';
 
-                // Actions Column
                 let actionsHTML = '';
                 if(!isMyView && canAccessFinanceTools()) {
                     actionsHTML = `
@@ -2882,7 +2866,6 @@
             }).join('');
         }
 
-        // --- ACTIONS: MARK PAID / UNDO ---
         async function markCommissionPaid(docId, crewId) {
             if(!canAccessFinanceTools()) return showToast("Access Denied", "error");
             
@@ -2902,16 +2885,13 @@
                 showToast(`Marked as ${newStatus}`, "success");
                 logActivity(`Updated commission status to ${newStatus} for ${crewId}`);
                 
-                // Refresh Data and re-apply filters
                 const isMyView = !canAccessFinanceTools();
                 await updateCommissionView(isMyView); 
-                // Note: updateCommissionView will re-fetch data and call applyFilters automatically
             } catch(e) {
                 showToast("Error updating status", "error");
             }
         }
 
-        // --- ACTIONS: WHATSAPP ---
         async function waCrewCommission(crewId, amount) {
             if(!canAccessFinanceTools()) return showToast("Access Denied", "error");
             
