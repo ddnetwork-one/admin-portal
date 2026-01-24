@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HQ-DDNetwork-portal.v2.7</title>
+    <title>HQ-DDNetwork-portal.v3.0</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,7 +18,7 @@
     <style>
         /* --- CORE VARIABLES & RESET --- */
         :root {
-            /* Light Theme Palette */
+            /* Palette */
             --bg-app: #f3f4f6;       
             --bg-sidebar: #ffffff;   
             --bg-surface: #ffffff;   
@@ -91,7 +91,7 @@
         .block { display: block; }
         .font-mono { font-family: var(--font-mono); letter-spacing: -0.5px; }
 
-        /* --- SCROLLBAR --- */
+        /* --- SCROLLBAR (Custom for better UX) --- */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius:4px; }
@@ -176,7 +176,7 @@
         #dashboard { display: flex; width: 100%; height: 100vh; overflow: hidden; position: relative; padding-top: var(--maintenance-bar-height); transition: padding-top 0.3s; }
         #dashboard.no-maintenance { padding-top: 0; }
         .sidebar-overlay {
-            position: fixed; inset: 0; background: rgba(255,255,255,0.8); backdrop-filter: blur(4px);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px);
             z-index: var(--z-sidebar); opacity: 0; pointer-events: none; transition: 0.3s;
         }
         .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
@@ -199,15 +199,39 @@
         header {
             height: var(--header-height); background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px);
             border-bottom:1px solid var(--border); display: flex; align-items: center; justify-content: space-between;
-            padding: 0 1.5rem; position: fixed; top: 0; left: 0; right: 0; z-index: var(--z-header);
+            padding: 0 1rem; position: fixed; top: 0; left: 0; right: 0; z-index: var(--z-header);
         }
         .has-maintenance header { top: var(--maintenance-bar-height); }
         
-        .header-left { display: flex; align-items: center; gap: 1rem; }
-        .header-brand { font-weight: 800; font-size: 1rem; color: var(--text-main); letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
+        .header-left { display: flex; align-items: center; gap: 1rem; flex: 1; }
+        .header-brand { font-weight: 800; font-size: 1rem; color: var(--text-main); letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+        .header-search { 
+            position: relative; max-width: 400px; width: 100%; display: none; 
+        }
+        @media(min-width: 768px) { .header-search { display: block; } }
+        
+        .header-search input {
+            width: 100%; padding-left: 2.5rem; border-radius: 20px; background: #f3f4f6; border: none;
+        }
+        .header-search i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+
         .header-actions { display: flex; align-items: center; gap: 0.25rem; position: relative; height: 100%; }
         .notification-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--danger); border-radius: 50%; border: 2px solid var(--bg-sidebar); pointer-events: none; z-index: 10; }
         
+        /* Search Results Dropdown */
+        #search-results {
+            position: absolute; top: 70px; left: 0; width: 100%; max-width: 400px; background: var(--bg-surface);
+            border:1px solid var(--border); border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            display: none; flex-direction: column; max-height: 400px; overflow-y: auto; z-index: var(--z-dropdown);
+        }
+        #search-results.active { display: flex; }
+        .search-item { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .search-item:hover { background: #f9fafb; }
+        .search-item-icon { width: 32px; height: 32px; background: #f3f4f6; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+        .search-item div { display: flex; flex-direction: column; }
+        .search-item strong { font-size: 0.85rem; color: var(--text-main); }
+        .search-item span { font-size: 0.7rem; color: var(--text-muted); }
+
         .notif-dropdown {
             position: absolute; top: 70px; right: 10px; width: 320px; background: var(--bg-surface); border:1px solid var(--border);
             border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); display: none; flex-direction: column; padding: 0;
@@ -240,16 +264,22 @@
         .nav-item { 
             padding: 0.7rem 1.5rem; display: flex; align-items: center; gap: 12px; color: var(--text-muted); cursor: pointer; 
             transition: 0.2s; border-left: 3px solid transparent; font-weight: 500; margin-right: 0.5rem;
-            border-radius: 0 8px 8px 0; position: relative;
+            border-radius: 0 8px 8px 0; position: relative; user-select: none;
         }
         .nav-item:hover { background: rgba(0,0,0,0.03); color: var(--text-main); }
         .nav-item.active { background: #eff6ff; color: var(--primary); border-left-color: var(--primary); font-weight: 600; }
         .nav-item.disabled { opacity: 0.5; pointer-events: none; filter: grayscale(1); }
         .nav-item i { font-size: 1.15rem; }
+        .nav-item.pinned { color: var(--primary); background: #f0fdf4; }
+        .nav-item.pinned::after {
+            content: '\eb4a'; /* Icon pin-fill from Remix */
+            font-family: 'remixicon';
+            position: absolute; right: 15px; font-size: 0.8rem; opacity: 0.7;
+        }
 
         /* MAIN CONTENT */
         main { 
-            flex:1; overflow-y: auto; overflow-x: hidden; background: var(--bg-app); padding: 2rem; position: relative; 
+            flex:1; overflow-y: auto; overflow-x: hidden; background: var(--bg-app); padding: 1.5rem; position: relative; 
             margin-top: var(--header-height); min-height: calc(100vh - var(--header-height)); width: 100%;
             margin-left: var(--sidebar-width); transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -269,15 +299,45 @@
         .stat-val { font-size: 1.6rem; font-weight: 700; color: var(--text-main); line-height: 1.1; margin-bottom: 4px; letter-spacing: -1px; }
         .stat-label { color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .table-container { background: var(--bg-surface); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .quick-actions-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 2rem;
+        }
+        .quick-action-card {
+            background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem;
+            cursor: pointer; transition: 0.2s; text-align: center;
+        }
+        .quick-action-card:hover { border-color: var(--primary); background: #eff6ff; transform: translateY(-2px); }
+        .quick-action-card i { font-size: 1.5rem; color: var(--primary); }
+
+        /* RESPONSIVE TABLE FIX */
+        .table-container { 
+            background: var(--bg-surface); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; 
+            margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
+        }
         .table-header { padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #f9fafb; flex-wrap: wrap; gap: 10px; }
         .table-header h3 { font-size: 0.95rem; font-weight: 600; color: var(--text-main); letter-spacing: -0.3px; }
-        .table-responsive { overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        .table-responsive { 
+            overflow-x: auto; 
+            width: 100%; 
+            -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; /* Forces scroll on mobile */ }
         th { text-align: left; padding: 0.8rem 1.2rem; color: var(--text-muted); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; background: #f3f4f6; white-space: nowrap; border-bottom: 1px solid var(--border); letter-spacing: 0.5px; }
-        td { padding: 1rem 1.2rem; border-bottom: 1px solid var(--border); color: var(--text-main); font-size: 0.85rem; vertical-align: middle; transition: 0.1s; background: white; }
+        td { padding: 1rem 1.2rem; border-bottom: 1px solid var(--border); color: var(--text-main); font-size: 0.85rem; vertical-align: middle; transition: 0.1s; background: white; white-space: nowrap; }
         tr:last-child td { border-bottom: none; }
         tr:hover td { background: #f9fafb; }
+
+        /* --- TIMELINE (Client History) --- */
+        .timeline-container { margin-top: 1rem; border-left: 2px solid var(--border); padding-left: 1.5rem; margin-left: 1rem; }
+        .timeline-item { position: relative; margin-bottom: 2rem; }
+        .timeline-item::before {
+            content: ''; position: absolute; left: -23px; top: 0; width: 16px; height: 16px;
+            background: white; border: 3px solid var(--primary); border-radius: 50%;
+        }
+        .timeline-date { font-size: 0.75rem; color: var(--text-faint); margin-bottom: 0.25rem; }
+        .timeline-title { font-weight: 600; color: var(--text-main); font-size: 0.95rem; }
+        .timeline-desc { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem; }
 
         /* --- MODALS & TOASTS --- */
         .modal-overlay { 
@@ -372,12 +432,15 @@
         .access-denied-title { font-size: 1.5rem; color: var(--text-main); margin-bottom: 0.5rem; }
         .access-denied-desc { font-size: 1rem; max-width: 400px; line-height: 1.5; margin-bottom: 2rem; }
 
+        /* RESPONSIVE BREAKPOINTS */
         @media(max-width: 1024px) {
             aside { transform: translateX(-100%); width: 280px; box-shadow: 20px 0 40px rgba(0,0,0,0.1); }
             aside.mobile-open { transform: translateX(0); }
-            main { margin-left: 0 !important; width: 100% !important; padding: 1.5rem; padding-top: 5rem; }
+            main { margin-left: 0 !important; width: 100% !important; padding: 1rem; padding-top: 5rem; }
             .header-brand span { display: none; }
             .notif-dropdown { right: 0; width: 90vw; }
+            /* On mobile, search bar might take too much space, hide text */
+            .header-search { max-width: 150px; }
         }
         @media(min-width: 1025px) and (max-width: 1440px) { .invoice-paper { transform: scale(0.85); } }
         @media print { body > *:not(#invoiceModalOverlay) { display: none !important; } }
@@ -388,7 +451,7 @@
     <!-- AUTH SCREEN -->
     <div id="auth-screen">
         <div class="auth-card">
-            <h2 class="mb-4" style="color:var(--text-main); font-weight: 800; letter-spacing: -0.5px;">New Portal v2.5</h2>
+            <h2 class="mb-4" style="color:var(--text-main); font-weight: 800; letter-spacing: -0.5px;">New Portal v3.0</h2>
             <p class="mb-4 text-muted">Enterprise Edition</p>
             <form id="loginForm">
                 <input type="text" id="loginInput" class="mb-4" placeholder="Email or Crew ID" required>
@@ -412,7 +475,17 @@
             <div class="header-left">
                 <button class="btn-icon" onclick="toggleSidebar()" title="Toggle Menu"><i class="ri-menu-line" style="font-size: 1.4rem;"></i></button>
                 <div class="header-brand">
-                    <span>HQ-DDNetwork-Portal.v2.5</span>
+                    <i class="ri-dashboard-3-line" style="color:var(--primary); font-size: 1.4rem;"></i>
+                    <span>HQ-DDNetwork.v3.0</span>
+                </div>
+                
+                <!-- GLOBAL SEARCH -->
+                <div class="header-search">
+                    <i class="ri-search-line"></i>
+                    <input type="text" id="globalSearch" placeholder="Search Orders, Clients..." onkeyup="handleGlobalSearch(this.value)">
+                    <div id="search-results">
+                        <!-- Results injected here -->
+                    </div>
                 </div>
             </div>
             <div class="header-actions">
@@ -442,14 +515,21 @@
                 </div>
             </div>
             
+            <!-- Pinned Section (Dynamic) -->
+            <div id="pinned-section" class="hidden">
+                <div class="nav-section-title"><span class="nav-text">Pinned</span></div>
+                <div id="pinned-list"></div>
+            </div>
+
             <div class="nav-scroll">
-                <div class="nav-item" onclick="navigateTo('/')"><i class="ri-dashboard-line"></i> <span class="nav-text">Overview</span></div>
+                <div class="nav-section-title"><span class="nav-text">Overview</span></div>
+                <div class="nav-item" onclick="navigateTo('/')"><i class="ri-dashboard-line"></i> <span class="nav-text">Dashboard</span></div>
                 
                 <div class="nav-section-title"><span class="nav-text">Operations</span></div>
-                <div class="nav-item" onclick="navigateTo('/orders')" id="nav-orders"><i class="ri-shopping-bag-3-line"></i> <span class="nav-text">Orders</span></div>
-                <div class="nav-item" onclick="navigateTo('/clients')" id="nav-clients"><i class="ri-user-line"></i> <span class="nav-text">Clients</span></div>
-                <div class="nav-item" onclick="navigateTo('/requests')" id="nav-requests"><i class="ri-database-2-line"></i> <span class="nav-text">Requests</span></div>
-                <div class="nav-item" onclick="navigateTo('/support')" id="nav-support"><i class="ri-customer-service-2-line"></i> <span class="nav-text">Support</span></div>
+                <div class="nav-item" onclick="navigateTo('/orders')" id="nav-orders" oncontextmenu="handleContextMenu(event, '/orders', 'Orders')"><i class="ri-shopping-bag-3-line"></i> <span class="nav-text">Orders</span></div>
+                <div class="nav-item" onclick="navigateTo('/clients')" id="nav-clients" oncontextmenu="handleContextMenu(event, '/clients', 'Clients')"><i class="ri-user-line"></i> <span class="nav-text">Clients</span></div>
+                <div class="nav-item" onclick="navigateTo('/requests')" id="nav-requests" oncontextmenu="handleContextMenu(event, '/requests', 'Requests')"><i class="ri-database-2-line"></i> <span class="nav-text">Requests</span></div>
+                <div class="nav-item" onclick="navigateTo('/support')" id="nav-support" oncontextmenu="handleContextMenu(event, '/support', 'Support')"><i class="ri-customer-service-2-line"></i> <span class="nav-text">Support</span></div>
                 <div class="nav-item" onclick="navigateTo('/vouchers')" id="nav-vouchers"><i class="ri-ticket-2-line"></i> <span class="nav-text">Vouchers</span></div>
                 
                 <div class="nav-section-title"><span class="nav-text">Management</span></div>
@@ -500,7 +580,6 @@
         document.getElementById('auth-screen').classList.add('hidden');
 
         // --- HELPER: OPEN WHATSAPP (MOBILE COMPATIBLE) ---
-        // Uses a hidden anchor click to bypass popup blockers in async functions on mobile
         function openWA(url) {
             const a = document.createElement('a');
             a.href = url;
@@ -529,7 +608,6 @@
             "Support Operations Executive"
         ];
 
-        // Maps specific Job Titles to System Roles
         const JOB_ROLE_MAP = {
             "Founder & Managing Director": "super_admin",
             "Project & Client Manager": "mid_admin",
@@ -547,7 +625,6 @@
             "Support Operations Executive": "crew"
         };
 
-        // Default Commission Rates
         const DEFAULT_COMMISSION_RATES = {
             "Founder & Managing Director": 0.05,
             "Project & Client Manager": 0.04,
@@ -565,7 +642,7 @@
             "Support Operations Executive": 0.025
         };
 
-        // --- IMPROVED PERMISSION SYSTEM ---
+        // --- PERMISSION SYSTEM ---
         const PERMISSION_KEYS = {
             EDIT_ORDERS: 'edit_orders',
             EDIT_CLIENTS: 'edit_clients',
@@ -598,6 +675,7 @@
         };
         let db, auth, currentUser, userData = null;
         let rawFinanceData = []; 
+        let userPinnedMenus = [];
         
         try { 
             firebase.initializeApp(firebaseConfig); 
@@ -629,7 +707,6 @@
                 }
                 const pmSnapshot = await db.collection("payment_methods").limit(1).get();
                 if (pmSnapshot.empty) {
-                    console.log("Creating default payment methods...");
                     const defaults = [
                         { id: 'tng', name: 'TNG eWallet', link: 'https://payment.tngdigital.com.my/sc/bDLob7YcpG', active: true },
                         { id: 'fpx', name: 'Online Banking (FPX)', link: 'https://toyyibpay.com', active: true }
@@ -728,11 +805,11 @@
                         if(!userData.permissions) userData.permissions = {};
                         if(!userData.isSuspended) userData.isSuspended = false;
                         if(userData.bypassApproval === undefined) userData.bypassApproval = false; 
+                        if(!userData.pinnedMenus) userData.pinnedMenus = [];
 
                         if(userData.isSuspended) {
                             auth.signOut();
                             showToast("Account Suspended. Contact Admin.", "error");
-                            // Show login screen if suspended
                             document.getElementById('auth-screen').classList.remove('hidden');
                             return;
                         }
@@ -743,12 +820,15 @@
                         document.getElementById('side-name').innerText = userData.name || 'User';
                         document.getElementById('side-job').innerText = `${userData.jobTitle} (${userData.role.toUpperCase()})`;
                         
-                        // --- HEADER UPDATE (Name & Location) ---
+                        // Load Pinned Menus
+                        userPinnedMenus = userData.pinnedMenus || [];
+                        renderPinnedMenus();
+
+                        // --- HEADER UPDATE ---
                         const userInitial = (userData.name || 'A').charAt(0).toUpperCase();
                         const workLoc = userData.workLocation || 'HQ';
                         const headerActions = document.querySelector('.header-actions');
                         
-                        // Update Header with Name and Location and Clickable Profile
                         const profileHTML = `
                             <div class="flex items-center gap-2" onclick="navigateTo('/my-profile')" style="cursor:pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
                                 <div style="text-align:right; line-height:1.2;">
@@ -796,6 +876,123 @@
         });
 
         function handleLogout() { auth.signOut().then(() => location.reload()); }
+
+        // --- GLOBAL SEARCH & PINNING ---
+        function handleContextMenu(e, path, name) {
+            e.preventDefault();
+            if(!currentUser) return;
+            
+            // Simple confirm dialog for pinning
+            const isPinned = userPinnedMenus.includes(path);
+            if(isPinned) {
+                if(confirm(`Unpin "${name}" from sidebar?`)) {
+                    userPinnedMenus = userPinnedMenus.filter(p => p !== path);
+                    savePinnedMenus();
+                    showToast("Unpinned", "success");
+                }
+            } else {
+                if(confirm(`Pin "${name}" to sidebar?`)) {
+                    userPinnedMenus.push(path);
+                    savePinnedMenus();
+                    showToast("Pinned to Sidebar", "success");
+                }
+            }
+        }
+
+        function savePinnedMenus() {
+            if(!currentUser) return;
+            db.collection("users").doc(currentUser.uid).update({
+                pinnedMenus: userPinnedMenus
+            });
+            renderPinnedMenus();
+        }
+
+        function renderPinnedMenus() {
+            const container = document.getElementById('pinned-list');
+            const section = document.getElementById('pinned-section');
+            if(!container) return;
+            
+            container.innerHTML = '';
+            if(userPinnedMenus.length === 0) {
+                section.classList.add('hidden');
+                return;
+            }
+            section.classList.remove('hidden');
+
+            const labels = {
+                '/orders': 'Orders', '/clients': 'Clients', '/support': 'Support', '/requests': 'Requests',
+                '/commissions': 'Finance', '/crew': 'Crew', '/portfolio': 'Portfolio'
+            };
+
+            userPinnedMenus.forEach(path => {
+                const label = labels[path] || path.substring(1);
+                const div = document.createElement('div');
+                div.className = 'nav-item pinned';
+                div.innerHTML = `<i class="ri-pushpin-line"></i> <span class="nav-text">${label}</span>`;
+                div.onclick = () => navigateTo(path);
+                div.oncontextmenu = (e) => handleContextMenu(e, path, label);
+                container.appendChild(div);
+            });
+        }
+
+        async function handleGlobalSearch(query) {
+            const resultsContainer = document.getElementById('search-results');
+            if(!query || query.length < 2) {
+                resultsContainer.classList.remove('active');
+                return;
+            }
+
+            const q = query.toLowerCase();
+            let html = '';
+
+            // Search Orders
+            try {
+                const oSnap = await db.collection("orders").orderBy("customerName").startAt(q).endAt(q + '\uf8ff').limit(3).get();
+                oSnap.forEach(doc => {
+                    const d = doc.data();
+                    html += `<div class="search-item" onclick="navigateTo('/orders'); closeModal();">
+                        <div class="search-item-icon"><i class="ri-shopping-bag-line"></i></div>
+                        <div><strong>${d.customerName}</strong><span>Order: RM ${d.total}</span></div>
+                    </div>`;
+                });
+            } catch(e) {}
+
+            // Search Clients
+            try {
+                const cSnap = await db.collection("users").where("role", "==", "user").orderBy("name").startAt(q).endAt(q + '\uf8ff').limit(3).get();
+                cSnap.forEach(doc => {
+                    const u = doc.data();
+                    html += `<div class="search-item" onclick="viewClientTimeline('${doc.id}', '${u.name}'); closeModal();">
+                        <div class="search-item-icon"><i class="ri-user-line"></i></div>
+                        <div><strong>${u.name}</strong><span>Client</span></div>
+                    </div>`;
+                });
+            } catch(e) {}
+
+            // Search Tickets
+            try {
+                const tSnap = await db.collection("tickets").orderBy("ticketId").startAt(q).endAt(q + '\uf8ff').limit(3).get();
+                tSnap.forEach(doc => {
+                    const d = doc.data();
+                    html += `<div class="search-item" onclick="navigateTo('/support'); closeModal();">
+                        <div class="search-item-icon"><i class="ri-customer-service-2-line"></i></div>
+                        <div><strong>${d.ticketId}</strong><span>${d.type}</span></div>
+                    </div>`;
+                });
+            } catch(e) {}
+
+            if(html === '') html = '<div class="p-4 text-center text-muted">No results found</div>';
+            resultsContainer.innerHTML = html;
+            resultsContainer.classList.add('active');
+        }
+
+        // Close search when clicking outside
+        document.addEventListener('click', (e) => {
+            const container = document.querySelector('.header-search');
+            if(!container.contains(e.target)) {
+                document.getElementById('search-results').classList.remove('active');
+            }
+        });
 
         // --- MAINTENANCE MODE LOGIC ---
         let currentMaintenanceConfig = { active: false, disabledMenus: [], message: "" };
@@ -913,7 +1110,6 @@
         };
 
         function navigateTo(path) {
-            // --- MOBILE FIX: Close sidebar automatically on navigation ---
             if (window.innerWidth <= 1024) {
                 document.getElementById('sidebar').classList.remove('mobile-open');
                 document.getElementById('sidebarOverlay').classList.remove('active');
@@ -948,7 +1144,6 @@
                     renderFn();
                 }
 
-                // Scroll to top on route load for better mobile experience
                 document.getElementById('main').scrollTop = 0;
             }
         }
@@ -965,11 +1160,9 @@
                 navigateTo('/');
             }
             
-            // Ensure Sidebar is Open by default on Desktop load
             if(window.innerWidth > 1024) {
                  const sb = document.getElementById('sidebar');
                  const mn = document.getElementById('main');
-                 // Reset to default CSS values if needed (optional, but ensures consistency)
                  sb.style.width = '';
                  mn.style.marginLeft = '';
             }
@@ -986,23 +1179,17 @@
             const mn = document.getElementById('main');
             const ov = document.getElementById('sidebarOverlay');
             
-            // Desktop (> 1024px): Total Hide Logic
             if(window.innerWidth > 1024) {
-                // Check current width to determine state
                 const isClosed = sb.style.width === '0px';
-                
                 if (isClosed) {
-                    // OPEN: Restore default CSS width and margin
                     sb.style.width = 'var(--sidebar-width)';
                     mn.style.marginLeft = 'var(--sidebar-width)';
                 } else {
-                    // CLOSE: Total Hide
                     sb.style.width = '0px';
                     sb.style.overflow = 'hidden';
                     mn.style.marginLeft = '0px';
                 }
             } 
-            // Mobile: Slide in/out
             else {
                 sb.classList.toggle('mobile-open');
                 ov.classList.toggle('active');
@@ -1015,7 +1202,6 @@
             document.getElementById('modalBody').innerHTML = body;
             document.getElementById('modalFooter').innerHTML = footer;
             document.getElementById('modalOverlay').classList.add('open');
-            // Scroll modal body to top on open
             document.getElementById('modalBody').scrollTop = 0;
         }
         function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
@@ -1041,7 +1227,7 @@
             }
         }
 
-        // --- 1. OVERVIEW ---
+        // --- 1. OVERVIEW (Enhanced) ---
         function renderOverview() {
             const main = document.getElementById('main');
             if(!main) return;
@@ -1050,21 +1236,21 @@
                 <div class="flex justify-between items-center mb-4" style="flex-wrap: wrap; gap:10px;">
                     <h2 style="font-size:1.5rem; font-weight:800; letter-spacing:-0.5px;">Dashboard Overview</h2>
                 </div>
+                
+                <!-- QUICK ACTIONS -->
+                <div class="quick-actions-grid">
+                    <div class="quick-action-card" onclick="navigateTo('/orders')"><i class="ri-shopping-cart-2-line"></i><span>New Order</span></div>
+                    <div class="quick-action-card" onclick="navigateTo('/clients')"><i class="ri-user-add-line"></i><span>Add Client</span></div>
+                    <div class="quick-action-card" onclick="navigateTo('/support')"><i class="ri-ticket-line"></i><span>New Ticket</span></div>
+                    <div class="quick-action-card" onclick="navigateTo('/vouchers')"><i class="ri-coupon-line"></i><span>Create Voucher</span></div>
+                </div>
+
                 <div class="stats-grid" id="stats-grid">
                     <div class="page-loader" style="height:100px;"><div class="loading-spinner"></div></div>
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
                     <div class="list-group">
-                        <h3><i class="ri-pulse-line" style="color:var(--success)"></i> Quick Actions</h3>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
-                            ${checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_ORDERS) ? `<button class="btn btn-secondary" onclick="navigateTo('/orders')"><i class="ri-shopping-bag-line"></i> New Order</button>` : ''}
-                            <button class="btn btn-secondary" onclick="navigateTo('/support')"><i class="ri-ticket-line"></i> Check Tickets</button>
-                            <button class="btn btn-secondary" onclick="navigateTo('/requests')"><i class="ri-database-2-line"></i> Requests</button>
-                            ${checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CREW) ? `<button class="btn btn-secondary" onclick="navigateTo('/crew')"><i class="ri-user-add-line"></i> Add Crew</button>` : ''}
-                        </div>
-                    </div>
-                    <div class="list-group">
-                        <h3><i class="ri-history-line" style="color:var(--primary)"></i> Recent Activity</h3>
+                        <h3><i class="ri-pulse-line" style="color:var(--success)"></i> Recent Activity</h3>
                         <div id="activity-feed"><div class="text-center p-4 text-muted">Loading...</div></div>
                     </div>
                 </div>
@@ -1128,7 +1314,7 @@
                     <div class="table-header">
                         <h3>Order Management</h3>
                         <div class="flex items-center gap-2">
-                            <input type="text" id="orderSearch" placeholder="Search ID, Name, Domain..." style="width:250px;" onkeyup="filterTable('orders-tbody', this.value)">
+                            <input type="text" id="orderSearch" placeholder="Search ID, Name..." style="width:200px;" onkeyup="filterTable('orders-tbody', this.value)">
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -1173,8 +1359,8 @@
                     let actions = '';
                     if(checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_ORDERS)) {
                         actions += `<button class="btn btn-sm btn-secondary" onclick="viewOrder('${doc.id}')">Manage</button>`;
-                        actions += `<button class="btn btn-sm btn-info" title="Generate Invoice" onclick="generateInvoice('${doc.id}')"><i class="ri-file-list-2-line"></i> PDF</button>`;
-                        actions += `<button class="btn btn-sm btn-success" title="Send WhatsApp Remainder" onclick="sendPaymentReminder('${doc.id}')"><i class="ri-whatsapp-line"></i> WA</button>`;
+                        actions += `<button class="btn btn-sm btn-info" title="Generate Invoice" onclick="generateInvoice('${doc.id}')"><i class="ri-file-list-2-line"></i></button>`;
+                        actions += `<button class="btn btn-sm btn-success" title="Send WhatsApp" onclick="sendPaymentReminder('${doc.id}')"><i class="ri-whatsapp-line"></i></button>`;
                     }
                     if(isSuperAdmin()) {
                         actions += `<button class="btn btn-sm btn-danger" onclick="deleteOrder('${doc.id}')"><i class="ri-delete-bin-line"></i></button>`;
@@ -1267,7 +1453,6 @@
                 let cleanPhone = d.customerPhone ? d.customerPhone.replace(/^0/, '60') : '60123456789';
                 if(!cleanPhone.startsWith('+')) cleanPhone = '+' + cleanPhone;
                 
-                // FIX: Use openWA helper for mobile compatibility
                 openWA(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`);
                 
                 showToast("Opening WhatsApp...", "success");
@@ -1322,6 +1507,14 @@
                         <span class="font-bold" style="color:var(--primary);">${d.billingCycle || '-'}</span>
                     </div>
                 </div>
+                
+                <!-- INTERNAL NOTES FEATURE -->
+                <div class="mb-4">
+                    <label>Internal Notes (Staff Only)</label>
+                    <textarea id="o-notes" rows="3" placeholder="Add notes about this order...">${d.internalNotes || ''}</textarea>
+                    <small class="text-muted">These notes are NOT visible to the client.</small>
+                </div>
+
                 <div class="mb-4">
                     <label>Sales Representatives (Multiple)</label>
                     ${salesRepHTML}
@@ -1394,9 +1587,7 @@
         }
 
         async function updateOrderDetails(id) {
-            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_ORDERS)) {
-                return showToast("Access Denied. You cannot edit orders.", "error");
-            }
+            if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_ORDERS)) return showToast("Access Denied. You cannot edit orders.", "error");
 
             const updateData = {
                 customerName: document.getElementById('o-name').value,
@@ -1404,7 +1595,8 @@
                 customerPhone: document.getElementById('o-phone').value,
                 total: document.getElementById('o-total').value,
                 domain: document.getElementById('o-domain').value.replace(/^https?:\/\//, ''), 
-                status: document.getElementById('upd-status').value
+                status: document.getElementById('upd-status').value,
+                internalNotes: document.getElementById('o-notes').value // Save Internal Notes
             };
             
             const checkboxes = document.querySelectorAll('.rep-checkbox:checked');
@@ -1434,7 +1626,7 @@
             });
         }
 
-        // --- 3. CLIENTS ---
+        // --- 3. CLIENTS (Enhanced with Timeline) ---
         function renderClients() {
             const main = document.getElementById('main');
             if(!main) return;
@@ -1467,6 +1659,8 @@
                         buttons += `<button class="btn btn-sm btn-secondary" onclick="editClient('${doc.id}')">Edit</button>`;
                         buttons += `<button class="btn btn-sm btn-primary" onclick="openAssignVoucherModal('${doc.id}', '${u.name}')">Assign Voucher</button>`;
                     }
+                    // TIMELINE BUTTON
+                    buttons += `<button class="btn btn-sm btn-info" onclick="viewClientTimeline('${doc.id}', '${u.name}')"><i class="ri-history-line"></i> Timeline</button>`;
                     buttons += `<button class="btn btn-sm btn-secondary" onclick="resetPassword('${u.email}')">Reset PW</button>`;
                     if (isSuperAdmin()) buttons += `<button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Client')"><i class="ri-delete-bin-line"></i></button>`;
 
@@ -1482,6 +1676,63 @@
                 }).join('');
             });
         }
+        
+        // --- CLIENT TIMELINE FEATURE ---
+        async function viewClientTimeline(uid, name) {
+            showModal(`Client Timeline: ${name}`, `<div class="loading-spinner"></div>`, `<button class="btn btn-secondary" onclick="closeModal()">Close</button>`);
+            
+            let timelineHTML = `<div class="timeline-container">`;
+            
+            try {
+                // 1. Get Orders
+                const oSnap = await db.collection("orders").where("customerEmail", "==", (await db.collection("users").doc(uid).get()).data().email).orderBy("timestamp", "desc").get();
+                oSnap.forEach(doc => {
+                    const d = doc.data();
+                    timelineHTML += `
+                        <div class="timeline-item">
+                            <div class="timeline-date">${formatDateTime(d.timestamp)}</div>
+                            <div class="timeline-title">New Order: ${d.package}</div>
+                            <div class="timeline-desc">Amount: ${d.total} | Status: <span style="color:${d.status==='Paid'?'var(--success)':'var(--warning)'}">${d.status}</span></div>
+                        </div>
+                    `;
+                });
+
+                // 2. Get Tickets
+                const tSnap = await db.collection("tickets").where("email", "==", (await db.collection("users").doc(uid).get()).data().email).orderBy("timestamp", "desc").get();
+                tSnap.forEach(doc => {
+                    const d = doc.data();
+                    timelineHTML += `
+                        <div class="timeline-item">
+                            <div class="timeline-date">${formatDateTime(d.timestamp)}</div>
+                            <div class="timeline-title">Support Ticket: ${d.type}</div>
+                            <div class="timeline-desc">ID: ${d.ticketId} | Status: ${d.status}</div>
+                        </div>
+                    `;
+                });
+                
+                // 3. Get Requests
+                const rSnap = await db.collection("customer_requests").where("userId", "==", uid).orderBy("timestamp", "desc").get();
+                rSnap.forEach(doc => {
+                    const d = doc.data();
+                    timelineHTML += `
+                        <div class="timeline-item">
+                            <div class="timeline-date">${formatDateTime(d.timestamp)}</div>
+                            <div class="timeline-title">Request: ${d.type}</div>
+                            <div class="timeline-desc">Status: ${d.status}</div>
+                        </div>
+                    `;
+                });
+
+                if(timelineHTML === `<div class="timeline-container">`) timelineHTML += `<p class="text-muted text-center mt-4">No history found for this client.</p>`;
+                else timelineHTML += `</div>`;
+
+                document.getElementById('modalBody').innerHTML = timelineHTML;
+
+            } catch(e) {
+                document.getElementById('modalBody').innerHTML = `<p class="text-danger text-center">Error loading timeline: ${e.message}</p>`;
+            }
+        }
+
         function editClient(uid) {
             if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CLIENTS)) return showToast("Access Denied", "error");
 
@@ -2754,8 +3005,6 @@
                 return;
             }
 
-            const colCount = isMyView ? 6 : 8;
-
             let query = db.collection("commission_overview").orderBy("orderDate", "desc");
 
             if (isMyView) {
@@ -2931,7 +3180,6 @@
 
                 const msg = `Hi ${crewData.name}, this is Finance.\n\n Your commission of ${amount} has been processed.\n\nPlease check your bank account.\n\n\ [Auto-generated from DDNet System]`;
                 
-                // FIX: Use openWA helper for mobile compatibility
                 openWA(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`);
             } catch(e) {
                 console.error(e);
@@ -3155,7 +3403,6 @@
             trs.forEach(tr => tr.style.display = tr.innerText.toLowerCase().includes(text)?'':'none');
         }
 
-    </script>
-
+</script>
 </body>
-</html>
+</html>"
