@@ -1015,7 +1015,7 @@
         function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
         function showToast(msg, type='info') {
             const t = document.createElement('div'); t.className = `toast ${type}`;
-            const icon = type=='success'?'ri-checkbox-circle-fill':(type=='error'?'ri-error-warning-fill':(type=='warning'?'ri-alert-fill':'ri-information-fill'));
+            const icon = type=='success'?'ri-checkbox-circle-fill':(type=='error'?'ri-error-warning-fill':(type=='warning'?'ri-alert-fill':'ri-information-fill');
             t.innerHTML = `<i class="${icon}" style="font-size:1.2rem; color: ${type=='success'?'var(--success)':(type=='error'?'var(--danger)':(type=='warning'?'var(--warning)':'black'))}"></i> <span>${msg}</span>`;
             document.getElementById('toastContainer').appendChild(t);
             setTimeout(()=>t.classList.add('show'), 10);
