@@ -496,6 +496,21 @@
 
     <!-- JAVASCRIPT -->
 <script>
+        // --- FIX: HIDE AUTH SCREEN IMMEDIATELY TO PREVENT REFRESH FLASH ---
+        document.getElementById('auth-screen').classList.add('hidden');
+
+        // --- HELPER: OPEN WHATSAPP (MOBILE COMPATIBLE) ---
+        // Uses a hidden anchor click to bypass popup blockers in async functions on mobile
+        function openWA(url) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
         // --- CONSTANTS & CONFIG ---
         const JOB_TITLES = [
             "Founder & Managing Director", 
@@ -717,6 +732,8 @@
                         if(userData.isSuspended) {
                             auth.signOut();
                             showToast("Account Suspended. Contact Admin.", "error");
+                            // Show login screen if suspended
+                            document.getElementById('auth-screen').classList.remove('hidden');
                             return;
                         }
 
@@ -731,10 +748,9 @@
                         const workLoc = userData.workLocation || 'HQ';
                         const headerActions = document.querySelector('.header-actions');
                         
-                        // Update Header with Name and Location
-                        // We replace the static avatar div with a flex container
+                        // Update Header with Name and Location and Clickable Profile
                         const profileHTML = `
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2" onclick="navigateTo('/my-profile')" style="cursor:pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
                                 <div style="text-align:right; line-height:1.2;">
                                     <div style="font-weight:700; font-size:0.85rem; color:var(--text-main);">${userData.name}</div>
                                     <div style="font-size:0.7rem; color:var(--text-muted); font-weight:500; text-transform:uppercase;">${workLoc}</div>
@@ -742,7 +758,6 @@
                                 <div class="u-avatar" style="width:32px; height:32px; font-size:0.85rem;">${userInitial}</div>
                             </div>
                         `;
-                        // Find and replace the avatar in the header
                         const oldAvatar = headerActions.querySelector('#header-avatar');
                         if(oldAvatar) {
                             const container = document.createElement('div');
@@ -751,7 +766,6 @@
                             oldAvatar.remove();
                         }
 
-                        // Sidebar Info
                         document.getElementById('side-avatar').innerText = userInitial;
 
                         if(hasPermission(PERMISSION_KEYS.APPROVE_ACTIONS)) {
@@ -1246,7 +1260,10 @@
                 
                 let cleanPhone = d.customerPhone ? d.customerPhone.replace(/^0/, '60') : '60123456789';
                 if(!cleanPhone.startsWith('+')) cleanPhone = '+' + cleanPhone;
-                window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+                
+                // FIX: Use openWA helper for mobile compatibility
+                openWA(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`);
+                
                 showToast("Opening WhatsApp...", "success");
                 logActivity(`Sent payment reminder for Order #${orderRef}`);
             } catch(err) {
@@ -2907,7 +2924,9 @@
                 if(!cleanPhone.startsWith('+')) cleanPhone = '+' + cleanPhone;
 
                 const msg = `Hi ${crewData.name}, this is Finance.\n\n Your commission of ${amount} has been processed.\n\nPlease check your bank account.\n\n\ [Auto-generated from DDNet System]`;
-                window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+                
+                // FIX: Use openWA helper for mobile compatibility
+                openWA(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`);
             } catch(e) {
                 console.error(e);
                 showToast("Error fetching crew details", "error");
