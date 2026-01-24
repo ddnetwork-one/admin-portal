@@ -913,6 +913,12 @@
         };
 
         function navigateTo(path) {
+            // --- MOBILE FIX: Close sidebar automatically on navigation ---
+            if (window.innerWidth <= 1024) {
+                document.getElementById('sidebar').classList.remove('mobile-open');
+                document.getElementById('sidebarOverlay').classList.remove('active');
+            }
+
             if(isMaintenanceBlockingPath(path)) {
                 showToast("Access Denied: Feature under maintenance.", "error");
                 return;
@@ -942,10 +948,8 @@
                     renderFn();
                 }
 
-                if(window.innerWidth <= 1024) {
-                    document.getElementById('sidebar').classList.remove('mobile-open');
-                    document.getElementById('sidebarOverlay').classList.remove('active');
-                }
+                // Scroll to top on route load for better mobile experience
+                document.getElementById('main').scrollTop = 0;
             }
         }
 
@@ -1011,11 +1015,13 @@
             document.getElementById('modalBody').innerHTML = body;
             document.getElementById('modalFooter').innerHTML = footer;
             document.getElementById('modalOverlay').classList.add('open');
+            // Scroll modal body to top on open
+            document.getElementById('modalBody').scrollTop = 0;
         }
         function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
         function showToast(msg, type='info') {
             const t = document.createElement('div'); t.className = `toast ${type}`;
-            const icon = type=='success'?'ri-checkbox-circle-fill':(type=='error'?'ri-error-warning-fill':(type=='warning'?'ri-alert-fill':'ri-information-fill');
+            const icon = type=='success'?'ri-checkbox-circle-fill':(type=='error'?'ri-error-warning-fill':(type=='warning'?'ri-alert-fill':'ri-information-fill'));
             t.innerHTML = `<i class="${icon}" style="font-size:1.2rem; color: ${type=='success'?'var(--success)':(type=='error'?'var(--danger)':(type=='warning'?'var(--warning)':'black'))}"></i> <span>${msg}</span>`;
             document.getElementById('toastContainer').appendChild(t);
             setTimeout(()=>t.classList.add('show'), 10);
@@ -1709,7 +1715,7 @@
                         <div style="margin-top:15px; padding-top:10px; border-top:1px solid #eee;" class="flex items-center gap-2">
                              <label class="toggle-switch">
                                 <input type="checkbox" id="e-c-bypass" ${isBypass ? 'checked' : ''}>
-                                <span class="spinner"></span>
+                                <span class="slider"></span>
                             </label>
                             <span style="font-size:0.8rem; color:var(--danger); font-weight:700;">BYPASS APPROVAL (Auto-Approve Edits)</span>
                         </div>
@@ -3150,5 +3156,6 @@
         }
 
     </script>
+
 </body>
 </html>
