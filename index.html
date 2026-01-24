@@ -495,7 +495,7 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- JAVASCRIPT -->
-    <!-- JAVASCRIPT -->
+        <!-- JAVASCRIPT -->
 <script>
         // --- CONSTANTS & CONFIG ---
         const JOB_TITLES = [
@@ -948,9 +948,12 @@
         function toggleSidebar() { 
             const sb = document.getElementById('sidebar');
             const ov = document.getElementById('sidebarOverlay');
+            // Desktop (> 1024px): Toggle Full Close/Close
             if(window.innerWidth > 1024) {
-                sb.classList.toggle('collapsed');
-            } else {
+                sb.classList.toggle('collapsed'); // 'collapsed' now translates to -100% (full hide)
+            } 
+            // Mobile: Slide in/out
+            else {
                 sb.classList.toggle('mobile-open');
                 ov.classList.toggle('active');
             }
@@ -1471,8 +1474,8 @@
                 </div>
                 <div class="table-container">
                     <div class="table-responsive">
-                        <table><thead><tr><th>Crew ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Job Title</th><th>Comm. Rate</th><th>Status</th><th>Actions</th></tr></thead><tbody id="crew-tbody">
-                        <tr><td colspan="9" class="text-center"><div class="loading-spinner"></div></td></tr>
+                        <table><thead><tr><th>Crew ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Work Loc</th><th>Role</th><th>Job Title</th><th>Comm. Rate</th><th>Status</th><th>Actions</th></tr></thead><tbody id="crew-tbody">
+                        <tr><td colspan="10" class="text-center"><div class="loading-spinner"></div></td></tr>
                         </tbody></table>
                     </div>
                 </div>`;
@@ -1482,6 +1485,7 @@
                 tbody.innerHTML = snap.docs.map(doc => {
                     const u = doc.data();
                     const rate = u.commissionRate ? (u.commissionRate * 100).toFixed(1) + '%' : '0%';
+                    const workLoc = u.workLocation || '-';
                     
                     const isSuspended = u.isSuspended || false;
                     const statusBadge = isSuspended 
@@ -1505,6 +1509,7 @@
                         <td>${u.name}</td>
                         <td>${u.email}</td>
                         <td>${u.phone || '-'}</td>
+                        <td><span class="badge badge-${u.workLocation === 'HQ' ? 'admin' : 'crew'}">${workLoc}</span></td>
                         <td><span class="badge badge-${u.role==='super_admin'?'admin':(u.role==='admin'?'admin':'crew')}">${u.role}</span></td>
                         <td>${u.jobTitle||'-'}</td>
                         <td><span class="badge" style="background:#ecfdf5; color:var(--success)">${rate}</span></td>
@@ -1543,6 +1548,13 @@
                         <input type="number" step="0.1" id="c-rate" readonly style="background:#f9fafb">
                     </div>
                 </div>
+                <div class="mb-4">
+                    <label>Work Location</label>
+                    <select id="c-work-loc">
+                        <option value="HQ">HQ (Office)</option>
+                        <option value="WFH">Work From Home (WFH)</option>
+                    </select>
+                </div>
                 <div class="mb-4"><label>Temporary Password</label><input type="password" id="c-pass" placeholder="Set password"></div>
             `, `<button class="btn btn-primary" onclick="saveCrew('${newCrewId}')">Create Crew</button>`);
         }
@@ -1568,6 +1580,7 @@
             const pass = document.getElementById('c-pass').value;
             const job = document.getElementById('c-job').value;
             const rateVal = parseFloat(document.getElementById('c-rate').value);
+            const workLoc = document.getElementById('c-work-loc').value;
 
             if(!name || !email || !pass || !job) return showToast("Please fill all required fields", "error");
 
@@ -1585,6 +1598,7 @@
                     role: dbRole, 
                     jobTitle: job,
                     commissionRate: isNaN(rateVal) ? 0.0 : (rateVal / 100),
+                    workLocation: workLoc, // Save Work Location
                     permissions: {},
                     bankDetails: bankDetails,
                     isSuspended: false,
@@ -1619,6 +1633,7 @@
             db.collection("users").doc(uid).get().then(doc => {
                 const u = doc.data();
                 const jobOptions = JOB_TITLES.map(j => `<option value="${j}" ${u.jobTitle===j?'selected':''}>${j}</option>`).join('');
+                const currentWorkLoc = u.workLocation || 'HQ';
                 
                 let permsHTML = '<div style="margin-top:1rem; border-top:1px solid var(--border); padding-top:1rem;"><label style="margin-bottom:0.5rem; display:block;">Access Permissions</label><div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">';
                 const userPerms = u.permissions || {};
@@ -1704,6 +1719,13 @@
                         ${!canEditRole ? '<small class="text-danger text-sm">Only Super Admins can change roles.</small>' : ''}
                     </div>
                      <div class="mb-4"><label>Commission Rate (%)</label><input type="number" step="0.1" id="e-c-rate" value="${(u.commissionRate*100).toFixed(1)}"></div>
+                     <div class="mb-4">
+                        <label>Work Location</label>
+                        <select id="e-c-work-loc">
+                            <option value="HQ" ${currentWorkLoc === 'HQ' ? 'selected' : ''}>HQ (Office)</option>
+                            <option value="WFH" ${currentWorkLoc === 'WFH' ? 'selected' : ''}>Work From Home (WFH)</option>
+                        </select>
+                    </div>
                      ${permsHTML}
                      ${bankHTML}
                 `, `<button class="btn btn-primary" onclick="updateCrewData('${uid}')">Save</button>`);
@@ -1755,7 +1777,8 @@
                 commissionRate: isNaN(rateVal) ? 0.0 : (rateVal / 100),
                 permissions: newPerms,
                 bankDetails: bankData,
-                bypassApproval: bypassVal 
+                bypassApproval: bypassVal,
+                workLocation: document.getElementById('e-c-work-loc').value // Update Work Location
             };
 
             if (isSuperAdmin()) {
