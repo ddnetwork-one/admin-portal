@@ -86,10 +86,10 @@
         .p-4 { padding: 1rem; }
         .text-center { text-align: center; }
         .text-sm { font-size: 0.85rem; }
+        .font-bold { font-weight: 700; }
         .text-muted { color: var(--text-muted); }
         .block { display: block; }
         .font-mono { font-family: var(--font-mono); letter-spacing: -0.5px; }
-        .cursor-pointer { cursor: pointer; }
 
         /* --- SCROLLBAR (Custom for better UX) --- */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -277,12 +277,6 @@
             position: absolute; right: 15px; font-size: 0.8rem; opacity: 0.7;
         }
 
-        /* BADGE COUNTERS FOR SIDEBAR */
-        .nav-badge-count {
-            margin-left: auto; background: var(--danger); color: white; font-size: 0.65rem; font-weight: 700;
-            padding: 2px 6px; border-radius: 10px; min-width: 18px; text-align: center;
-        }
-
         /* MAIN CONTENT */
         main { 
             flex:1; overflow-y: auto; overflow-x: hidden; background: var(--bg-app); padding: 1.5rem; position: relative; 
@@ -297,8 +291,6 @@
             display: flex; align-items: center; gap: 1.2rem; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         .stat-card:hover { transform: translateY(-2px); border-color: var(--border-active); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
-        .stat-card.clickable { cursor: pointer; }
-        .stat-card.clickable:hover { border-color: var(--primary); background: #f8fafc; }
         .stat-icon { 
             width: 48px; height: 48px; border-radius: 12px; background: #f3f4f6; display: flex; 
             align-items: center; justify-content: center; font-size: 1.4rem; color: var(--text-main);
@@ -318,42 +310,7 @@
         .quick-action-card:hover { border-color: var(--primary); background: #eff6ff; transform: translateY(-2px); }
         .quick-action-card i { font-size: 1.5rem; color: var(--primary); }
 
-        /* NEW: OWNER SNAPSHOT */
-        .owner-snapshot {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; padding: 1.5rem;
-            border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;
-        }
-        .os-item h4 { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 0.5rem; }
-        .os-item .val { font-size: 1.5rem; font-weight: 700; }
-
-        /* NEW: ACTION ALERTS */
-        .action-alerts {
-            background: #fff7ed; border: 1px solid #ffedd5; border-radius: 12px; padding: 1rem; margin-bottom: 2rem;
-        }
-        .alert-item { display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem; font-size: 0.9rem; color: #9a3412; }
-        .alert-item:last-child { margin-bottom: 0; }
-        .alert-item i { color: var(--warning); font-size: 1.1rem; }
-
-        /* NEW: GROUPED ACTIVITY */
-        .activity-group { margin-bottom: 1rem; }
-        .activity-group-header { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem; display: flex; justify-content: space-between;}
-        .activity-item {
-            display: flex; align-items: flex-start; gap: 1rem; padding: 0.8rem; border-bottom: 1px solid var(--border-light);
-            transition: 0.2s;
-        }
-        .activity-item:last-child { border-bottom: none; }
-        .activity-item:hover { background: #f9fafb; }
-        .activity-icon { 
-            width: 32px; height: 32px; background: #eff6ff; border-radius: 8px; color: var(--primary); 
-            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-        }
-        .activity-content { flex: 1; }
-        .activity-content h5 { font-size: 0.85rem; color: var(--text-main); margin-bottom: 2px; }
-        .activity-content p { font-size: 0.75rem; color: var(--text-muted); }
-        .activity-time { font-size: 0.7rem; color: var(--text-faint); text-align: right; white-space: nowrap; }
-
-        /* TABLE STYLES */
+        /* RESPONSIVE TABLE FIX */
         .table-container { 
             background: var(--bg-surface); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; 
             margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
@@ -367,24 +324,9 @@
         }
         table { width: 100%; border-collapse: collapse; min-width: 800px; /* Forces scroll on mobile */ }
         th { text-align: left; padding: 0.8rem 1.2rem; color: var(--text-muted); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; background: #f3f4f6; white-space: nowrap; border-bottom: 1px solid var(--border); letter-spacing: 0.5px; }
-        th.sortable { cursor: pointer; user-select: none; }
-        th.sortable:hover { background: #e5e7eb; }
-        th.sortable i { font-size: 0.8rem; margin-left: 4px; opacity: 0.5; }
         td { padding: 1rem 1.2rem; border-bottom: 1px solid var(--border); color: var(--text-main); font-size: 0.85rem; vertical-align: middle; transition: 0.1s; background: white; white-space: nowrap; }
         tr:last-child td { border-bottom: none; }
         tr:hover td { background: #f9fafb; }
-
-        /* PAGINATION */
-        .pagination-controls {
-            display: flex; align-items: center; justify-content: space-between; padding: 1rem; border-top: 1px solid var(--border); background: #f9fafb;
-        }
-        .pagination-info { font-size: 0.85rem; color: var(--text-muted); }
-        .pagination-buttons { display: flex; gap: 0.5rem; align-items: center; }
-        .page-btn { padding: 0.4rem 0.8rem; border: 1px solid var(--border); border-radius: 6px; background: white; cursor: pointer; font-size: 0.85rem; }
-        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .page-btn:hover:not(:disabled) { background: #f3f4f6; }
-        .rows-per-page { margin-right: 1rem; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; }
-        .rows-per-page select { width: auto; padding: 0.3rem; font-size: 0.85rem; }
 
         /* --- TIMELINE (Client History) --- */
         .timeline-container { margin-top: 1rem; border-left: 2px solid var(--border); padding-left: 1.5rem; margin-left: 1rem; }
@@ -490,21 +432,15 @@
         .access-denied-title { font-size: 1.5rem; color: var(--text-main); margin-bottom: 0.5rem; }
         .access-denied-desc { font-size: 1rem; max-width: 400px; line-height: 1.5; margin-bottom: 2rem; }
 
-        /* NEW: FOOTER */
-        .app-footer {
-            margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-faint);
-        }
-        .footer-link { color: var(--primary); text-decoration: none; cursor: pointer; }
-
         /* RESPONSIVE BREAKPOINTS */
         @media(max-width: 1024px) {
             aside { transform: translateX(-100%); width: 280px; box-shadow: 20px 0 40px rgba(0,0,0,0.1); }
             aside.mobile-open { transform: translateX(0); }
-            main { margin-left: 0 !important; width: 100% !important; padding: 1rem; padding-top: 5rem; padding-bottom: 4rem; }
+            main { margin-left: 0 !important; width: 100% !important; padding: 1rem; padding-top: 5rem; }
             .header-brand span { display: none; }
             .notif-dropdown { right: 0; width: 90vw; }
-            .owner-snapshot { grid-template-columns: 1fr; }
+            /* On mobile, search bar might take too much space, hide text */
+            .header-search { max-width: 150px; }
         }
         @media(min-width: 1025px) and (max-width: 1440px) { .invoice-paper { transform: scale(0.85); } }
         @media print { body > *:not(#invoiceModalOverlay) { display: none !important; } }
@@ -590,21 +526,21 @@
                 <div class="nav-item" onclick="navigateTo('/')"><i class="ri-dashboard-line"></i> <span class="nav-text">Dashboard</span></div>
                 
                 <div class="nav-section-title"><span class="nav-text">Operations</span></div>
-                <div class="nav-item" onclick="navigateTo('/orders')" id="nav-orders" oncontextmenu="handleContextMenu(event, '/orders', 'Orders')"><i class="ri-shopping-bag-3-line"></i> <span class="nav-text">Orders</span><span class="nav-badge-count hidden" id="count-orders">0</span></div>
+                <div class="nav-item" onclick="navigateTo('/orders')" id="nav-orders" oncontextmenu="handleContextMenu(event, '/orders', 'Orders')"><i class="ri-shopping-bag-3-line"></i> <span class="nav-text">Orders</span></div>
                 <div class="nav-item" onclick="navigateTo('/clients')" id="nav-clients" oncontextmenu="handleContextMenu(event, '/clients', 'Clients')"><i class="ri-user-line"></i> <span class="nav-text">Clients</span></div>
                 <div class="nav-item" onclick="navigateTo('/requests')" id="nav-requests" oncontextmenu="handleContextMenu(event, '/requests', 'Requests')"><i class="ri-database-2-line"></i> <span class="nav-text">Requests</span></div>
-                <div class="nav-item" onclick="navigateTo('/support')" id="nav-support" oncontextmenu="handleContextMenu(event, '/support', 'Support')"><i class="ri-customer-service-2-line"></i> <span class="nav-text">Support</span><span class="nav-badge-count hidden" id="count-support">0</span></div>
+                <div class="nav-item" onclick="navigateTo('/support')" id="nav-support" oncontextmenu="handleContextMenu(event, '/support', 'Support')"><i class="ri-customer-service-2-line"></i> <span class="nav-text">Support</span></div>
                 <div class="nav-item" onclick="navigateTo('/vouchers')" id="nav-vouchers"><i class="ri-ticket-2-line"></i> <span class="nav-text">Vouchers</span></div>
                 
                 <div class="nav-section-title"><span class="nav-text">Management</span></div>
                 <div class="nav-item" onclick="navigateTo('/portfolio')" id="nav-portfolio"><i class="ri-gallery-line"></i> <span class="nav-text">Portfolio</span></div>
-                <div class="nav-item" onclick="navigateTo('/content')" id="nav-content"><i class="ri-layout-masonry-line"></i> <span class="nav-text">Products & Pkg</span></div>
+                <div class="nav-item" onclick="navigateTo('/content')" id="nav-content"><i class="ri-layout-masonry-line"></i> <span class="nav-text">Content & Pkg</span></div>
                 <div class="nav-item" onclick="navigateTo('/public-promos')" id="nav-public-promos"><i class="ri-coupon-3-line"></i> <span class="nav-text">Public Promos</span></div>
                 
                 <div class="nav-section-title"><span class="nav-text">System</span></div>
                 <div class="nav-item" onclick="navigateTo('/crew')" id="nav-crew"><i class="ri-team-line"></i> <span class="nav-text">Internal Crew</span></div>
                 <div class="nav-item" onclick="navigateTo('/config')" id="nav-config"><i class="ri-settings-4-line"></i> <span class="nav-text">System Config</span></div>
-                <div class="nav-item hidden" id="nav-approvals" onclick="navigateTo('/approvals')"><i class="ri-shield-check-line" style="color: var(--warning)"></i> <span class="nav-text">Approval Tools</span><span class="nav-badge-count hidden" id="count-approvals">0</span></div>
+                <div class="nav-item hidden" id="nav-approvals" onclick="navigateTo('/approvals')"><i class="ri-shield-check-line" style="color: var(--warning)"></i> <span class="nav-text">Approval Tools</span></div>
                 
                 <!-- FINANCE -->
                 <div class="nav-section-title"><span class="nav-text">Finance</span></div>
@@ -622,12 +558,6 @@
         </aside>
 
         <main id="main"></main>
-        
-        <!-- NEW FOOTER -->
-        <div class="app-footer" style="position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-app); padding: 0.5rem 1.5rem; z-index: 90; pointer-events: none;">
-            <span id="last-updated-time">Last updated: Just now</span>
-            <span style="pointer-events: auto;"><a class="footer-link" onclick="navigateTo('/my-profile')">View System Activity Log</a></span>
-        </div>
     </div>
 
     <!-- MAIN MODAL -->
@@ -643,15 +573,18 @@
     </div>
 
     <div class="toast-container" id="toastContainer"></div>
-
 <!-- JAVASCRIPT -->
 <script>
         // --- FIX: HIDE AUTH SCREEN IMMEDIATELY TO PREVENT REFRESH FLASH ---
         document.getElementById('auth-screen').classList.add('hidden');
 
-        // --- GLOBAL FILTER STATE ---
-        // This ensures filters persist when Firestore updates the table DOM
-        window.savedTableFilters = window.savedTableFilters || {};
+        // --- GLOBAL COMMISSION RATES CONFIG ---
+        let commissionRatesConfig = {
+            sales: 0.50,
+            tech: 0.20,
+            success: 0.15,
+            ops: 0.05
+        };
 
         // --- CONSTANTS & CONFIG ---
         const JOB_TITLES = [
@@ -671,24 +604,6 @@
             "Support Operations Executive"
         ];
 
-        // NEW: Department Map for Internal Crew
-        const JOB_DEPARTMENT_MAP = {
-            "Founder & Managing Director": "Founder / Owner",
-            "Project & Client Manager": "Operations / Admin",
-            "Account / Operations / Marketing Manager": "Operations / Admin",
-            "Finance / Billing Executive": "Finance",
-            "People / Team Operations Executive": "Operations / Admin",
-            "Business Development Executive": "Sales",
-            "Sales Executive": "Sales",
-            "Client Success Coordinator": "Success / CX",
-            "Client Experience Executive": "Success / CX",
-            "Technical Specialist": "Tech",
-            "Web Developer": "Tech",
-            "Full Stack Developer": "Tech",
-            "Automation & AI Specialist": "Tech",
-            "Support Operations Executive": "Operations / Admin"
-        };
-
         const JOB_ROLE_MAP = {
             "Founder & Managing Director": "super_admin",
             "Project & Client Manager": "mid_admin",
@@ -706,13 +621,8 @@
             "Support Operations Executive": "crew"
         };
 
-        let commissionRatesConfig = {
-            sales: 0.50,
-            tech: 0.20,
-            success: 0.15,
-            ops: 0.05
-        };
-
+        // --- COMMISSION CONFIGURATION ---
+        // Defines which Category a job title belongs to (Sales, Tech, Support, Ops)
         const COMMISSION_CATEGORY_MAP = {
             "Sales Executive": "sales",
             "Business Development Executive": "sales",
@@ -727,6 +637,7 @@
             "People / Team Operations Executive": "ops"
         };
 
+        // --- PERMISSION SYSTEM ---
         const PERMISSION_KEYS = {
             EDIT_ORDERS: 'edit_orders',
             EDIT_CLIENTS: 'edit_clients',
@@ -745,6 +656,8 @@
             APPROVE_ACTIONS: 'approve_actions', 
             BYPASS_APPROVAL: 'bypass_approval'
         };
+
+        function getDefaultRate(title) { return 0.0; } // Default 0, calculated dynamically now
 
         // --- FIREBASE SETUP ---
         const firebaseConfig = {
@@ -767,9 +680,7 @@
             else { console.error("Firebase initialization failed."); }
         } catch(e) { console.log("Firebase init error", e); }
 
-        // --- HELPER FUNCTIONS ---
-        function getDefaultRate(title) { return 0.0; }
-
+        // --- HELPER: LOAD COMMISSION CONFIG ---
         async function loadCommissionConfig() {
             try {
                 const doc = await db.collection("config").doc("site_settings").get();
@@ -781,6 +692,7 @@
             }
         }
 
+        // --- AUTO CREATE CONFIG ---
         async function initializeDatabase() {
             try {
                 const configRef = db.collection("config").doc("site_settings");
@@ -807,6 +719,7 @@
                         commission_rates: defaultRates
                     });
                 } else {
+                    // Ensure commission_rates exist if doc exists
                     const data = doc.data();
                     if(!data.commission_rates) {
                          await configRef.update({
@@ -978,16 +891,9 @@
                             listenForNotifications(); 
                         }
 
-                        // NEW: Listen for Global Counts (Sidebar Badges)
-                        listenForGlobalCounts();
-
                         initRouter(); 
                         initializeDatabase();
                         listenForMaintenanceChanges(); 
-                        
-                        // Start "Last Updated" timer
-                        updateLastUpdatedTime();
-                        setInterval(updateLastUpdatedTime, 60000);
                     } else {
                         showToast("Access Denied. User record not found.", "error");
                         auth.signOut();
@@ -1129,6 +1035,7 @@
                     // Reload commission config if it changes
                     if(data.commission_rates) {
                         commissionRatesConfig = data.commission_rates;
+                        // If finance tools is open, refresh inputs
                         const isMyView = !canAccessFinanceTools();
                         if(document.getElementById('tab-content-tools').classList.contains('active') && !isMyView) {
                             populateFinanceRatesUI();
@@ -1159,7 +1066,7 @@
             return currentMaintenanceConfig.disabledMenus.includes(path);
         }
 
-        // --- GLOBAL COUNTS & NOTIFICATIONS ---
+        // --- NOTIFICATIONS ---
         function toggleNotifications() {
             const el = document.getElementById('notifDropdown');
             el.classList.toggle('show');
@@ -1190,38 +1097,6 @@
                     </div>`;
                 }).join('');
             });
-        }
-
-        // NEW: Listen for Global Badge Counts
-        function listenForGlobalCounts() {
-            // Orders Count
-            db.collection("orders").where("status", "==", "Pending").onSnapshot(snap => {
-                const el = document.getElementById('count-orders');
-                if(el) {
-                    el.innerText = snap.size;
-                    el.classList.toggle('hidden', snap.size === 0);
-                }
-            });
-
-            // Support Count
-            db.collection("tickets").where("status", "in", ["Open", "In Progress"]).onSnapshot(snap => {
-                const el = document.getElementById('count-support');
-                if(el) {
-                    el.innerText = snap.size;
-                    el.classList.toggle('hidden', snap.size === 0);
-                }
-            });
-
-            // Approvals Count
-            if(hasPermission(PERMISSION_KEYS.APPROVE_ACTIONS)) {
-                db.collection("pending_edits").where("status", "==", "Pending").onSnapshot(snap => {
-                    const el = document.getElementById('count-approvals');
-                    if(el) {
-                        el.innerText = snap.size;
-                        el.classList.toggle('hidden', snap.size === 0);
-                    }
-                });
-            }
         }
 
         // --- ACCESS CONTROL & PERMISSIONS ---
@@ -1374,19 +1249,24 @@
             setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(), 400); }, 4000);
         }
 
-        function updateLastUpdatedTime() {
-            const now = new Date();
-            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-            document.getElementById('last-updated-time').innerText = `Last updated: ${timeStr}`;
-        }
-
         // --- WHATSAPP HELPER FOR MOBILE ---
         function formatWAPhone(phone) {
             if (!phone) return null;
+            // Remove all non-numeric characters
             let clean = phone.replace(/[^0-9]/g, '');
-            if (clean.startsWith('0')) clean = '60' + clean.substring(1);
-            if (clean.startsWith('+')) clean = clean.substring(1);
+            
+            // If starts with 0, replace with 60
+            if (clean.startsWith('0')) {
+                clean = '60' + clean.substring(1);
+            }
+            // If starts with +, just remove it to be safe, we add it back or rely on wa.me format
+            if (clean.startsWith('+')) {
+                clean = clean.substring(1);
+            }
+            
+            // Basic length check for MY numbers (10-12 digits usually)
             if (clean.length < 10 || clean.length > 13) return null;
+
             return clean;
         }
 
@@ -1403,156 +1283,71 @@
             }
         }
 
-        // --- 1. OVERVIEW (UPDATED) ---
-        let dashboardTimeFilter = 'all'; // 'today', 'month', 'all'
-
+        // --- 1. OVERVIEW ---
         function renderOverview() {
             const main = document.getElementById('main');
             if(!main) return;
             
-            // Owner Snapshot HTML (Conditional)
-            const ownerSnapshotHTML = isSuperAdmin() ? `
-                <div class="owner-snapshot">
-                    <div class="os-item"><h4>Today Revenue</h4><div class="val" id="os-revenue">RM 0</div></div>
-                    <div class="os-item"><h4>Pending Approvals</h4><div class="val" id="os-approvals">0</div></div>
-                    <div class="os-item"><h4>Pending Payouts</h4><div class="val" id="os-payouts">0</div></div>
-                    <div class="os-item"><h4>System Alerts</h4><div class="val" id="os-alerts" style="color:#fca5a5">None</div></div>
-                </div>
-            ` : '';
-
-            // Action Alerts HTML
-            const alertsHTML = `
-                <div class="action-alerts hidden" id="action-alerts-section">
-                    <h4 style="color:#9a3412; margin-bottom:0.5rem; font-size:0.8rem; text-transform:uppercase; font-weight:700;">Action Required</h4>
-                    <div id="action-alerts-list"></div>
-                </div>
-            `;
-
             main.innerHTML = `
                 <div class="flex justify-between items-center mb-4" style="flex-wrap: wrap; gap:10px;">
                     <h2 style="font-size:1.5rem; font-weight:800; letter-spacing:-0.5px;">Dashboard Overview</h2>
-                    <div style="display:flex; background:#f3f4f6; padding:4px; border-radius:8px;">
-                        <button class="btn btn-sm time-toggle ${dashboardTimeFilter==='today'?'btn-primary':'btn-secondary'}" style="border:none; box-shadow:none;" onclick="setDashboardTimeFilter('today')">Today</button>
-                        <button class="btn btn-sm time-toggle ${dashboardTimeFilter==='month'?'btn-primary':'btn-secondary'}" style="border:none; box-shadow:none;" onclick="setDashboardTimeFilter('month')">Month</button>
-                        <button class="btn btn-sm time-toggle ${dashboardTimeFilter==='all'?'btn-primary':'btn-secondary'}" style="border:none; box-shadow:none;" onclick="setDashboardTimeFilter('all')">All Time</button>
-                    </div>
                 </div>
-
-                ${ownerSnapshotHTML}
-                ${alertsHTML}
-
+                
                 <div class="quick-actions-grid">
                     <div class="quick-action-card" onclick="navigateTo('/orders')"><i class="ri-shopping-cart-2-line"></i><span>New Order</span></div>
                     <div class="quick-action-card" onclick="navigateTo('/clients')"><i class="ri-user-add-line"></i><span>Add Client</span></div>
                     <div class="quick-action-card" onclick="navigateTo('/support')"><i class="ri-ticket-line"></i><span>New Ticket</span></div>
                     <div class="quick-action-card" onclick="navigateTo('/vouchers')"><i class="ri-coupon-line"></i><span>Create Voucher</span></div>
-                    <!-- NEW ACTIONS -->
-                    <div class="quick-action-card" onclick="showCreateInvoiceModal()"><i class="ri-file-list-3-line"></i><span>Create Invoice</span></div>
-                    <div class="quick-action-card" onclick="navigateTo('/crew')"><i class="ri-user-add-line"></i><span>Add Staff</span></div>
                 </div>
 
                 <div class="stats-grid" id="stats-grid">
                     <div class="page-loader" style="height:100px;"><div class="loading-spinner"></div></div>
                 </div>
-                
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
                     <div class="list-group">
-                        <div class="flex justify-between items-center" style="margin-bottom:1rem;">
-                            <h3><i class="ri-pulse-line" style="color:var(--success)"></i> Recent Activity</h3>
-                            <select id="activity-filter" onchange="renderDashboardActivity()" style="width:auto; padding:0.3rem; font-size:0.75rem;">
-                                <option value="all">All</option>
-                                <option value="orders">Orders</option>
-                                <option value="finance">Finance</option>
-                                <option value="system">System</option>
-                            </select>
-                        </div>
+                        <h3><i class="ri-pulse-line" style="color:var(--success)"></i> Recent Activity</h3>
                         <div id="activity-feed"><div class="text-center p-4 text-muted">Loading...</div></div>
                     </div>
                 </div>
             `;
-
-            updateDashboardStats();
-            renderDashboardActivity();
-            if(isSuperAdmin()) updateOwnerSnapshot();
-        }
-
-        function setDashboardTimeFilter(period) {
-            dashboardTimeFilter = period;
-            document.querySelectorAll('.time-toggle').forEach(b => {
-                if(b.innerText.toLowerCase() === period || (period==='all' && b.innerText==='All Time')) {
-                    b.classList.remove('btn-secondary'); b.classList.add('btn-primary');
-                } else {
-                    b.classList.remove('btn-primary'); b.classList.add('btn-secondary');
+            
+            db.collection("activity_logs").orderBy("timestamp", "desc").limit(5).onSnapshot(snap => {
+                const feed = document.getElementById('activity-feed');
+                if(feed) {
+                    if(snap.empty) feed.innerHTML = '<div class="text-muted text-sm text-center mt-2">No recent activity</div>';
+                    else feed.innerHTML = snap.docs.map(doc => {
+                        const d = doc.data();
+                        return `<div class="activity-item">
+                            <div class="activity-icon"><i class="ri-shield-flash-line" style="color:var(--primary)"></i></div>
+                            <div class="activity-content">
+                                <h5>${d.message}</h5>
+                                <p>${d.actorName || d.actor}</p>
+                            </div>
+                            <div class="activity-time">${formatDateTime(d.timestamp)}</div>
+                        </div>`;
+                    }).join('');
                 }
             });
-            updateDashboardStats();
-            if(isSuperAdmin()) updateOwnerSnapshot();
-        }
-
-        function getStartOfPeriod(period) {
-            const now = new Date();
-            if(period === 'today') {
-                now.setHours(0,0,0,0);
-                return firebase.firestore.Timestamp.fromDate(now);
-            } else if (period === 'month') {
-                now.setDate(1);
-                now.setHours(0,0,0,0);
-                return firebase.firestore.Timestamp.fromDate(now);
-            }
-            return null;
-        }
-
-        async function updateDashboardStats() {
-            const start = getStartOfPeriod(dashboardTimeFilter);
-            
-            const queryBase = (col) => start ? db.collection(col).where("timestamp", ">=", start) : db.collection(col);
 
             const promises = [
-                queryBase("tickets").where("status", "in", ["Open", "In Progress"]).get(),
-                queryBase("users").where("role", "==", "user").get(),
-                queryBase("orders").where("status", "==", "Pending").get(),
-                queryBase("orders").where("status", "==", "Paid").get(),
-                queryBase("customer_requests").where("status", "==", "Pending").get()
+                db.collection("tickets").where("status", "in", ["Open", "In Progress"]).get(),
+                db.collection("users").where("role", "==", "user").get(),
+                db.collection("orders").where("status", "==", "Pending").get(),
+                db.collection("orders").where("status", "==", "Paid").get(),
+                db.collection("customer_requests").where("status", "==", "Pending").get()
             ];
 
             Promise.all(promises).then(([tSnap, uSnap, oSnapP, oSnapPaid, rSnapP]) => {
                 const stats = [
-                    { 
-                        label: "Active Cases", 
-                        val: tSnap.size, 
-                        icon: "ri-customer-service-2-line", 
-                        color: "var(--ticket)",
-                        clickable: true,
-                        link: '/support'
-                    },
-                    { 
-                        label: "Total Clients", 
-                        val: uSnap.size, 
-                        icon: "ri-user-smile-line", 
-                        color: "var(--primary)",
-                        clickable: false
-                    },
-                    { 
-                        label: "Pending Orders", 
-                        val: oSnapP.size, 
-                        icon: "ri-shopping-basket-2-line", 
-                        color: "var(--text-muted)",
-                        clickable: true,
-                        link: '/orders'
-                    },
-                    { 
-                        label: "Revenue (Est.)", 
-                        val: `RM ${oSnapPaid.size * 300}`, // Simple logic from original, can be improved
-                        icon: "ri-wallet-3-line", 
-                        color: "var(--success)",
-                        clickable: true,
-                        link: '/commissions'
-                    }
+                    { label: "Active Cases", val: tSnap.size, icon: "ri-customer-service-2-line", color: "var(--ticket)" },
+                    { label: "Total Clients", val: uSnap.size, icon: "ri-user-smile-line", color: "var(--primary)" },
+                    { label: "Pending Orders", val: oSnapP.size, icon: "ri-shopping-basket-2-line", color: "var(--text-muted)" },
+                    { label: "Revenue (Est.)", val: `RM ${oSnapPaid.size * 300}`, icon: "ri-wallet-3-line", color: "var(--success)" }
                 ];
                 const grid = document.getElementById('stats-grid');
                 if(grid) {
                     grid.innerHTML = stats.map(s => `
-                        <div class="stat-card ${s.clickable ? 'clickable' : ''}" onclick="${s.clickable ? `navigateTo('${s.link}')` : ''}">
+                        <div class="stat-card">
                             <div class="stat-icon" style="color:${s.color}; background:${s.color}15"><i class="${s.icon}"></i></div>
                             <div class="stat-info">
                                 <div class="stat-val">${s.val}</div>
@@ -1561,106 +1356,6 @@
                         </div>
                     `).join('');
                 }
-
-                // Update Action Alerts
-                const alertsContainer = document.getElementById('action-alerts-section');
-                const alertsList = document.getElementById('action-alerts-list');
-                if(alertsContainer && alertsList) {
-                    let alerts = [];
-                    if(oSnapP.size > 0) alerts.push({msg: `${oSnapP.size} unpaid invoices pending`, icon:'ri-file-warning-line'});
-                    if(rSnapP.size > 0) alerts.push({msg: `${rSnapP.size} request(s) waiting approval`, icon:'ri-user-follow-line'});
-                    
-                    if(alerts.length > 0) {
-                        alertsContainer.classList.remove('hidden');
-                        alertsList.innerHTML = alerts.map(a => `
-                            <div class="alert-item">
-                                <i class="${a.icon}"></i>
-                                <span>${a.msg}</span>
-                            </div>
-                        `).join('');
-                    } else {
-                        alertsContainer.classList.add('hidden');
-                    }
-                }
-            });
-        }
-
-        function updateOwnerSnapshot() {
-            if(!isSuperAdmin()) return;
-            const start = getStartOfPeriod(dashboardTimeFilter);
-            const queryBase = (col) => start ? db.collection(col).where("timestamp", ">=", start) : db.collection(col);
-
-            // Simplified logic for snapshot
-            Promise.all([
-                queryBase("orders").where("status", "==", "Paid").get(),
-                db.collection("pending_edits").where("status", "==", "Pending").get(),
-                queryBase("commission_overview").where("status", "==", "unpaid").get(),
-                queryBase("vouchers_history").where("status", "==", "Expired").get() // System alert proxy
-            ]).then(([ordSnap, appSnap, commSnap, expSnap]) => {
-                if(document.getElementById('os-revenue')) {
-                    // Calc real revenue roughly
-                    let rev = 0; ordSnap.forEach(d => rev += parseFloat((d.data().total || '0').replace('RM','')) );
-                    document.getElementById('os-revenue').innerText = `RM ${rev}`;
-                }
-                if(document.getElementById('os-approvals')) document.getElementById('os-approvals').innerText = appSnap.size;
-                if(document.getElementById('os-payouts')) document.getElementById('os-payouts').innerText = commSnap.size;
-                if(document.getElementById('os-alerts')) {
-                    const txt = expSnap.size > 0 ? `${expSnap.size} Vouchers Expired` : 'None';
-                    document.getElementById('os-alerts').innerText = txt;
-                    document.getElementById('os-alerts').style.color = expSnap.size > 0 ? '#fca5a5' : '#94a3b8';
-                }
-            });
-        }
-
-        function renderDashboardActivity() {
-            const filter = document.getElementById('activity-filter') ? document.getElementById('activity-filter').value : 'all';
-            const feed = document.getElementById('activity-feed');
-            if(!feed) return;
-
-            let query = db.collection("activity_logs").orderBy("timestamp", "desc").limit(20);
-            
-            // Simple client-side filter for demo performance (Firestore queries would be better for massive scale)
-            query.onSnapshot(snap => {
-                if(snap.empty) {
-                    feed.innerHTML = '<div class="text-muted text-sm text-center mt-2">No recent activity</div>';
-                    return;
-                }
-                
-                // Grouping logic
-                const groups = {};
-                snap.docs.forEach(doc => {
-                    const d = doc.data();
-                    const key = d.actor || 'System';
-                    if(!groups[key]) groups[key] = [];
-                    groups[key].push(d);
-                });
-
-                // Filter logic
-                if (filter !== 'all') {
-                    // This is rough, ideally query Firestore directly
-                    // Just hiding DOM elements for simplicity
-                }
-
-                feed.innerHTML = Object.keys(groups).map(actor => {
-                    const actions = groups[actor];
-                    const latest = actions[0];
-                    return `
-                        <div class="activity-group">
-                            <div class="activity-group-header">
-                                <span style="font-weight:600; color:var(--text-main);">${latest.actorName || actor}</span>
-                                <span>${formatDateTime(latest.timestamp)}</span>
-                            </div>
-                            ${actions.map(act => `
-                                <div class="activity-item">
-                                    <div class="activity-icon"><i class="ri-shield-flash-line" style="color:var(--primary)"></i></div>
-                                    <div class="activity-content">
-                                        <h5>${act.message}</h5>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
-                }).join('');
             });
         }
 
@@ -1681,10 +1376,10 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th class="sortable" onclick="genericSort('orders', 'timestamp')">Date</th>
+                                    <th>Date</th>
                                     <th>Client</th>
                                     <th>Package</th>
-                                    <th>Cycle</th>
+                                    <th>Cycle</th> <!-- Added Cycle -->
                                     <th>Total</th>
                                     <th>Status</th>
                                     <th>Actions</th>
@@ -1739,10 +1434,6 @@
                         </td>
                     </tr>`;
                 }).join('');
-                
-                // FIX: Re-apply filter if it exists
-                const savedSearch = window.savedTableFilters && window.savedTableFilters['orders-tbody'];
-                if(savedSearch) filterTable('orders-tbody', savedSearch);
             });
         }
 
@@ -1794,14 +1485,6 @@
                 showToast("Error generating invoice", "error");
             }
         }
-        
-        // NEW: Show Create Invoice Modal (Quick Action)
-        function showCreateInvoiceModal() {
-            // Reusing existing invoice generation flow but for manual creation if needed
-            // For now, let's just redirect to Orders as that's where invoice logic lives
-            navigateTo('/orders');
-            showToast("Select an order to generate an invoice", "info");
-        }
 
         async function sendPaymentReminder(id) {
             try {
@@ -1823,15 +1506,20 @@
                     msg = `Hi ${d.customerName},\n\nWe noticed that payment for your recent order with DDNetwork was not completed successfully.\n\nOrder ID: #${orderRef}\nOutstanding Amount: ${d.total}\n\nTo avoid any delay or cancellation, please complete the payment as soon as possible. If you encountered any issues during payment, let us know and we will assist you.\n\nThank you for your understanding.\n\n[Auto-generated from DDNet System]`;
                 }
 
+                // Robust Phone Cleaning
                 const cleanPhone = formatWAPhone(d.customerPhone);
+                
                 if(!cleanPhone) {
                     showToast("Invalid Phone Number", "error");
                     return;
                 }
                 
                 const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+                
+                // Mobile Fallback: window.open might be blocked, try location.href
                 const win = window.open(url, '_blank');
                 if (!win || win.closed || typeof win.closed == 'undefined') {
+                    // Fallback
                     window.location.href = url;
                 }
                 
@@ -1917,6 +1605,7 @@
             `, `<button class="btn btn-primary" onclick="updateOrderDetails('${id}')">Save Changes</button>`);
         }
 
+        // --- SMART COMMISSION GENERATION ---
         async function generateCommissionsForOrder(orderId, orderData) {
             const existingCommSnap = await db.collection("commission_overview").where("orderId", "==", orderId).get();
             const batch = db.batch();
@@ -1936,14 +1625,16 @@
                 const orderTotal = parseFloat(orderData.total.replace('RM ', '')) || 0;
                 const orderDate = orderData.timestamp || firebase.firestore.FieldValue.serverTimestamp();
                 
+                // 1. Determine Team Rate based on Billing Cycle
                 const cycle = (orderData.billingCycle || 'one-time').toLowerCase();
                 let teamPercentage = 0.0;
-                if(cycle.includes('month')) teamPercentage = 0.10;
-                else if(cycle.includes('year')) teamPercentage = 0.12;
-                else teamPercentage = 0.20;
+                if(cycle.includes('month')) teamPercentage = 0.10;      // 10% for monthly
+                else if(cycle.includes('year')) teamPercentage = 0.12;  // 12% for yearly
+                else teamPercentage = 0.20;                             // 20% for one-time
 
                 const totalTeamCommission = orderTotal * teamPercentage;
                 
+                // 2. Define Split Percentages for Categories (Use Global Config)
                 const SALES_SPLIT = commissionRatesConfig.sales;  
                 const TECH_SPLIT = commissionRatesConfig.tech;    
                 const SUCCESS_SPLIT = commissionRatesConfig.success;
@@ -1952,6 +1643,7 @@
                 repIds.forEach(repId => {
                     const rep = usersMap[repId];
                     if(rep) {
+                        // Determine Category based on Job Title
                         const category = COMMISSION_CATEGORY_MAP[rep.jobTitle] || 'other';
                         let sharePercentage = 0.0;
 
@@ -1959,9 +1651,16 @@
                         else if (category === 'tech') sharePercentage = TECH_SPLIT;
                         else if (category === 'success') sharePercentage = SUCCESS_SPLIT;
                         else if (category === 'ops') sharePercentage = OPS_SPLIT;
-                        else sharePercentage = 0.0;
+                        else sharePercentage = 0.0; // Roles like Founder/Admin might need manual override or 0%
+
+                        // Formula: Final Amount = (Order Total * Team Rate) * Category Split
+                        // Note: If multiple people in Sales, they SPLIT the Sales Portion?
+                        // The prompt implies "Sales commission = team commission x 50%". Usually this is split.
+                        // We will implement Equal Split within category for now.
                         
                         const categoryPortion = totalTeamCommission * sharePercentage;
+                        
+                        // Count people in this category to split the portion
                         const peopleInCategory = repIds.filter(id => {
                              const u = usersMap[id];
                              const cat = COMMISSION_CATEGORY_MAP[u.jobTitle] || 'other';
@@ -2080,10 +1779,6 @@
                         </td>
                     </tr>`;
                 }).join('');
-                
-                // FIX: Re-apply filter if it exists
-                const savedSearch = window.savedTableFilters && window.savedTableFilters['client-tbody'];
-                if(savedSearch) filterTable('client-tbody', savedSearch);
             });
         }
         
@@ -2166,236 +1861,60 @@
             if(confirm(`Send reset email to ${email}?`)) { auth.sendPasswordResetEmail(email).then(() => showToast("Reset email sent", "success")); }
         }
 
-        // --- 4. CREW MANAGEMENT (UPDATED WITH PAGINATION & SORTING) ---
-        let crewState = {
-            data: [],
-            currentPage: 1,
-            rowsPerPage: 10,
-            sortCol: 'crewId',
-            sortAsc: true,
-            filters: {
-                search: '',
-                role: '',
-                status: ''
-            }
-        };
-
+        // --- 4. CREW MANAGEMENT ---
         function renderCrew() {
             const main = document.getElementById('main');
             if(!main) return;
 
             const canEdit = checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CREW);
-            
-            // Generate Role Options
-            const roleOptions = `
-                <option value="">All Roles</option>
-                <option value="super_admin">Super Admin</option>
-                <option value="mid_admin">Mid Admin</option>
-                <option value="admin">Admin</option>
-                <option value="crew">Crew</option>
-            `;
-
             main.innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:800;">Internal Crew</h2>
                     ${canEdit ? `<button class="btn btn-primary" onclick="openAddCrewModal()"><i class="ri-add-line"></i> Add Crew</button>` : ''}
                 </div>
                 <div class="table-container">
-                    <div class="table-header" style="gap:10px; display:flex; flex-wrap:wrap;">
-                        <div style="flex:1; min-width:200px;">
-                            <input type="text" id="crew-search" placeholder="Search Name, ID, Email..." onkeyup="handleCrewFilter('search', this.value)">
-                        </div>
-                        <div style="width:150px;">
-                            <select id="crew-role-filter" onchange="handleCrewFilter('role', this.value)">
-                                ${roleOptions}
-                            </select>
-                        </div>
-                         <div style="width:150px;">
-                            <select id="crew-status-filter" onchange="handleCrewFilter('status', this.value)">
-                                <option value="">All Status</option>
-                                <option value="active">Active</option>
-                                <option value="suspended">Suspended</option>
-                            </select>
-                        </div>
-                    </div>
                     <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th class="sortable" onclick="sortCrew('crewId')">Crew ID</th>
-                                    <th class="sortable" onclick="sortCrew('name')">Name</th>
-                                    <th class="sortable" onclick="sortCrew('email')">Email</th>
-                                    <th>Phone</th>
-                                    <th>Department</th>
-                                    <th>Rate / Commission</th>
-                                    <th>Role</th>
-                                    <th>Job Title</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="crew-tbody">
-                                <tr><td colspan="10" class="text-center"><div class="loading-spinner"></div></td></tr>
-                            </tbody>
-                        </table>
+                        <table><thead><tr><th>Crew ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Work Loc</th><th>Role</th><th>Job Title</th><th>Status</th><th>Actions</th></tr></thead><tbody id="crew-tbody">
+                        <tr><td colspan="9" class="text-center"><div class="loading-spinner"></div></td></tr>
+                        </tbody></table>
                     </div>
-                    <div class="pagination-controls">
-                        <div class="pagination-info">
-                            Showing <span id="crew-start-idx">0</span> to <span id="crew-end-idx">0</span> of <span id="crew-total">0</span> entries
-                        </div>
-                        <div class="pagination-buttons">
-                            <div class="rows-per-page">
-                                <label>Rows:</label>
-                                <select id="crew-per-page" onchange="setCrewPerPage(this.value)">
-                                    <option value="10">10</option>
-                                    <option value="25">25</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </select>
-                            </div>
-                            <button class="page-btn" id="crew-prev" onclick="changeCrewPage(-1)">Prev</button>
-                            <span id="crew-page-num" style="font-size:0.85rem; font-weight:600;">1</span>
-                            <button class="page-btn" id="crew-next" onclick="changeCrewPage(1)">Next</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Initial Fetch
-            fetchCrewData();
-        }
-
-        function fetchCrewData() {
+                </div>`;
             db.collection("users").where("role", "in", ["super_admin", "mid_admin", "admin", "crew"]).onSnapshot(snap => {
-                crewState.data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                processCrewData();
-            });
-        }
-
-        function handleCrewFilter(type, value) {
-            crewState.filters[type] = value.toLowerCase();
-            crewState.currentPage = 1;
-            processCrewData();
-        }
-
-        function sortCrew(col) {
-            if(crewState.sortCol === col) {
-                crewState.sortAsc = !crewState.sortAsc;
-            } else {
-                crewState.sortCol = col;
-                crewState.sortAsc = true;
-            }
-            processCrewData();
-        }
-
-        function processCrewData() {
-            let filtered = crewState.data.filter(u => {
-                const matchSearch = !crewState.filters.search || 
-                                    u.name.toLowerCase().includes(crewState.filters.search) || 
-                                    (u.crewId && u.crewId.includes(crewState.filters.search)) ||
-                                    u.email.toLowerCase().includes(crewState.filters.search);
-                
-                const matchRole = !crewState.filters.role || u.role === crewState.filters.role;
-                
-                let matchStatus = true;
-                if(crewState.filters.status === 'active') matchStatus = !u.isSuspended;
-                if(crewState.filters.status === 'suspended') matchStatus = u.isSuspended;
-
-                return matchSearch && matchRole && matchStatus;
-            });
-
-            // Sorting
-            filtered.sort((a,b) => {
-                let valA = a[crewState.sortCol];
-                let valB = b[crewState.sortCol];
-                
-                // Handle ID numeric sort
-                if(crewState.sortCol === 'crewId') {
-                    valA = parseInt(valA) || 0;
-                    valB = parseInt(valB) || 0;
-                } else {
-                    valA = (valA || '').toString().toLowerCase();
-                    valB = (valB || '').toString().toLowerCase();
-                }
-
-                if(valA < valB) return crewState.sortAsc ? -1 : 1;
-                if(valA > valB) return crewState.sortAsc ? 1 : -1;
-                return 0;
-            });
-
-            // Pagination
-            const total = filtered.length;
-            const start = (crewState.currentPage - 1) * crewState.rowsPerPage;
-            const end = Math.min(start + crewState.rowsPerPage, total);
-            const pageData = filtered.slice(start, end);
-
-            // Update DOM
-            const tbody = document.getElementById('crew-tbody');
-            if(!tbody) return;
-
-            if(total === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">No crew members found</td></tr>';
-            } else {
-                tbody.innerHTML = pageData.map(u => {
-                    const dept = JOB_DEPARTMENT_MAP[u.jobTitle] || '-';
-                    const commCat = COMMISSION_CATEGORY_MAP[u.jobTitle] || '-';
-                    const commDisplay = commCat.charAt(0).toUpperCase() + commCat.slice(1) + ' Rate';
+                const tbody = document.getElementById('crew-tbody');
+                if(!tbody) return;
+                tbody.innerHTML = snap.docs.map(doc => {
+                    const u = doc.data();
+                    const workLoc = u.workLocation || '-';
                     const isSuspended = u.isSuspended || false;
                     const statusBadge = isSuspended 
                         ? `<span class="badge" style="background:#fef2f2; color:var(--danger); border:1px solid #fecaca">Suspended</span>` 
                         : `<span class="badge" style="background:#ecfdf5; color:var(--success); border:1px solid #a7f3d0">Active</span>`;
 
                     let buttons = '';
-                    if (canEdit = checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CREW)) { // Re-check permission logic inside map
-                         buttons = `<button class="btn btn-sm btn-secondary" onclick="editCrew('${u.id}')"><i class="ri-pencil-line"></i></button>`;
+                    if (canEdit) {
+                        buttons = `<button class="btn btn-sm btn-secondary" onclick="editCrew('${doc.id}')"><i class="ri-pencil-line"></i></button>`;
                     }
                     if (isSuperAdmin()) {
                         if(isSuspended) {
-                            buttons += `<button class="btn btn-sm btn-success" onclick="toggleSuspension('${u.id}', false)" title="Reactivate"><i class="ri-user-follow-line"></i></button>`;
+                            buttons += `<button class="btn btn-sm btn-success" onclick="toggleSuspension('${doc.id}', false)" title="Reactivate"><i class="ri-user-follow-line"></i></button>`;
                         } else {
-                            buttons += `<button class="btn btn-sm btn-warning" onclick="toggleSuspension('${u.id}', true)" title="Suspend"><i class="ri-user-unfollow-line"></i></button>`;
+                            buttons += `<button class="btn btn-sm btn-warning" onclick="toggleSuspension('${doc.id}', true)" title="Suspend"><i class="ri-user-unfollow-line"></i></button>`;
                         }
-                        buttons += `<button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}', '${u.name}', 'Crew')"><i class="ri-delete-bin-line"></i></button>`;
+                        buttons += `<button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Crew')"><i class="ri-delete-bin-line"></i></button>`;
                     }
-
-                    // Re-access permission for logic
-                    const canEditAction = checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CREW);
-
                     return `<tr>
                         <td class="font-mono" style="color:var(--primary)">${u.crewId || 'N/A'}</td>
                         <td>${u.name}</td>
                         <td>${u.email}</td>
                         <td>${u.phone || '-'}</td>
-                        <td><span class="badge badge-${u.workLocation === 'HQ' ? 'admin' : 'crew'}">${dept}</span></td>
-                        <td><small style="color:var(--text-muted)">${commDisplay}</small></td>
+                        <td><span class="badge badge-${u.workLocation === 'HQ' ? 'admin' : 'crew'}">${workLoc}</span></td>
                         <td><span class="badge badge-${u.role==='super_admin'?'admin':(u.role==='admin'?'admin':'crew')}">${u.role}</span></td>
                         <td>${u.jobTitle||'-'}</td>
                         <td>${statusBadge}</td>
-                        <td>${canEditAction ? buttons : ''}</td>
+                        <td>${buttons}</td>
                     </tr>`;
                 }).join('');
-            }
-
-            // Update Controls
-            if(document.getElementById('crew-total')) {
-                document.getElementById('crew-total').innerText = total;
-                document.getElementById('crew-start-idx').innerText = total > 0 ? start + 1 : 0;
-                document.getElementById('crew-end-idx').innerText = end;
-                document.getElementById('crew-page-num').innerText = crewState.currentPage;
-                document.getElementById('crew-prev').disabled = crewState.currentPage === 1;
-                document.getElementById('crew-next').disabled = end >= total;
-            }
-        }
-
-        function setCrewPerPage(val) {
-            crewState.rowsPerPage = parseInt(val);
-            crewState.currentPage = 1;
-            processCrewData();
-        }
-
-        function changeCrewPage(delta) {
-            crewState.currentPage += delta;
-            processCrewData();
+            });
         }
 
         async function openAddCrewModal() {
@@ -2686,10 +2205,6 @@
                         </td>
                     </tr>`;
                 }).join('');
-                
-                // FIX: Re-apply filter if it exists
-                const savedSearch = window.savedTableFilters && window.savedTableFilters['supp-tbody'];
-                if(savedSearch) filterTable('supp-tbody', savedSearch);
             });
         }
 
@@ -2955,7 +2470,7 @@
             const canEdit = checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CONTENT);
             main.innerHTML = `
                 <div class="flex justify-between items-center mb-4">
-                    <h2 style="font-size:1.25rem; font-weight:800;">Products & Packages</h2>
+                    <h2 style="font-size:1.25rem; font-weight:800;">Content & Packages</h2>
                     ${canEdit ? `<button class="btn btn-primary" onclick="saveContentChanges()"><i class="ri-save-line"></i> Save Changes</button>` : ''}
                 </div>
                 <div class="config-section">
@@ -3154,7 +2669,9 @@
             snap.forEach(doc => {
                 const u = doc.data();
                 if(u.phone) {
+                    // Robust Phone Cleaning
                     const cleanPhone = formatWAPhone(u.phone);
+                    
                     if (cleanPhone) {
                         const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
                         content += `
@@ -3366,10 +2883,6 @@
                         <td>${actions}</td>
                     </tr>`;
                 }).join('');
-                
-                // FIX: Re-apply filter if it exists
-                const savedSearch = window.savedTableFilters && window.savedTableFilters['req-tbody'];
-                if(savedSearch) filterTable('req-tbody', savedSearch);
             });
         }
         function viewRequestDetails(id) {
@@ -3520,7 +3033,7 @@
             const main = document.getElementById('main');
             if(!main) return;
 
-                        const canManageFinance = canAccessFinanceTools(); 
+            const canManageFinance = canAccessFinanceTools(); 
             const isMyView = !canManageFinance; 
 
             if(!canManageFinance && (!currentUser || !currentUser.uid)) {
@@ -3600,7 +3113,7 @@
                             <h3>Commission Rate Configuration</h3>
                             <span class="badge badge-user">Finance Access</span>
                         </div>
-                        <p class="text-muted text-sm mb-4">Set percentage distribution of the team commission pot. Total must equal 100%.</p>
+                        <p class="text-muted text-sm mb-4">Set the percentage distribution of the team commission pot. Total must equal 100%.</p>
                         <div class="price-grid">
                             <div>
                                 <label>Sales Split (%)</label>
@@ -3853,7 +3366,7 @@
             const tbody = document.getElementById('comm-tbody');
             // We need to get the IDs from the raw data that passed the filter
             // A bit tricky because rawFinanceData has all, we need to re-apply logic or parse DOM? 
-            // Better: Re-run applyFilters logic inside this function to get subset.
+            // Better: Re-run applyFilters logic inside this function to get the subset.
             
             const filterRef = document.getElementById('filter-ref').value.toLowerCase();
             const filterStatus = document.getElementById('filter-status').value;
@@ -4141,54 +3654,13 @@
                     <p class="text-center text-muted text-sm mt-4">Profile is read-only.</p>
                 </div>`;
         }
-
-        // --- FIX: UPDATED FILTER TABLE ---
         function filterTable(id, text) {
-            const tbody = document.getElementById(id);
-            if(!tbody) return;
-            
-            const rows = tbody.querySelectorAll('tr');
+            const trs = document.querySelectorAll(`#${id} tr`);
             text = text.toLowerCase();
-            
-            rows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                // Convert to array and remove the last cell (Actions column)
-                const searchCells = Array.from(cells).slice(0, -1); 
-                
-                let match = false;
-                searchCells.forEach(cell => {
-                    if(cell.innerText.toLowerCase().includes(text)) {
-                        match = true;
-                    }
-                });
-                
-                row.style.display = match ? '' : 'none';
-            });
-
-            // Save to global state to persist during DB refreshes
-            if(!window.savedTableFilters) window.savedTableFilters = {};
-            window.savedTableFilters[id] = text;
+            trs.forEach(tr => tr.style.display = tr.innerText.toLowerCase().includes(text)?'':'none');
         }
-        
-        // --- GENERIC SORT HELPER ---
-        function genericSort(tableId, field) {
-            const table = document.querySelector(`#${tableId}`);
-            if(!table) return;
-            const tbody = table.querySelector('tbody');
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-            const isAsc = table.dataset.sortOrder !== 'asc';
-            table.dataset.sortOrder = isAsc ? 'asc' : 'desc';
+                // --- VOUCHER WHATSAPP HELPERS ---
 
-            rows.sort((a, b) => {
-                const aVal = a.children[0].innerText.trim(); // Simplified for first column sort mainly
-                const bVal = b.children[0].innerText.trim();
-                return isAsc ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-            });
-
-            rows.forEach(row => tbody.appendChild(row));
-        }
-
-        // --- VOUCHER WHATSAPP HELPERS ---
         function notifyVoucherExpiryAdmin(voucherCode, expiryDate, customerName) {
             const msg = `Hi Admin Team,\n\nA customer’s voucher (${voucherCode}) will expire on ${expiryDate}.\nCustomer: ${customerName}\n\nPlease follow up with them and try to close the sale.\n\nThank you.\n\n> [Auto-generated from DDNet System]`;
             
@@ -4218,6 +3690,7 @@
                 window.location.href = url;
             }
         }
+
 </script>
 </body>
 </html>
