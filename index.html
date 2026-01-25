@@ -1197,6 +1197,28 @@
             setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(), 400); }, 4000);
         }
 
+        // --- WHATSAPP HELPER FOR MOBILE ---
+        // Ensures phone number is strictly formatted for Malaysia
+        function formatWAPhone(phone) {
+            if (!phone) return null;
+            // Remove all non-numeric characters
+            let clean = phone.replace(/[^0-9]/g, '');
+            
+            // If starts with 0, replace with 60
+            if (clean.startsWith('0')) {
+                clean = '60' + clean.substring(1);
+            }
+            // If starts with +, just remove it to be safe, we add it back or rely on wa.me format
+            if (clean.startsWith('+')) {
+                clean = clean.substring(1);
+            }
+            
+            // Basic length check for MY numbers (10-12 digits usually)
+            if (clean.length < 10 || clean.length > 13) return null;
+
+            return clean;
+        }
+
         async function deleteUser(uid, name, type) {
             if(!isSuperAdmin()) return showToast("Access Denied", "error");
             if(!confirm(`Are you sure you want to PERMANENTLY DELETE ${name}?`)) return;
@@ -1425,20 +1447,30 @@
                 } catch(e) {}
                 const orderRef = id.substring(0,6).toUpperCase();
 
-            let msg = "";
-            if (d.status === "Pending" || d.status === "Cancelled" || !d.status) {
-                msg = `Hi ${d.customerName},\n\nThis is a friendly reminder that we are still awaiting payment for your recent order with DDNetwork.\n\nOrder ID: #${orderRef}\nAmount: ${d.total}\n\nPlease proceed with payment at your convenience so we can continue processing your order. If you’ve already made the payment, kindly ignore this message.\n\nThank you for your support.\n\n[Auto-generated from DDNet System]`;
-            } 
-            else { 
-                msg = `Hi ${d.customerName},\n\nWe noticed that payment for your recent order with DDNetwork was not completed successfully.\n\nOrder ID: #${orderRef}\nOutstanding Amount: ${d.total}\n\nTo avoid any delay or cancellation, please complete the payment as soon as possible. If you encountered any issues during payment, let us know and we will assist you.\n\nThank you for your understanding.\n\n[Auto-generated from DDNet System]`;
-            }
+                let msg = "";
+                if (d.status === "Pending" || d.status === "Cancelled" || !d.status) {
+                    msg = `Hi ${d.customerName},\n\nThis is a friendly reminder that we are still awaiting payment for your recent order with DDNetwork.\n\nOrder ID: #${orderRef}\nAmount: ${d.total}\n\nPlease proceed with payment at your convenience so we can continue processing your order. If you’ve already made the payment, kindly ignore this message.\n\nThank you for your support.\n\n[Auto-generated from DDNet System]`;
+                } 
+                else { 
+                    msg = `Hi ${d.customerName},\n\nWe noticed that payment for your recent order with DDNetwork was not completed successfully.\n\nOrder ID: #${orderRef}\nOutstanding Amount: ${d.total}\n\nTo avoid any delay or cancellation, please complete the payment as soon as possible. If you encountered any issues during payment, let us know and we will assist you.\n\nThank you for your understanding.\n\n[Auto-generated from DDNet System]`;
+                }
 
+                // Robust Phone Cleaning
+                const cleanPhone = formatWAPhone(d.customerPhone);
                 
-                let cleanPhone = d.customerPhone ? d.customerPhone.replace(/^0/, '60') : '60123456789';
-                if(!cleanPhone.startsWith('+')) cleanPhone = '+' + cleanPhone;
+                if(!cleanPhone) {
+                    showToast("Invalid Phone Number", "error");
+                    return;
+                }
                 
-                // FIX: Direct window.open for mobile compatibility
-                window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+                const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+                
+                // Mobile Fallback: window.open might be blocked, try location.href
+                const win = window.open(url, '_blank');
+                if (!win || win.closed || typeof win.closed == 'undefined') {
+                    // Fallback
+                    window.location.href = url;
+                }
                 
                 showToast("Opening WhatsApp...", "success");
                 logActivity(`Sent payment reminder for Order #${orderRef}`);
@@ -2574,15 +2606,18 @@
             snap.forEach(doc => {
                 const u = doc.data();
                 if(u.phone) {
-                    let cleanPhone = u.phone.replace(/^0/, '60');
-                    if(!cleanPhone.startsWith('+')) cleanPhone = '+' + cleanPhone;
-                    const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
-                    content += `
-                        <div class="flex justify-between items-center p-2 border rounded" style="background:white;">
-                            <span><strong>${u.name}</strong> <small class="text-muted">(${u.jobTitle})</small></span>
-                            <a href="${url}" target="_blank" class="btn btn-sm btn-success"><i class="ri-whatsapp-line"></i> Send</a>
-                        </div>
-                    `;
+                    // Robust Phone Cleaning
+                    const cleanPhone = formatWAPhone(u.phone);
+                    
+                    if (cleanPhone) {
+                        const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+                        content += `
+                            <div class="flex justify-between items-center p-2 border rounded" style="background:white;">
+                                <span><strong>${u.name}</strong> <small class="text-muted">(${u.jobTitle})</small></span>
+                                <a href="${url}" target="_blank" class="btn btn-sm btn-success"><i class="ri-whatsapp-line"></i> Send</a>
+                            </div>
+                        `;
+                    }
                 }
             });
             content += `</div>`;
@@ -3234,15 +3269,22 @@
                 const crewData = crewSnap.data();
                 const phone = crewData.phone;
 
-                if(!phone) return showToast("Crew has no phone number", "error");
+                // Robust Phone Cleaning
+                const cleanPhone = formatWAPhone(phone);
 
-                let cleanPhone = phone.replace(/^0/, '60');
-                if(!cleanPhone.startsWith('+')) cleanPhone = '+' + cleanPhone;
+                if(!cleanPhone) {
+                    return showToast("Crew has invalid phone number", "error");
+                }
 
                 const msg = `Hi ${crewData.name}, this is Finance.\n\n Your commission of ${amount} has been processed.\n\nPlease check your bank account.\n\n\ [Auto-generated from DDNet System]`;
                 
-                // FIX: Direct window.open for mobile
-                window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+                const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+                
+                // Mobile Fallback
+                const win = window.open(url, '_blank');
+                if (!win || win.closed || typeof win.closed == 'undefined') {
+                    window.location.href = url;
+                }
             } catch(e) {
                 console.error(e);
                 showToast("Error fetching crew details", "error");
@@ -3466,6 +3508,5 @@
         }
 
 </script>
-
 </body>
 </html>
