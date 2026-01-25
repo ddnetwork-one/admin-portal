@@ -86,10 +86,10 @@
         .p-4 { padding: 1rem; }
         .text-center { text-align: center; }
         .text-sm { font-size: 0.85rem; }
+        .font-bold { font-weight: 700; }
         .text-muted { color: var(--text-muted); }
         .block { display: block; }
         .font-mono { font-family: var(--font-mono); letter-spacing: -0.5px; }
-        .cursor-pointer { cursor: pointer; }
 
         /* --- SCROLLBAR (Custom for better UX) --- */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -277,12 +277,6 @@
             position: absolute; right: 15px; font-size: 0.8rem; opacity: 0.7;
         }
 
-        /* BADGE COUNTERS FOR SIDEBAR */
-        .nav-badge-count {
-            margin-left: auto; background: var(--danger); color: white; font-size: 0.65rem; font-weight: 700;
-            padding: 2px 6px; border-radius: 10px; min-width: 18px; text-align: center;
-        }
-
         /* MAIN CONTENT */
         main { 
             flex:1; overflow-y: auto; overflow-x: hidden; background: var(--bg-app); padding: 1.5rem; position: relative; 
@@ -297,8 +291,6 @@
             display: flex; align-items: center; gap: 1.2rem; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         .stat-card:hover { transform: translateY(-2px); border-color: var(--border-active); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
-        .stat-card.clickable { cursor: pointer; }
-        .stat-card.clickable:hover { border-color: var(--primary); background: #f8fafc; }
         .stat-icon { 
             width: 48px; height: 48px; border-radius: 12px; background: #f3f4f6; display: flex; 
             align-items: center; justify-content: center; font-size: 1.4rem; color: var(--text-main);
@@ -318,42 +310,7 @@
         .quick-action-card:hover { border-color: var(--primary); background: #eff6ff; transform: translateY(-2px); }
         .quick-action-card i { font-size: 1.5rem; color: var(--primary); }
 
-        /* NEW: OWNER SNAPSHOT */
-        .owner-snapshot {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; padding: 1.5rem;
-            border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;
-        }
-        .os-item h4 { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 0.5rem; }
-        .os-item .val { font-size: 1.5rem; font-weight: 700; }
-
-        /* NEW: ACTION ALERTS */
-        .action-alerts {
-            background: #fff7ed; border: 1px solid #ffedd5; border-radius: 12px; padding: 1rem; margin-bottom: 2rem;
-        }
-        .alert-item { display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem; font-size: 0.9rem; color: #9a3412; }
-        .alert-item:last-child { margin-bottom: 0; }
-        .alert-item i { color: var(--warning); font-size: 1.1rem; }
-
-        /* NEW: GROUPED ACTIVITY */
-        .activity-group { margin-bottom: 1rem; }
-        .activity-group-header { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem; display: flex; justify-content: space-between;}
-        .activity-item {
-            display: flex; align-items: flex-start; gap: 1rem; padding: 0.8rem; border-bottom: 1px solid var(--border-light);
-            transition: 0.2s;
-        }
-        .activity-item:last-child { border-bottom: none; }
-        .activity-item:hover { background: #f9fafb; }
-        .activity-icon { 
-            width: 32px; height: 32px; background: #eff6ff; border-radius: 8px; color: var(--primary); 
-            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-        }
-        .activity-content { flex: 1; }
-        .activity-content h5 { font-size: 0.85rem; color: var(--text-main); margin-bottom: 2px; }
-        .activity-content p { font-size: 0.75rem; color: var(--text-muted); }
-        .activity-time { font-size: 0.7rem; color: var(--text-faint); text-align: right; white-space: nowrap; }
-
-        /* TABLE STYLES */
+        /* RESPONSIVE TABLE FIX */
         .table-container { 
             background: var(--bg-surface); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; 
             margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
@@ -367,24 +324,9 @@
         }
         table { width: 100%; border-collapse: collapse; min-width: 800px; /* Forces scroll on mobile */ }
         th { text-align: left; padding: 0.8rem 1.2rem; color: var(--text-muted); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; background: #f3f4f6; white-space: nowrap; border-bottom: 1px solid var(--border); letter-spacing: 0.5px; }
-        th.sortable { cursor: pointer; user-select: none; }
-        th.sortable:hover { background: #e5e7eb; }
-        th.sortable i { font-size: 0.8rem; margin-left: 4px; opacity: 0.5; }
         td { padding: 1rem 1.2rem; border-bottom: 1px solid var(--border); color: var(--text-main); font-size: 0.85rem; vertical-align: middle; transition: 0.1s; background: white; white-space: nowrap; }
         tr:last-child td { border-bottom: none; }
         tr:hover td { background: #f9fafb; }
-
-        /* PAGINATION */
-        .pagination-controls {
-            display: flex; align-items: center; justify-content: space-between; padding: 1rem; border-top: 1px solid var(--border); background: #f9fafb;
-        }
-        .pagination-info { font-size: 0.85rem; color: var(--text-muted); }
-        .pagination-buttons { display: flex; gap: 0.5rem; align-items: center; }
-        .page-btn { padding: 0.4rem 0.8rem; border: 1px solid var(--border); border-radius: 6px; background: white; cursor: pointer; font-size: 0.85rem; }
-        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .page-btn:hover:not(:disabled) { background: #f3f4f6; }
-        .rows-per-page { margin-right: 1rem; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; }
-        .rows-per-page select { width: auto; padding: 0.3rem; font-size: 0.85rem; }
 
         /* --- TIMELINE (Client History) --- */
         .timeline-container { margin-top: 1rem; border-left: 2px solid var(--border); padding-left: 1.5rem; margin-left: 1rem; }
@@ -490,21 +432,15 @@
         .access-denied-title { font-size: 1.5rem; color: var(--text-main); margin-bottom: 0.5rem; }
         .access-denied-desc { font-size: 1rem; max-width: 400px; line-height: 1.5; margin-bottom: 2rem; }
 
-        /* NEW: FOOTER */
-        .app-footer {
-            margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-faint);
-        }
-        .footer-link { color: var(--primary); text-decoration: none; cursor: pointer; }
-
         /* RESPONSIVE BREAKPOINTS */
         @media(max-width: 1024px) {
             aside { transform: translateX(-100%); width: 280px; box-shadow: 20px 0 40px rgba(0,0,0,0.1); }
             aside.mobile-open { transform: translateX(0); }
-            main { margin-left: 0 !important; width: 100% !important; padding: 1rem; padding-top: 5rem; padding-bottom: 4rem; }
+            main { margin-left: 0 !important; width: 100% !important; padding: 1rem; padding-top: 5rem; }
             .header-brand span { display: none; }
             .notif-dropdown { right: 0; width: 90vw; }
-            .owner-snapshot { grid-template-columns: 1fr; }
+            /* On mobile, search bar might take too much space, hide text */
+            .header-search { max-width: 150px; }
         }
         @media(min-width: 1025px) and (max-width: 1440px) { .invoice-paper { transform: scale(0.85); } }
         @media print { body > *:not(#invoiceModalOverlay) { display: none !important; } }
@@ -590,21 +526,21 @@
                 <div class="nav-item" onclick="navigateTo('/')"><i class="ri-dashboard-line"></i> <span class="nav-text">Dashboard</span></div>
                 
                 <div class="nav-section-title"><span class="nav-text">Operations</span></div>
-                <div class="nav-item" onclick="navigateTo('/orders')" id="nav-orders" oncontextmenu="handleContextMenu(event, '/orders', 'Orders')"><i class="ri-shopping-bag-3-line"></i> <span class="nav-text">Orders</span><span class="nav-badge-count hidden" id="count-orders">0</span></div>
+                <div class="nav-item" onclick="navigateTo('/orders')" id="nav-orders" oncontextmenu="handleContextMenu(event, '/orders', 'Orders')"><i class="ri-shopping-bag-3-line"></i> <span class="nav-text">Orders</span></div>
                 <div class="nav-item" onclick="navigateTo('/clients')" id="nav-clients" oncontextmenu="handleContextMenu(event, '/clients', 'Clients')"><i class="ri-user-line"></i> <span class="nav-text">Clients</span></div>
                 <div class="nav-item" onclick="navigateTo('/requests')" id="nav-requests" oncontextmenu="handleContextMenu(event, '/requests', 'Requests')"><i class="ri-database-2-line"></i> <span class="nav-text">Requests</span></div>
-                <div class="nav-item" onclick="navigateTo('/support')" id="nav-support" oncontextmenu="handleContextMenu(event, '/support', 'Support')"><i class="ri-customer-service-2-line"></i> <span class="nav-text">Support</span><span class="nav-badge-count hidden" id="count-support">0</span></div>
+                <div class="nav-item" onclick="navigateTo('/support')" id="nav-support" oncontextmenu="handleContextMenu(event, '/support', 'Support')"><i class="ri-customer-service-2-line"></i> <span class="nav-text">Support</span></div>
                 <div class="nav-item" onclick="navigateTo('/vouchers')" id="nav-vouchers"><i class="ri-ticket-2-line"></i> <span class="nav-text">Vouchers</span></div>
                 
                 <div class="nav-section-title"><span class="nav-text">Management</span></div>
                 <div class="nav-item" onclick="navigateTo('/portfolio')" id="nav-portfolio"><i class="ri-gallery-line"></i> <span class="nav-text">Portfolio</span></div>
-                <div class="nav-item" onclick="navigateTo('/content')" id="nav-content"><i class="ri-layout-masonry-line"></i> <span class="nav-text">Products & Pkg</span></div>
+                <div class="nav-item" onclick="navigateTo('/content')" id="nav-content"><i class="ri-layout-masonry-line"></i> <span class="nav-text">Content & Pkg</span></div>
                 <div class="nav-item" onclick="navigateTo('/public-promos')" id="nav-public-promos"><i class="ri-coupon-3-line"></i> <span class="nav-text">Public Promos</span></div>
                 
                 <div class="nav-section-title"><span class="nav-text">System</span></div>
                 <div class="nav-item" onclick="navigateTo('/crew')" id="nav-crew"><i class="ri-team-line"></i> <span class="nav-text">Internal Crew</span></div>
                 <div class="nav-item" onclick="navigateTo('/config')" id="nav-config"><i class="ri-settings-4-line"></i> <span class="nav-text">System Config</span></div>
-                <div class="nav-item hidden" id="nav-approvals" onclick="navigateTo('/approvals')"><i class="ri-shield-check-line" style="color: var(--warning)"></i> <span class="nav-text">Approval Tools</span><span class="nav-badge-count hidden" id="count-approvals">0</span></div>
+                <div class="nav-item hidden" id="nav-approvals" onclick="navigateTo('/approvals')"><i class="ri-shield-check-line" style="color: var(--warning)"></i> <span class="nav-text">Approval Tools</span></div>
                 
                 <!-- FINANCE -->
                 <div class="nav-section-title"><span class="nav-text">Finance</span></div>
@@ -622,12 +558,6 @@
         </aside>
 
         <main id="main"></main>
-        
-        <!-- NEW FOOTER -->
-        <div class="app-footer" style="position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-app); padding: 0.5rem 1.5rem; z-index: 90; pointer-events: none;">
-            <span id="last-updated-time">Last updated: Just now</span>
-            <span style="pointer-events: auto;"><a class="footer-link" onclick="navigateTo('/my-profile')">View System Activity Log</a></span>
-        </div>
     </div>
 
     <!-- MAIN MODAL -->
@@ -643,23 +573,18 @@
     </div>
 
     <div class="toast-container" id="toastContainer"></div>
-
 <!-- JAVASCRIPT -->
-    <!-- JAVASCRIPT -->
 <script>
         // --- FIX: HIDE AUTH SCREEN IMMEDIATELY TO PREVENT REFRESH FLASH ---
         document.getElementById('auth-screen').classList.add('hidden');
 
-        // --- HELPER: OPEN WHATSAPP (MOBILE COMPATIBLE) ---
-        function openWA(url) {
-            const a = document.createElement('a');
-            a.href = url;
-            a.target = '_blank';
-            a.rel = 'noopener noreferrer';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
+        // --- GLOBAL COMMISSION RATES CONFIG ---
+        let commissionRatesConfig = {
+            sales: 0.50,
+            tech: 0.20,
+            success: 0.15,
+            ops: 0.05
+        };
 
         // --- CONSTANTS & CONFIG ---
         const JOB_TITLES = [
@@ -696,21 +621,20 @@
             "Support Operations Executive": "crew"
         };
 
-        const DEFAULT_COMMISSION_RATES = {
-            "Founder & Managing Director": 0.05,
-            "Project & Client Manager": 0.04,
-            "Account / Operations / Marketing Manager": 0.04,
-            "Finance / Billing Executive": 0.0,
-            "People / Team Operations Executive": 0.0,
-            "Business Development Executive": 0.125,
-            "Sales Executive": 0.125,
-            "Client Success Coordinator": 0.025,
-            "Client Experience Executive": 0.025,
-            "Technical Specialist": 0.04,
-            "Web Developer": 0.04,
-            "Full Stack Developer": 0.05,
-            "Automation & AI Specialist": 0.05,
-            "Support Operations Executive": 0.025
+        // --- COMMISSION CONFIGURATION ---
+        // Defines which Category a job title belongs to (Sales, Tech, Support, Ops)
+        const COMMISSION_CATEGORY_MAP = {
+            "Sales Executive": "sales",
+            "Business Development Executive": "sales",
+            "Technical Specialist": "tech",
+            "Web Developer": "tech",
+            "Full Stack Developer": "tech",
+            "Automation & AI Specialist": "tech",
+            "Client Success Coordinator": "success",
+            "Client Experience Executive": "success",
+            "Support Operations Executive": "success",
+            "Finance / Billing Executive": "ops",
+            "People / Team Operations Executive": "ops"
         };
 
         // --- PERMISSION SYSTEM ---
@@ -733,7 +657,7 @@
             BYPASS_APPROVAL: 'bypass_approval'
         };
 
-        function getDefaultRate(title) { return DEFAULT_COMMISSION_RATES[title] || 0.0; }
+        function getDefaultRate(title) { return 0.0; } // Default 0, calculated dynamically now
 
         // --- FIREBASE SETUP ---
         const firebaseConfig = {
@@ -756,6 +680,18 @@
             else { console.error("Firebase initialization failed."); }
         } catch(e) { console.log("Firebase init error", e); }
 
+        // --- HELPER: LOAD COMMISSION CONFIG ---
+        async function loadCommissionConfig() {
+            try {
+                const doc = await db.collection("config").doc("site_settings").get();
+                if (doc.exists && doc.data().commission_rates) {
+                    commissionRatesConfig = doc.data().commission_rates;
+                }
+            } catch (e) {
+                console.error("Error loading commission config", e);
+            }
+        }
+
         // --- AUTO CREATE CONFIG ---
         async function initializeDatabase() {
             try {
@@ -763,6 +699,12 @@
                 const doc = await configRef.get();
                 if (!doc.exists) {
                     console.log("Creating default config...");
+                    const defaultRates = {
+                        sales: 0.50,
+                        tech: 0.20,
+                        success: 0.15,
+                        ops: 0.05
+                    };
                     await configRef.set({
                         maintenance_active: false,
                         maintenance_message: "IT Department currently fix Portal Bugs",
@@ -773,8 +715,22 @@
                         },
                         discountActive: false,
                         discountPercent: 0.1,
-                        disabled_menus: [] 
+                        disabled_menus: [],
+                        commission_rates: defaultRates
                     });
+                } else {
+                    // Ensure commission_rates exist if doc exists
+                    const data = doc.data();
+                    if(!data.commission_rates) {
+                         await configRef.update({
+                             commission_rates: {
+                                 sales: 0.50,
+                                 tech: 0.20,
+                                 success: 0.15,
+                                 ops: 0.05
+                             }
+                         });
+                    }
                 }
                 const pmSnapshot = await db.collection("payment_methods").limit(1).get();
                 if (pmSnapshot.empty) {
@@ -825,7 +781,7 @@
                      let existingIds = [];
                      snap.forEach(doc => { const id = doc.data().crewId; if(id) existingIds.push(parseInt(id)); });
                      existingIds.sort((a,b) => a-b);
-                     let nextId = 1;
+                     let nextId =1;
                      if(existingIds.length > 0) { for(let i=0; i<existingIds.length; i++) { if(existingIds[i] === nextId) nextId++; else break; } }
                      return String(nextId).padStart(3, '0');
                  } catch(e) { return "001"; }
@@ -895,6 +851,9 @@
                         userPinnedMenus = userData.pinnedMenus || [];
                         renderPinnedMenus();
 
+                        // Load Commission Config
+                        loadCommissionConfig();
+
                         // --- HEADER UPDATE ---
                         const userInitial = (userData.name || 'A').charAt(0).toUpperCase();
                         const workLoc = userData.workLocation || 'HQ';
@@ -953,7 +912,6 @@
             e.preventDefault();
             if(!currentUser) return;
             
-            // Simple confirm dialog for pinning
             const isPinned = userPinnedMenus.includes(path);
             if(isPinned) {
                 if(confirm(`Unpin "${name}" from sidebar?`)) {
@@ -1016,7 +974,6 @@
             const q = query.toLowerCase();
             let html = '';
 
-            // Search Orders
             try {
                 const oSnap = await db.collection("orders").orderBy("customerName").startAt(q).endAt(q + '\uf8ff').limit(3).get();
                 oSnap.forEach(doc => {
@@ -1028,7 +985,6 @@
                 });
             } catch(e) {}
 
-            // Search Clients
             try {
                 const cSnap = await db.collection("users").where("role", "==", "user").orderBy("name").startAt(q).endAt(q + '\uf8ff').limit(3).get();
                 cSnap.forEach(doc => {
@@ -1040,7 +996,6 @@
                 });
             } catch(e) {}
 
-            // Search Tickets
             try {
                 const tSnap = await db.collection("tickets").orderBy("ticketId").startAt(q).endAt(q + '\uf8ff').limit(3).get();
                 tSnap.forEach(doc => {
@@ -1057,7 +1012,6 @@
             resultsContainer.classList.add('active');
         }
 
-        // Close search when clicking outside
         document.addEventListener('click', (e) => {
             const container = document.querySelector('.header-search');
             if(!container.contains(e.target)) {
@@ -1077,6 +1031,16 @@
                         disabledMenus: data.disabled_menus || [],
                         message: data.maintenance_message || "System Maintenance"
                     };
+                    
+                    // Reload commission config if it changes
+                    if(data.commission_rates) {
+                        commissionRatesConfig = data.commission_rates;
+                        // If finance tools is open, refresh inputs
+                        const isMyView = !canAccessFinanceTools();
+                        if(document.getElementById('tab-content-tools').classList.contains('active') && !isMyView) {
+                            populateFinanceRatesUI();
+                        }
+                    }
 
                     const bar = document.getElementById('maintenance-bar');
                     const dash = document.getElementById('dashboard');
@@ -1285,6 +1249,27 @@
             setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(), 400); }, 4000);
         }
 
+        // --- WHATSAPP HELPER FOR MOBILE ---
+        function formatWAPhone(phone) {
+            if (!phone) return null;
+            // Remove all non-numeric characters
+            let clean = phone.replace(/[^0-9]/g, '');
+            
+            // If starts with 0, replace with 60
+            if (clean.startsWith('0')) {
+                clean = '60' + clean.substring(1);
+            }
+            // If starts with +, just remove it to be safe, we add it back or rely on wa.me format
+            if (clean.startsWith('+')) {
+                clean = clean.substring(1);
+            }
+            
+            // Basic length check for MY numbers (10-12 digits usually)
+            if (clean.length < 10 || clean.length > 13) return null;
+
+            return clean;
+        }
+
         async function deleteUser(uid, name, type) {
             if(!isSuperAdmin()) return showToast("Access Denied", "error");
             if(!confirm(`Are you sure you want to PERMANENTLY DELETE ${name}?`)) return;
@@ -1298,7 +1283,7 @@
             }
         }
 
-        // --- 1. OVERVIEW (Enhanced) ---
+        // --- 1. OVERVIEW ---
         function renderOverview() {
             const main = document.getElementById('main');
             if(!main) return;
@@ -1308,7 +1293,6 @@
                     <h2 style="font-size:1.5rem; font-weight:800; letter-spacing:-0.5px;">Dashboard Overview</h2>
                 </div>
                 
-                <!-- QUICK ACTIONS -->
                 <div class="quick-actions-grid">
                     <div class="quick-action-card" onclick="navigateTo('/orders')"><i class="ri-shopping-cart-2-line"></i><span>New Order</span></div>
                     <div class="quick-action-card" onclick="navigateTo('/clients')"><i class="ri-user-add-line"></i><span>Add Client</span></div>
@@ -1395,13 +1379,14 @@
                                     <th>Date</th>
                                     <th>Client</th>
                                     <th>Package</th>
+                                    <th>Cycle</th> <!-- Added Cycle -->
                                     <th>Total</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="orders-tbody">
-                                <tr><td colspan="6" class="text-center"><div class="loading-spinner"></div></td></tr>
+                                <tr><td colspan="7" class="text-center"><div class="loading-spinner"></div></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1411,7 +1396,7 @@
                 const tbody = document.getElementById('orders-tbody');
                 if(!tbody) return;
                 if(snap.empty) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No orders found</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No orders found</td></tr>';
                     return;
                 }
 
@@ -1441,6 +1426,7 @@
                         <td style="white-space:nowrap;">${formatDateTime(d.timestamp)}</td>
                         <td><strong>${d.customerName}</strong><br>${domainDisplay}</td>
                         <td>${d.package}</td>
+                        <td><span class="badge badge-user">${d.billingCycle || 'One-time'}</span></td>
                         <td>${d.total}</td>
                         <td><span class="badge" style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}25">${d.status}</span></td>
                         <td>
@@ -1512,19 +1498,30 @@
                 } catch(e) {}
                 const orderRef = id.substring(0,6).toUpperCase();
 
-            let msg = "";
-            if (d.status === "Pending" || d.status === "Cancelled" || !d.status) {
-                msg = `Hi ${d.customerName},\n\nThis is a friendly reminder that we are still awaiting payment for your recent order with DDNetwork.\n\nOrder ID: #${orderRef}\nAmount: ${d.total}\n\nPlease proceed with payment at your convenience so we can continue processing your order. If you’ve already made the payment, kindly ignore this message.\n\nThank you for your support.\n\n[Auto-generated from DDNet System]`;
-            } 
-            else { 
-                msg = `Hi ${d.customerName},\n\nWe noticed that payment for your recent order with DDNetwork was not completed successfully.\n\nOrder ID: #${orderRef}\nOutstanding Amount: ${d.total}\n\nTo avoid any delay or cancellation, please complete the payment as soon as possible. If you encountered any issues during payment, let us know and we will assist you.\n\nThank you for your understanding.\n\n[Auto-generated from DDNet System]`;
-            }
+                let msg = "";
+                if (d.status === "Pending" || d.status === "Cancelled" || !d.status) {
+                    msg = `Hi ${d.customerName},\n\nThis is a friendly reminder that we are still awaiting payment for your recent order with DDNetwork.\n\nOrder ID: #${orderRef}\nAmount: ${d.total}\n\nPlease proceed with payment at your convenience so we can continue processing your order. If you’ve already made payment, kindly ignore this message.\n\nThank you for your support.\n\n[Auto-generated from DDNet System]`;
+                } 
+                else { 
+                    msg = `Hi ${d.customerName},\n\nWe noticed that payment for your recent order with DDNetwork was not completed successfully.\n\nOrder ID: #${orderRef}\nOutstanding Amount: ${d.total}\n\nTo avoid any delay or cancellation, please complete the payment as soon as possible. If you encountered any issues during payment, let us know and we will assist you.\n\nThank you for your understanding.\n\n[Auto-generated from DDNet System]`;
+                }
 
+                // Robust Phone Cleaning
+                const cleanPhone = formatWAPhone(d.customerPhone);
                 
-                let cleanPhone = d.customerPhone ? d.customerPhone.replace(/^0/, '60') : '60123456789';
-                if(!cleanPhone.startsWith('+')) cleanPhone = '+' + cleanPhone;
+                if(!cleanPhone) {
+                    showToast("Invalid Phone Number", "error");
+                    return;
+                }
                 
-                openWA(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`);
+                const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+                
+                // Mobile Fallback: window.open might be blocked, try location.href
+                const win = window.open(url, '_blank');
+                if (!win || win.closed || typeof win.closed == 'undefined') {
+                    // Fallback
+                    window.location.href = url;
+                }
                 
                 showToast("Opening WhatsApp...", "success");
                 logActivity(`Sent payment reminder for Order #${orderRef}`);
@@ -1574,12 +1571,11 @@
                 </div>
                 <div class="mb-4 p-2" style="background:#f3f4f6; border-radius:8px; border:1px solid var(--border);">
                     <div class="flex justify-between items-center">
-                        <span style="font-size:0.8rem; color:var(--text-muted);">Billing Cycle</span>
+                        <span style="font-size:0.8rem; color:var(--text-muted);">Billing Cycle (Affects Commission)</span>
                         <span class="font-bold" style="color:var(--primary);">${d.billingCycle || '-'}</span>
                     </div>
                 </div>
                 
-                <!-- INTERNAL NOTES FEATURE -->
                 <div class="mb-4">
                     <label>Internal Notes (Staff Only)</label>
                     <textarea id="o-notes" rows="3" placeholder="Add notes about this order...">${d.internalNotes || ''}</textarea>
@@ -1587,9 +1583,9 @@
                 </div>
 
                 <div class="mb-4">
-                    <label>Sales Representatives (Multiple)</label>
+                    <label>Sales Representatives (Commission will split automatically)</label>
                     ${salesRepHTML}
-                    <small class="text-muted">Select all employees entitled to commission for this order.</small>
+                    <small class="text-muted">Select all employees entitled to commission. Rules apply by Job Title (Sales, Tech, etc).</small>
                 </div>
                 <div class="mt-4">
                     <label>Client Domain</label>
@@ -1609,7 +1605,7 @@
             `, `<button class="btn btn-primary" onclick="updateOrderDetails('${id}')">Save Changes</button>`);
         }
 
-        // --- COMMISSION GENERATION LOGIC ---
+        // --- SMART COMMISSION GENERATION ---
         async function generateCommissionsForOrder(orderId, orderData) {
             const existingCommSnap = await db.collection("commission_overview").where("orderId", "==", orderId).get();
             const batch = db.batch();
@@ -1620,7 +1616,6 @@
 
             if(orderData.salesRepIds && orderData.salesRepIds.length > 0) {
                 const commBatch = db.batch();
-                
                 const repIds = orderData.salesRepIds;
                 const usersSnap = await db.collection("users").where(firebase.firestore.FieldPath.documentId(), "in", repIds).get();
                 
@@ -1630,30 +1625,70 @@
                 const orderTotal = parseFloat(orderData.total.replace('RM ', '')) || 0;
                 const orderDate = orderData.timestamp || firebase.firestore.FieldValue.serverTimestamp();
                 
+                // 1. Determine Team Rate based on Billing Cycle
+                const cycle = (orderData.billingCycle || 'one-time').toLowerCase();
+                let teamPercentage = 0.0;
+                if(cycle.includes('month')) teamPercentage = 0.10;      // 10% for monthly
+                else if(cycle.includes('year')) teamPercentage = 0.12;  // 12% for yearly
+                else teamPercentage = 0.20;                             // 20% for one-time
+
+                const totalTeamCommission = orderTotal * teamPercentage;
+                
+                // 2. Define Split Percentages for Categories (Use Global Config)
+                const SALES_SPLIT = commissionRatesConfig.sales;  
+                const TECH_SPLIT = commissionRatesConfig.tech;    
+                const SUCCESS_SPLIT = commissionRatesConfig.success;
+                const OPS_SPLIT = commissionRatesConfig.ops;   
+
                 repIds.forEach(repId => {
                     const rep = usersMap[repId];
                     if(rep) {
-                        const rate = rep.commissionRate || 0;
-                        const amount = orderTotal * rate;
+                        // Determine Category based on Job Title
+                        const category = COMMISSION_CATEGORY_MAP[rep.jobTitle] || 'other';
+                        let sharePercentage = 0.0;
+
+                        if (category === 'sales') sharePercentage = SALES_SPLIT;
+                        else if (category === 'tech') sharePercentage = TECH_SPLIT;
+                        else if (category === 'success') sharePercentage = SUCCESS_SPLIT;
+                        else if (category === 'ops') sharePercentage = OPS_SPLIT;
+                        else sharePercentage = 0.0; // Roles like Founder/Admin might need manual override or 0%
+
+                        // Formula: Final Amount = (Order Total * Team Rate) * Category Split
+                        // Note: If multiple people in Sales, they SPLIT the Sales Portion?
+                        // The prompt implies "Sales commission = team commission x 50%". Usually this is split.
+                        // We will implement Equal Split within category for now.
                         
-                        const newCommRef = db.collection("commission_overview").doc();
-                        commBatch.set(newCommRef, {
-                            orderId: orderId,
-                            crewId: repId,
-                            crewName: rep.name,
-                            amount: parseFloat(amount.toFixed(2)),
-                            orderDate: orderDate,
-                            status: 'unpaid', 
-                            paidAt: null,
-                            paidBy: null,
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                        });
+                        const categoryPortion = totalTeamCommission * sharePercentage;
+                        
+                        // Count people in this category to split the portion
+                        const peopleInCategory = repIds.filter(id => {
+                             const u = usersMap[id];
+                             const cat = COMMISSION_CATEGORY_MAP[u.jobTitle] || 'other';
+                             return cat === category;
+                        }).length;
+
+                        const finalAmount = categoryPortion / peopleInCategory;
+                        
+                        if (finalAmount > 0) {
+                            const newCommRef = db.collection("commission_overview").doc();
+                            commBatch.set(newCommRef, {
+                                orderId: orderId,
+                                crewId: repId,
+                                crewName: rep.name,
+                                amount: parseFloat(finalAmount.toFixed(2)),
+                                orderDate: orderDate,
+                                status: 'unpaid', 
+                                paidAt: null,
+                                paidBy: null,
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        }
                     }
                 });
 
                 await commBatch.commit();
-                console.log(`Generated ${repIds.length} commission records for order ${orderId} in 'commission_overview'`);
-                showToast(`Generated ${repIds.length} commission records.`, "success");
+                console.log(`Generated commission records for order ${orderId}`);
+                showToast(`Commissions calculated based on ${cycle} rules.`, "success");
             }
         }
 
@@ -1667,7 +1702,7 @@
                 total: document.getElementById('o-total').value,
                 domain: document.getElementById('o-domain').value.replace(/^https?:\/\//, ''), 
                 status: document.getElementById('upd-status').value,
-                internalNotes: document.getElementById('o-notes').value // Save Internal Notes
+                internalNotes: document.getElementById('o-notes').value 
             };
             
             const checkboxes = document.querySelectorAll('.rep-checkbox:checked');
@@ -1697,7 +1732,7 @@
             });
         }
 
-        // --- 3. CLIENTS (Enhanced with Timeline) ---
+        // --- 3. CLIENTS ---
         function renderClients() {
             const main = document.getElementById('main');
             if(!main) return;
@@ -1730,7 +1765,6 @@
                         buttons += `<button class="btn btn-sm btn-secondary" onclick="editClient('${doc.id}')">Edit</button>`;
                         buttons += `<button class="btn btn-sm btn-primary" onclick="openAssignVoucherModal('${doc.id}', '${u.name}')">Assign Voucher</button>`;
                     }
-                    // TIMELINE BUTTON
                     buttons += `<button class="btn btn-sm btn-info" onclick="viewClientTimeline('${doc.id}', '${u.name}')"><i class="ri-history-line"></i> Timeline</button>`;
                     buttons += `<button class="btn btn-sm btn-secondary" onclick="resetPassword('${u.email}')">Reset PW</button>`;
                     if (isSuperAdmin()) buttons += `<button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Client')"><i class="ri-delete-bin-line"></i></button>`;
@@ -1748,14 +1782,12 @@
             });
         }
         
-        // --- CLIENT TIMELINE FEATURE ---
         async function viewClientTimeline(uid, name) {
             showModal(`Client Timeline: ${name}`, `<div class="loading-spinner"></div>`, `<button class="btn btn-secondary" onclick="closeModal()">Close</button>`);
             
             let timelineHTML = `<div class="timeline-container">`;
             
             try {
-                // 1. Get Orders
                 const oSnap = await db.collection("orders").where("customerEmail", "==", (await db.collection("users").doc(uid).get()).data().email).orderBy("timestamp", "desc").get();
                 oSnap.forEach(doc => {
                     const d = doc.data();
@@ -1768,7 +1800,6 @@
                     `;
                 });
 
-                // 2. Get Tickets
                 const tSnap = await db.collection("tickets").where("email", "==", (await db.collection("users").doc(uid).get()).data().email).orderBy("timestamp", "desc").get();
                 tSnap.forEach(doc => {
                     const d = doc.data();
@@ -1781,7 +1812,6 @@
                     `;
                 });
                 
-                // 3. Get Requests
                 const rSnap = await db.collection("customer_requests").where("userId", "==", uid).orderBy("timestamp", "desc").get();
                 rSnap.forEach(doc => {
                     const d = doc.data();
@@ -1844,8 +1874,8 @@
                 </div>
                 <div class="table-container">
                     <div class="table-responsive">
-                        <table><thead><tr><th>Crew ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Work Loc</th><th>Role</th><th>Job Title</th><th>Comm. Rate</th><th>Status</th><th>Actions</th></tr></thead><tbody id="crew-tbody">
-                        <tr><td colspan="10" class="text-center"><div class="loading-spinner"></div></td></tr>
+                        <table><thead><tr><th>Crew ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Work Loc</th><th>Role</th><th>Job Title</th><th>Status</th><th>Actions</th></tr></thead><tbody id="crew-tbody">
+                        <tr><td colspan="9" class="text-center"><div class="loading-spinner"></div></td></tr>
                         </tbody></table>
                     </div>
                 </div>`;
@@ -1854,9 +1884,7 @@
                 if(!tbody) return;
                 tbody.innerHTML = snap.docs.map(doc => {
                     const u = doc.data();
-                    const rate = u.commissionRate ? (u.commissionRate * 100).toFixed(1) + '%' : '0%';
                     const workLoc = u.workLocation || '-';
-                    
                     const isSuspended = u.isSuspended || false;
                     const statusBadge = isSuspended 
                         ? `<span class="badge" style="background:#fef2f2; color:var(--danger); border:1px solid #fecaca">Suspended</span>` 
@@ -1882,7 +1910,6 @@
                         <td><span class="badge badge-${u.workLocation === 'HQ' ? 'admin' : 'crew'}">${workLoc}</span></td>
                         <td><span class="badge badge-${u.role==='super_admin'?'admin':(u.role==='admin'?'admin':'crew')}">${u.role}</span></td>
                         <td>${u.jobTitle||'-'}</td>
-                        <td><span class="badge" style="background:#ecfdf5; color:var(--success)">${rate}</span></td>
                         <td>${statusBadge}</td>
                         <td>${buttons}</td>
                     </tr>`;
@@ -1902,20 +1929,17 @@
                 <div class="mb-4"><label>Email Address</label><input type="email" id="c-email"></div>
                 <div class="mb-4"><label>Phone Number (Optional)</label><input type="tel" id="c-phone" placeholder="01XXXXXXXXX"></div>
                 <div class="mb-4">
-                    <label>Job Title (Auto-Sets Role)</label>
-                    <select id="c-job" onchange="autoSetRoleAndRate()">
+                    <label>Job Title (Auto-Sets Role & Category)</label>
+                    <select id="c-job">
                         <option value="">Select Job Title...</option>
                         ${jobOptions}
                     </select>
+                    <small class="text-muted">Category determines commission share (Sales=50%, Tech=20%, etc)</small>
                 </div>
                 <div class="flex gap-4 mb-4">
                     <div style="flex:1">
                         <label>Role</label>
                         <input type="text" id="c-role" readonly style="background:#f9fafb">
-                    </div>
-                    <div style="flex:1">
-                        <label>Comm. Rate (%)</label>
-                        <input type="number" step="0.1" id="c-rate" readonly style="background:#f9fafb">
                     </div>
                 </div>
                 <div class="mb-4">
@@ -1928,16 +1952,12 @@
                 <div class="mb-4"><label>Temporary Password</label><input type="password" id="c-pass" placeholder="Set password"></div>
             `, `<button class="btn btn-primary" onclick="saveCrew('${newCrewId}')">Create Crew</button>`);
         }
-
-        function autoSetRoleAndRate() {
+        
+        function autoSetRole() {
             const title = document.getElementById('c-job').value;
             const roleInput = document.getElementById('c-role');
-            const rateInput = document.getElementById('c-rate');
             const dbRole = JOB_ROLE_MAP[title] || 'crew'; 
             roleInput.value = dbRole.toUpperCase();
-            
-            const defaultRate = getDefaultRate(title);
-            rateInput.value = (defaultRate * 100).toFixed(1);
         }
 
         async function saveCrew(newId) {
@@ -1948,7 +1968,6 @@
             const phone = document.getElementById('c-phone').value; 
             const pass = document.getElementById('c-pass').value;
             const job = document.getElementById('c-job').value;
-            const rateVal = parseFloat(document.getElementById('c-rate').value);
             const workLoc = document.getElementById('c-work-loc').value;
 
             if(!name || !email || !pass || !job) return showToast("Please fill all required fields", "error");
@@ -1966,7 +1985,6 @@
                     phone: phone, 
                     role: dbRole, 
                     jobTitle: job,
-                    commissionRate: isNaN(rateVal) ? 0.0 : (rateVal / 100),
                     workLocation: workLoc, 
                     permissions: {},
                     bankDetails: bankDetails,
@@ -2070,12 +2088,12 @@
                     <div class="mb-4"><label>Email Address</label><input id="e-c-email" value="${u.email}"></div>
                     <div class="mb-4"><label>Phone Number</label><input id="e-c-phone" value="${u.phone||''}"></div>
                     <div class="mb-4">
-                        <label>Job Title (Auto-Sets Role & Rate)</label>
-                        <select id="e-c-job" onchange="autoSetEditRoleAndRate()">
+                        <label>Job Title (Auto-Sets Role)</label>
+                        <select id="e-c-job" onchange="autoSetEditRole()">
                             <option value="">Select Job Title...</option>
                             ${jobOptions}
                         </select>
-                        <small style="color:var(--info)">Changing Job Title will auto-update Role and Commission Rate.</small>
+                        <small style="color:var(--info)">Changing Job Title will auto-update Role.</small>
                     </div>
                     <div class="mb-4">
                         <label>System Role</label>
@@ -2087,7 +2105,6 @@
                         </select>
                         ${!canEditRole ? '<small class="text-danger text-sm">Only Super Admins can change roles.</small>' : ''}
                     </div>
-                     <div class="mb-4"><label>Commission Rate (%)</label><input type="number" step="0.1" id="e-c-rate" value="${(u.commissionRate*100).toFixed(1)}"></div>
                      <div class="mb-4">
                         <label>Work Location</label>
                         <select id="e-c-work-loc">
@@ -2101,22 +2118,15 @@
             });
         }
 
-        function autoSetEditRoleAndRate() {
+        function autoSetEditRole() {
             const title = document.getElementById('e-c-job').value;
             const roleSelect = document.getElementById('e-c-role');
-            const rateInput = document.getElementById('e-c-rate');
-            
             const dbRole = JOB_ROLE_MAP[title] || 'crew'; 
             roleSelect.value = dbRole;
-            
-            const defaultRate = getDefaultRate(title);
-            rateInput.value = (defaultRate * 100).toFixed(1);
         }
 
         async function updateCrewData(uid) {
             if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CREW)) return showToast("Access Denied", "error");
-
-            const rateVal = parseFloat(document.getElementById('e-c-rate').value);
             
             const newPerms = {};
             document.querySelectorAll('.perm-toggle').forEach(cb => {
@@ -2142,7 +2152,6 @@
                 email: document.getElementById('e-c-email').value,
                 phone: document.getElementById('e-c-phone').value, 
                 jobTitle: document.getElementById('e-c-job').value,
-                commissionRate: isNaN(rateVal) ? 0.0 : (rateVal / 100),
                 permissions: newPerms,
                 bankDetails: bankData,
                 bypassApproval: bypassVal,
@@ -2283,10 +2292,23 @@
                     if (statusLower === 'suspended') statusColor = 'var(--danger)';
                     
                     let actions = `<button class="btn btn-sm btn-secondary" onclick="editVoucher('${doc.id}', '${v.code}')">Edit</button>`;
+                    
                     if (canEdit) {
-                        actions += `<button class="btn btn-sm btn-success" onclick="markRedeem('${doc.id}', '${v.code}')"><i class="ri-check-double-line"></i> Redeem</button>`;
+                        actions += `<button class="btn btn-sm btn-success" onclick="markRedeem('${doc.id}', '${v.code}')"><i class="ri-checkbox-double-line"></i> Redeem</button>`;
                         actions += `<button class="btn btn-sm btn-danger" onclick="disableVoucher('${doc.id}', '${v.code}')"><i class="ri-delete-bin-line"></i> Disable</button>`;
                     }
+
+                    // --- NEW: WhatsApp Buttons ---
+                    
+                    // 1. Admin WhatsApp Button
+                    actions += `<button class="btn btn-sm btn-info" title="Notify Admin Team" onclick="notifyVoucherExpiryAdmin('${v.code}', '${v.expiryDate ? new Date(v.expiryDate.seconds * 1000).toLocaleDateString() : 'N/A'}', '${u.name}')">
+                        <i class="ri-whatsapp-line"></i> Admin
+                    </button>`;
+
+                    // 2. Client WhatsApp Button
+                    actions += `<button class="btn btn-sm btn-success" title="Notify Client" onclick="notifyVoucherExpiryClient('${u.phone}', '${u.name}', '${v.expiryDate ? new Date(v.expiryDate.seconds * 1000).toLocaleDateString() : 'N/A'}')">
+                        <i class="ri-whatsapp-line"></i> Client
+                    </button>`;
 
                     tbody.innerHTML += `<tr>
                         <td>${u.name}</td>
@@ -2492,7 +2514,7 @@
             }).catch(err => { showToast("Error updating: " + err.message, "error"); btn.innerHTML = originalHTML; });
         }
 
-        // --- 8. CONFIG (Updated with Maintenance) ---
+        // --- 8. CONFIG ---
         async function renderConfig() {
             const main = document.getElementById('main');
             if(!main) return;
@@ -2647,15 +2669,18 @@
             snap.forEach(doc => {
                 const u = doc.data();
                 if(u.phone) {
-                    let cleanPhone = u.phone.replace(/^0/, '60');
-                    if(!cleanPhone.startsWith('+')) cleanPhone = '+' + cleanPhone;
-                    const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
-                    content += `
-                        <div class="flex justify-between items-center p-2 border rounded" style="background:white;">
-                            <span><strong>${u.name}</strong> <small class="text-muted">(${u.jobTitle})</small></span>
-                            <a href="${url}" target="_blank" class="btn btn-sm btn-success"><i class="ri-whatsapp-line"></i> Send</a>
-                        </div>
-                    `;
+                    // Robust Phone Cleaning
+                    const cleanPhone = formatWAPhone(u.phone);
+                    
+                    if (cleanPhone) {
+                        const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+                        content += `
+                            <div class="flex justify-between items-center p-2 border rounded" style="background:white;">
+                                <span><strong>${u.name}</strong> <small class="text-muted">(${u.jobTitle})</small></span>
+                                <a href="${url}" target="_blank" class="btn btn-sm btn-success"><i class="ri-whatsapp-line"></i> Send</a>
+                            </div>
+                        `;
+                    }
                 }
             });
             content += `</div>`;
@@ -2952,6 +2977,58 @@
 
         // --- 12. FINANCE OVERVIEW ---
         
+        function populateFinanceRatesUI() {
+            document.getElementById('rate-sales').value = commissionRatesConfig.sales * 100;
+            document.getElementById('rate-tech').value = commissionRatesConfig.tech * 100;
+            document.getElementById('rate-success').value = commissionRatesConfig.success * 100;
+            document.getElementById('rate-ops').value = commissionRatesConfig.ops * 100;
+            calculateRateTotal();
+        }
+
+        function calculateRateTotal() {
+            const s = parseFloat(document.getElementById('rate-sales').value) || 0;
+            const t = parseFloat(document.getElementById('rate-tech').value) || 0;
+            const su = parseFloat(document.getElementById('rate-success').value) || 0;
+            const o = parseFloat(document.getElementById('rate-ops').value) || 0;
+            const total = (s + t + su + o) / 100;
+            const totalDisplay = (total * 100).toFixed(1);
+            const totalEl = document.getElementById('rate-total');
+            if(totalEl) {
+                totalEl.innerText = `${totalDisplay}%`;
+                if(total > 1) totalEl.style.color = 'var(--warning)';
+                else totalEl.style.color = 'var(--success)';
+            }
+        }
+
+        function saveCommissionRates() {
+            if(!canAccessFinanceTools()) return showToast("Access Denied", "error");
+            const salesVal = parseFloat(document.getElementById('rate-sales').value) || 0;
+            const techVal = parseFloat(document.getElementById('rate-tech').value) || 0;
+            const successVal = parseFloat(document.getElementById('rate-success').value) || 0;
+            const opsVal = parseFloat(document.getElementById('rate-ops').value) || 0;
+
+            const newRates = {
+                sales: salesVal / 100,
+                tech: techVal / 100,
+                success: successVal / 100,
+                ops: opsVal / 100
+            };
+            
+            // Update global config
+            commissionRatesConfig = newRates;
+
+            // Update DB
+            db.collection("config").doc("site_settings").update({
+                commission_rates: newRates
+            }).then(() => {
+                showToast("Commission Rates Updated", "success");
+                logActivity(`Updated commission rates`);
+            }).catch(e => {
+                console.error(e);
+                showToast("Error saving rates", "error");
+            });
+        }
+
         function renderFinanceOverview() {
             const main = document.getElementById('main');
             if(!main) return;
@@ -3032,6 +3109,36 @@
 
                 <div id="tab-content-tools" class="tab-content">
                     <div class="config-section">
+                        <div class="config-header flex justify-between">
+                            <h3>Commission Rate Configuration</h3>
+                            <span class="badge badge-user">Finance Access</span>
+                        </div>
+                        <p class="text-muted text-sm mb-4">Set the percentage distribution of the team commission pot. Total must equal 100%.</p>
+                        <div class="price-grid">
+                            <div>
+                                <label>Sales Split (%)</label>
+                                <input type="number" id="rate-sales" step="0.01" oninput="calculateRateTotal()" ${!canManageFinance ? 'readonly' : ''}>
+                            </div>
+                            <div>
+                                <label>Tech Split (%)</label>
+                                <input type="number" id="rate-tech" step="0.01" oninput="calculateRateTotal()" ${!canManageFinance ? 'readonly' : ''}>
+                            </div>
+                            <div>
+                                <label>Success/CX Split (%)</label>
+                                <input type="number" id="rate-success" step="0.01" oninput="calculateRateTotal()" ${!canManageFinance ? 'readonly' : ''}>
+                            </div>
+                            <div>
+                                <label>Ops Split (%)</label>
+                                <input type="number" id="rate-ops" step="0.01" oninput="calculateRateTotal()" ${!canManageFinance ? 'readonly' : ''}>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-center">
+                            <p>Total Split: <span id="rate-total">100%</span></p>
+                            ${canManageFinance ? `<button class="btn btn-primary" onclick="saveCommissionRates()">Update Rates</button>` : ''}
+                        </div>
+                    </div>
+
+                    <div class="config-section">
                         <h3 style="margin-bottom:1rem;">Financial Operations (Authorized Only)</h3>
                         <div class="grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem;">
                             <div class="p-4 border rounded" style="background:#f9fafb;">
@@ -3049,6 +3156,11 @@
                 </div>
             `;
             
+            // Populate inputs if tab active
+            if(document.getElementById('tab-content-tools').classList.contains('active') && !isMyView) {
+                populateFinanceRatesUI();
+            }
+            
             updateCommissionView(isMyView);
         }
 
@@ -3059,9 +3171,12 @@
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.getElementById(`tab-content-${tabName}`).classList.add('active');
 
-            if(tabName === 'commission') {
+            if(tabName === 'tools') {
                 const isMyView = !canAccessFinanceTools();
-                updateCommissionView(isMyView);
+                // Only refresh rates if authorized
+                if(!isMyView) populateFinanceRatesUI();
+            } else {
+                updateCommissionView(!canAccessFinanceTools());
             }
         }
 
@@ -3167,7 +3282,15 @@
                 return;
             }
 
-            tbody.innerHTML = data.map(item => {
+            // Check if all currently shown are unpaid
+            const allUnpaid = data.every(item => (item.status || 'unpaid') === 'unpaid');
+            const bulkPayBtn = (!isMyView && allUnpaid && canAccessFinanceTools()) 
+                ? `<div style="margin-bottom:10px; display:flex; justify-content:flex-end;">
+                    <button class="btn btn-success" style="touch-action: manipulation; cursor: pointer;" onclick="bulkMarkPaid()">Mark All Shown as Paid</button>
+                   </div>` 
+                : '';
+
+            tbody.innerHTML = bulkPayBtn + data.map(item => {
                 const d = item;
                 const status = d.status || 'unpaid';
                 const isPaid = status === 'paid';
@@ -3183,13 +3306,13 @@
 
                 let actionsHTML = '';
                 if(!isMyView && canAccessFinanceTools()) {
-                    // FIX: Added 'touch-action: manipulation' to ensure buttons fire instantly on touch devices
+                    // FIX: Direct window.open for mobile, large touch targets
                     actionsHTML = `
-                        <button class="btn btn-sm ${isPaid?'btn-secondary':'btn-success'}" style="touch-action: manipulation; cursor: pointer;" onclick="markCommissionPaid('${d.id}', '${d.crewId}')" title="${isPaid?'Mark Unpaid':'Mark Paid'}">
+                        <button class="btn btn-sm ${isPaid?'btn-secondary':'btn-success'}" style="touch-action: manipulation; cursor: pointer; min-width:40px;" onclick="markCommissionPaid('${d.id}', '${d.crewId}')" title="${isPaid?'Mark Unpaid':'Mark Paid'}">
                             <i class="${isPaid?'ri-arrow-go-back-line':'ri-checkbox-circle-line'}"></i> ${isPaid?'Undo':'Pay'}
                         </button>
-                        <button class="btn btn-sm btn-info" style="touch-action: manipulation; cursor: pointer;" onclick="waCrewCommission('${d.crewId}', 'RM ${d.amount.toFixed(2)}')" title="WhatsApp Crew">
-                            <i class="ri-whatsapp-line"></i> WA
+                        <button class="btn btn-sm btn-info" style="touch-action: manipulation; cursor: pointer; min-width:40px;" onclick="waCrewCommission('${d.crewId}', 'RM ${d.amount.toFixed(2)}')" title="WhatsApp Crew">
+                            <i class="ri-whatsapp-line"></i> 
                         </button>
                     `;
                 }
@@ -3236,6 +3359,60 @@
             }
         }
 
+        async function bulkMarkPaid() {
+            if(!confirm("Mark all currently listed commissions as Paid?")) return;
+            
+            // We use the filtered data currently displayed
+            const tbody = document.getElementById('comm-tbody');
+            // We need to get the IDs from the raw data that passed the filter
+            // A bit tricky because rawFinanceData has all, we need to re-apply logic or parse DOM? 
+            // Better: Re-run applyFilters logic inside this function to get the subset.
+            
+            const filterRef = document.getElementById('filter-ref').value.toLowerCase();
+            const filterStatus = document.getElementById('filter-status').value;
+            const filterStart = document.getElementById('filter-date-start').value;
+            const filterEnd = document.getElementById('filter-date-end').value;
+            const filterAmount = document.getElementById('filter-amount').value;
+
+            const idsToPay = rawFinanceData
+                .filter(item => {
+                    const dateObj = item.orderDate ? item.orderDate.toDate() : new Date(0);
+                    const dateStr = formatDateTime(dateObj).toLowerCase();
+                    const refStr = (item.orderId || '').substring(0,6).toLowerCase();
+                    const crewName = (item.crewName || '').toLowerCase();
+                    const paidBy = (item.paidBy || '').toLowerCase();
+                    const status = (item.status || '').toLowerCase();
+
+                    const matchesSearch = !filterRef || refStr.includes(filterRef) || crewName.includes(filterRef) || paidBy.includes(filterRef);
+                    const matchesStatus = !filterStatus || status === filterStatus;
+                    const matchesAmount = !filterAmount || item.amount >= parseFloat(filterAmount);
+                    let matchesDate = true;
+                    if(filterStart) { if (dateObj < new Date(filterStart)) matchesDate = false; }
+                    if(filterEnd) { const endObj = new Date(filterEnd); endObj.setHours(23, 59, 59, 999); if (dateObj > endObj) matchesDate = false; }
+                    return matchesSearch && matchesStatus && matchesAmount && matchesDate;
+                })
+                .map(item => item.id);
+
+            const batch = db.batch();
+            idsToPay.forEach(id => {
+                batch.update(db.collection("commission_overview").doc(id), {
+                    status: 'paid',
+                    paidAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    paidBy: userData.name
+                });
+            });
+
+            try {
+                await batch.commit();
+                showToast(`${idsToPay.length} commissions marked as Paid`, "success");
+                logActivity(`Bulk paid ${idsToPay.length} commissions`);
+                applyFilters(); // Re-render
+            } catch(e) {
+                console.error(e);
+                showToast("Error bulk paying", "error");
+            }
+        }
+
         async function waCrewCommission(crewId, amount) {
             if(!canAccessFinanceTools()) return showToast("Access Denied", "error");
             
@@ -3245,14 +3422,22 @@
                 const crewData = crewSnap.data();
                 const phone = crewData.phone;
 
-                if(!phone) return showToast("Crew has no phone number", "error");
+                // Robust Phone Cleaning
+                const cleanPhone = formatWAPhone(phone);
 
-                let cleanPhone = phone.replace(/^0/, '60');
-                if(!cleanPhone.startsWith('+')) cleanPhone = '+' + cleanPhone;
+                if(!cleanPhone) {
+                    return showToast("Crew has invalid phone number", "error");
+                }
 
-                const msg = `Hi ${crewData.name}, this is Finance.\n\n Your commission of ${amount} has been processed.\n\nPlease check your bank account.\n\n\ [Auto-generated from DDNet System]`;
+                const msg = `Hi ${crewData.name}, this is DDNet-Finance.\n\nYour commission of ${amount} has been processed.\n\nPlease check your bank account.\n\n\> [Auto-generated from DDNet System]`;
                 
-                openWA(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`);
+                const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+                
+                // Mobile Fallback
+                const win = window.open(url, '_blank');
+                if (!win || win.closed || typeof win.closed == 'undefined') {
+                    window.location.href = url;
+                }
             } catch(e) {
                 console.error(e);
                 showToast("Error fetching crew details", "error");
@@ -3473,6 +3658,37 @@
             const trs = document.querySelectorAll(`#${id} tr`);
             text = text.toLowerCase();
             trs.forEach(tr => tr.style.display = tr.innerText.toLowerCase().includes(text)?'':'none');
+        }
+                // --- VOUCHER WHATSAPP HELPERS ---
+
+        function notifyVoucherExpiryAdmin(voucherCode, expiryDate, customerName) {
+            const msg = `Hi Admin Team,\n\nA customer’s voucher (${voucherCode}) will expire on ${expiryDate}.\nCustomer: ${customerName}\n\nPlease follow up with them and try to close the sale.\n\nThank you.\n\n> [Auto-generated from DDNet System]`;
+            
+            // Opens a generic WhatsApp link so you can choose who to send it to
+            const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+            
+            const win = window.open(url, '_blank');
+            if (!win || win.closed || typeof win.closed == 'undefined') {
+                window.location.href = url;
+            }
+        }
+
+        function notifyVoucherExpiryClient(phone, name, expiryDate) {
+            // Clean phone number
+            const cleanPhone = phone ? phone.replace(/[^0-9]/g, '').replace(/^0/, '60') : '';
+            
+            if(!cleanPhone) {
+                return showToast("Client has no valid phone number", "error");
+            }
+
+            const msg = `Hi ${name},\n\nWe noticed your voucher will expire on ${expiryDate}. Don’t miss out—use it soon! If you need any assistance, we’re happy to help.\n\nThank you,\n> [Auto-generated from DDNet System]`;
+
+            const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+            
+            const win = window.open(url, '_blank');
+            if (!win || win.closed || typeof win.closed == 'undefined') {
+                window.location.href = url;
+            }
         }
 
 </script>
