@@ -573,11 +573,18 @@
     </div>
 
     <div class="toast-container" id="toastContainer"></div>
-
-    <!-- JAVASCRIPT -->
+<!-- JAVASCRIPT -->
 <script>
         // --- FIX: HIDE AUTH SCREEN IMMEDIATELY TO PREVENT REFRESH FLASH ---
         document.getElementById('auth-screen').classList.add('hidden');
+
+        // --- GLOBAL COMMISSION RATES CONFIG ---
+        let commissionRatesConfig = {
+            sales: 0.50,
+            tech: 0.20,
+            success: 0.15,
+            ops: 0.05
+        };
 
         // --- CONSTANTS & CONFIG ---
         const JOB_TITLES = [
@@ -673,6 +680,18 @@
             else { console.error("Firebase initialization failed."); }
         } catch(e) { console.log("Firebase init error", e); }
 
+        // --- HELPER: LOAD COMMISSION CONFIG ---
+        async function loadCommissionConfig() {
+            try {
+                const doc = await db.collection("config").doc("site_settings").get();
+                if (doc.exists && doc.data().commission_rates) {
+                    commissionRatesConfig = doc.data().commission_rates;
+                }
+            } catch (e) {
+                console.error("Error loading commission config", e);
+            }
+        }
+
         // --- AUTO CREATE CONFIG ---
         async function initializeDatabase() {
             try {
@@ -680,6 +699,12 @@
                 const doc = await configRef.get();
                 if (!doc.exists) {
                     console.log("Creating default config...");
+                    const defaultRates = {
+                        sales: 0.50,
+                        tech: 0.20,
+                        success: 0.15,
+                        ops: 0.05
+                    };
                     await configRef.set({
                         maintenance_active: false,
                         maintenance_message: "IT Department currently fix Portal Bugs",
@@ -690,8 +715,22 @@
                         },
                         discountActive: false,
                         discountPercent: 0.1,
-                        disabled_menus: [] 
+                        disabled_menus: [],
+                        commission_rates: defaultRates
                     });
+                } else {
+                    // Ensure commission_rates exist if doc exists
+                    const data = doc.data();
+                    if(!data.commission_rates) {
+                         await configRef.update({
+                             commission_rates: {
+                                 sales: 0.50,
+                                 tech: 0.20,
+                                 success: 0.15,
+                                 ops: 0.05
+                             }
+                         });
+                    }
                 }
                 const pmSnapshot = await db.collection("payment_methods").limit(1).get();
                 if (pmSnapshot.empty) {
@@ -742,7 +781,7 @@
                      let existingIds = [];
                      snap.forEach(doc => { const id = doc.data().crewId; if(id) existingIds.push(parseInt(id)); });
                      existingIds.sort((a,b) => a-b);
-                     let nextId = 1;
+                     let nextId =1;
                      if(existingIds.length > 0) { for(let i=0; i<existingIds.length; i++) { if(existingIds[i] === nextId) nextId++; else break; } }
                      return String(nextId).padStart(3, '0');
                  } catch(e) { return "001"; }
@@ -811,6 +850,9 @@
                         // Load Pinned Menus
                         userPinnedMenus = userData.pinnedMenus || [];
                         renderPinnedMenus();
+
+                        // Load Commission Config
+                        loadCommissionConfig();
 
                         // --- HEADER UPDATE ---
                         const userInitial = (userData.name || 'A').charAt(0).toUpperCase();
@@ -989,6 +1031,16 @@
                         disabledMenus: data.disabled_menus || [],
                         message: data.maintenance_message || "System Maintenance"
                     };
+                    
+                    // Reload commission config if it changes
+                    if(data.commission_rates) {
+                        commissionRatesConfig = data.commission_rates;
+                        // If finance tools is open, refresh inputs
+                        const isMyView = !canAccessFinanceTools();
+                        if(document.getElementById('tab-content-tools').classList.contains('active') && !isMyView) {
+                            populateFinanceRatesUI();
+                        }
+                    }
 
                     const bar = document.getElementById('maintenance-bar');
                     const dash = document.getElementById('dashboard');
@@ -1198,7 +1250,6 @@
         }
 
         // --- WHATSAPP HELPER FOR MOBILE ---
-        // Ensures phone number is strictly formatted for Malaysia
         function formatWAPhone(phone) {
             if (!phone) return null;
             // Remove all non-numeric characters
@@ -1449,10 +1500,10 @@
 
                 let msg = "";
                 if (d.status === "Pending" || d.status === "Cancelled" || !d.status) {
-                    msg = `Hi ${d.customerName},\n\nThis is a friendly reminder that we are still awaiting payment for your recent order with DDNetwork.\n\nOrder ID: #${orderRef}\nAmount: ${d.total}\n\nPlease proceed with payment at your convenience so we can continue processing your order. If you’ve already made the payment, kindly ignore this message.\n\nThank you for your support.\n\n> [Auto-generated from DDNet System]`;
+                    msg = `Hi ${d.customerName},\n\nThis is a friendly reminder that we are still awaiting payment for your recent order with DDNetwork.\n\nOrder ID: #${orderRef}\nAmount: ${d.total}\n\nPlease proceed with payment at your convenience so we can continue processing your order. If you’ve already made payment, kindly ignore this message.\n\nThank you for your support.\n\n[Auto-generated from DDNet System]`;
                 } 
                 else { 
-                    msg = `Hi ${d.customerName},\n\nWe noticed that payment for your recent order with DDNetwork was not completed successfully.\n\nOrder ID: #${orderRef}\nOutstanding Amount: ${d.total}\n\nTo avoid any delay or cancellation, please complete the payment as soon as possible. If you encountered any issues during payment, let us know and we will assist you.\n\nThank you for your understanding.\n\n> [Auto-generated from DDNet System]`;
+                    msg = `Hi ${d.customerName},\n\nWe noticed that payment for your recent order with DDNetwork was not completed successfully.\n\nOrder ID: #${orderRef}\nOutstanding Amount: ${d.total}\n\nTo avoid any delay or cancellation, please complete the payment as soon as possible. If you encountered any issues during payment, let us know and we will assist you.\n\nThank you for your understanding.\n\n[Auto-generated from DDNet System]`;
                 }
 
                 // Robust Phone Cleaning
@@ -1583,12 +1634,11 @@
 
                 const totalTeamCommission = orderTotal * teamPercentage;
                 
-                // 2. Define Split Percentages for Categories
-                const SALES_SPLIT = 0.50;  // 50% of Team Pot
-                const TECH_SPLIT = 0.20;    // 20% of Team Pot
-                const SUCCESS_SPLIT = 0.15; // 15% of Team Pot
-                const OPS_SPLIT = 0.05;     // 5% of Team Pot
-                // Buffer (10%) is effectively kept by company as unassigned or reallocated if desired.
+                // 2. Define Split Percentages for Categories (Use Global Config)
+                const SALES_SPLIT = commissionRatesConfig.sales;  
+                const TECH_SPLIT = commissionRatesConfig.tech;    
+                const SUCCESS_SPLIT = commissionRatesConfig.success;
+                const OPS_SPLIT = commissionRatesConfig.ops;   
 
                 repIds.forEach(repId => {
                     const rep = usersMap[repId];
@@ -2914,6 +2964,58 @@
 
         // --- 12. FINANCE OVERVIEW ---
         
+        function populateFinanceRatesUI() {
+            document.getElementById('rate-sales').value = commissionRatesConfig.sales * 100;
+            document.getElementById('rate-tech').value = commissionRatesConfig.tech * 100;
+            document.getElementById('rate-success').value = commissionRatesConfig.success * 100;
+            document.getElementById('rate-ops').value = commissionRatesConfig.ops * 100;
+            calculateRateTotal();
+        }
+
+        function calculateRateTotal() {
+            const s = parseFloat(document.getElementById('rate-sales').value) || 0;
+            const t = parseFloat(document.getElementById('rate-tech').value) || 0;
+            const su = parseFloat(document.getElementById('rate-success').value) || 0;
+            const o = parseFloat(document.getElementById('rate-ops').value) || 0;
+            const total = (s + t + su + o) / 100;
+            const totalDisplay = (total * 100).toFixed(1);
+            const totalEl = document.getElementById('rate-total');
+            if(totalEl) {
+                totalEl.innerText = `${totalDisplay}%`;
+                if(total > 1) totalEl.style.color = 'var(--warning)';
+                else totalEl.style.color = 'var(--success)';
+            }
+        }
+
+        function saveCommissionRates() {
+            if(!canAccessFinanceTools()) return showToast("Access Denied", "error");
+            const salesVal = parseFloat(document.getElementById('rate-sales').value) || 0;
+            const techVal = parseFloat(document.getElementById('rate-tech').value) || 0;
+            const successVal = parseFloat(document.getElementById('rate-success').value) || 0;
+            const opsVal = parseFloat(document.getElementById('rate-ops').value) || 0;
+
+            const newRates = {
+                sales: salesVal / 100,
+                tech: techVal / 100,
+                success: successVal / 100,
+                ops: opsVal / 100
+            };
+            
+            // Update global config
+            commissionRatesConfig = newRates;
+
+            // Update DB
+            db.collection("config").doc("site_settings").update({
+                commission_rates: newRates
+            }).then(() => {
+                showToast("Commission Rates Updated", "success");
+                logActivity(`Updated commission rates`);
+            }).catch(e => {
+                console.error(e);
+                showToast("Error saving rates", "error");
+            });
+        }
+
         function renderFinanceOverview() {
             const main = document.getElementById('main');
             if(!main) return;
@@ -2994,6 +3096,36 @@
 
                 <div id="tab-content-tools" class="tab-content">
                     <div class="config-section">
+                        <div class="config-header flex justify-between">
+                            <h3>Commission Rate Configuration</h3>
+                            <span class="badge badge-user">Finance Access</span>
+                        </div>
+                        <p class="text-muted text-sm mb-4">Set the percentage distribution of the team commission pot. Total must equal 100%.</p>
+                        <div class="price-grid">
+                            <div>
+                                <label>Sales Split (%)</label>
+                                <input type="number" id="rate-sales" step="0.01" oninput="calculateRateTotal()" ${!canManageFinance ? 'readonly' : ''}>
+                            </div>
+                            <div>
+                                <label>Tech Split (%)</label>
+                                <input type="number" id="rate-tech" step="0.01" oninput="calculateRateTotal()" ${!canManageFinance ? 'readonly' : ''}>
+                            </div>
+                            <div>
+                                <label>Success/CX Split (%)</label>
+                                <input type="number" id="rate-success" step="0.01" oninput="calculateRateTotal()" ${!canManageFinance ? 'readonly' : ''}>
+                            </div>
+                            <div>
+                                <label>Ops Split (%)</label>
+                                <input type="number" id="rate-ops" step="0.01" oninput="calculateRateTotal()" ${!canManageFinance ? 'readonly' : ''}>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-center">
+                            <p>Total Split: <span id="rate-total">100%</span></p>
+                            ${canManageFinance ? `<button class="btn btn-primary" onclick="saveCommissionRates()">Update Rates</button>` : ''}
+                        </div>
+                    </div>
+
+                    <div class="config-section">
                         <h3 style="margin-bottom:1rem;">Financial Operations (Authorized Only)</h3>
                         <div class="grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem;">
                             <div class="p-4 border rounded" style="background:#f9fafb;">
@@ -3011,6 +3143,11 @@
                 </div>
             `;
             
+            // Populate inputs if tab active
+            if(document.getElementById('tab-content-tools').classList.contains('active') && !isMyView) {
+                populateFinanceRatesUI();
+            }
+            
             updateCommissionView(isMyView);
         }
 
@@ -3021,9 +3158,12 @@
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.getElementById(`tab-content-${tabName}`).classList.add('active');
 
-            if(tabName === 'commission') {
+            if(tabName === 'tools') {
                 const isMyView = !canAccessFinanceTools();
-                updateCommissionView(isMyView);
+                // Only refresh rates if authorized
+                if(!isMyView) populateFinanceRatesUI();
+            } else {
+                updateCommissionView(!canAccessFinanceTools());
             }
         }
 
@@ -3159,7 +3299,7 @@
                             <i class="${isPaid?'ri-arrow-go-back-line':'ri-checkbox-circle-line'}"></i> ${isPaid?'Undo':'Pay'}
                         </button>
                         <button class="btn btn-sm btn-info" style="touch-action: manipulation; cursor: pointer; min-width:40px;" onclick="waCrewCommission('${d.crewId}', 'RM ${d.amount.toFixed(2)}')" title="WhatsApp Crew">
-                            <i class="ri-whatsapp-line"></i>
+                            <i class="ri-whatsapp-line"></i> 
                         </button>
                     `;
                 }
