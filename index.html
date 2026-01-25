@@ -3016,7 +3016,7 @@
                 
                 if (snap.empty) {
                     rawFinanceData = []; 
-                    tbody.innerHTML = `<tr><td colspan="${colCount}" class="text-center text-muted">No commissions found.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="${isMyView ? 6 : 8}" class="text-center text-muted">No commissions found.</td></tr>`;
                     totalEl.innerText = 'RM 0.00';
                     return;
                 }
@@ -3030,7 +3030,7 @@
                 let errorMsg = "Error loading data.";
                 if(error.code === 'permission-denied') errorMsg = "Permission Denied.";
                 if(error.code === 'failed-precondition') errorMsg = "Database Index Missing.";
-                tbody.innerHTML = `<tr><td colspan="${colCount}" class="text-center text-danger">${errorMsg}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="${isMyView ? 6 : 8}" class="text-center text-danger">${errorMsg}</td></tr>`;
                 showToast(errorMsg, "error");
             }
         }
@@ -3112,11 +3112,12 @@
 
                 let actionsHTML = '';
                 if(!isMyView && canAccessFinanceTools()) {
+                    // FIX: Added 'touch-action: manipulation' to ensure buttons fire instantly on touch devices
                     actionsHTML = `
-                        <button class="btn btn-sm ${isPaid?'btn-secondary':'btn-success'}" onclick="markCommissionPaid('${d.id}', '${d.crewId}')" title="${isPaid?'Mark Unpaid':'Mark Paid'}">
+                        <button class="btn btn-sm ${isPaid?'btn-secondary':'btn-success'}" style="touch-action: manipulation; cursor: pointer;" onclick="markCommissionPaid('${d.id}', '${d.crewId}')" title="${isPaid?'Mark Unpaid':'Mark Paid'}">
                             <i class="${isPaid?'ri-arrow-go-back-line':'ri-checkbox-circle-line'}"></i> ${isPaid?'Undo':'Pay'}
                         </button>
-                        <button class="btn btn-sm btn-info" onclick="waCrewCommission('${d.crewId}', 'RM ${d.amount.toFixed(2)}')" title="WhatsApp Crew">
+                        <button class="btn btn-sm btn-info" style="touch-action: manipulation; cursor: pointer;" onclick="waCrewCommission('${d.crewId}', 'RM ${d.amount.toFixed(2)}')" title="WhatsApp Crew">
                             <i class="ri-whatsapp-line"></i> WA
                         </button>
                     `;
@@ -3404,5 +3405,6 @@
         }
 
 </script>
+
 </body>
-</html>"
+</html>
