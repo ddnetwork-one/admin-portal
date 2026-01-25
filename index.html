@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HQ-DDNetwork-portal.v3.0</title>
+    <title>HQ-DDNetwork-portal</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2292,10 +2292,23 @@
                     if (statusLower === 'suspended') statusColor = 'var(--danger)';
                     
                     let actions = `<button class="btn btn-sm btn-secondary" onclick="editVoucher('${doc.id}', '${v.code}')">Edit</button>`;
+                    
                     if (canEdit) {
-                        actions += `<button class="btn btn-sm btn-success" onclick="markRedeem('${doc.id}', '${v.code}')"><i class="ri-check-double-line"></i> Redeem</button>`;
+                        actions += `<button class="btn btn-sm btn-success" onclick="markRedeem('${doc.id}', '${v.code}')"><i class="ri-checkbox-double-line"></i> Redeem</button>`;
                         actions += `<button class="btn btn-sm btn-danger" onclick="disableVoucher('${doc.id}', '${v.code}')"><i class="ri-delete-bin-line"></i> Disable</button>`;
                     }
+
+                    // --- NEW: WhatsApp Buttons ---
+                    
+                    // 1. Admin WhatsApp Button
+                    actions += `<button class="btn btn-sm btn-info" title="Notify Admin Team" onclick="notifyVoucherExpiryAdmin('${v.code}', '${v.expiryDate ? new Date(v.expiryDate.seconds * 1000).toLocaleDateString() : 'N/A'}', '${u.name}')">
+                        <i class="ri-whatsapp-line"></i> Admin
+                    </button>`;
+
+                    // 2. Client WhatsApp Button
+                    actions += `<button class="btn btn-sm btn-success" title="Notify Client" onclick="notifyVoucherExpiryClient('${u.phone}', '${u.name}', '${v.expiryDate ? new Date(v.expiryDate.seconds * 1000).toLocaleDateString() : 'N/A'}')">
+                        <i class="ri-whatsapp-line"></i> Client
+                    </button>`;
 
                     tbody.innerHTML += `<tr>
                         <td>${u.name}</td>
@@ -3645,6 +3658,37 @@
             const trs = document.querySelectorAll(`#${id} tr`);
             text = text.toLowerCase();
             trs.forEach(tr => tr.style.display = tr.innerText.toLowerCase().includes(text)?'':'none');
+        }
+                // --- VOUCHER WHATSAPP HELPERS ---
+
+        function notifyVoucherExpiryAdmin(voucherCode, expiryDate, customerName) {
+            const msg = `Hi Admin Team,\n\nA customer’s voucher (${voucherCode}) will expire on ${expiryDate}.\nCustomer: ${customerName}\n\nPlease follow up with them and try to close the sale.\n\nThank you.`;
+            
+            // Opens a generic WhatsApp link so you can choose who to send it to
+            const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+            
+            const win = window.open(url, '_blank');
+            if (!win || win.closed || typeof win.closed == 'undefined') {
+                window.location.href = url;
+            }
+        }
+
+        function notifyVoucherExpiryClient(phone, name, expiryDate) {
+            // Clean phone number
+            const cleanPhone = phone ? phone.replace(/[^0-9]/g, '').replace(/^0/, '60') : '';
+            
+            if(!cleanPhone) {
+                return showToast("Client has no valid phone number", "error");
+            }
+
+            const msg = `Hi ${name},\n\nWe noticed your voucher will expire on ${expiryDate}. Don’t miss out—use it soon! If you need any assistance, we’re happy to help.\n\nThank you,\nDDNetwork`;
+
+            const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+            
+            const win = window.open(url, '_blank');
+            if (!win || win.closed || typeof win.closed == 'undefined') {
+                window.location.href = url;
+            }
         }
 
 </script>
