@@ -579,17 +579,6 @@
         // --- FIX: HIDE AUTH SCREEN IMMEDIATELY TO PREVENT REFRESH FLASH ---
         document.getElementById('auth-screen').classList.add('hidden');
 
-        // --- HELPER: OPEN WHATSAPP (MOBILE COMPATIBLE) ---
-        function openWA(url) {
-            const a = document.createElement('a');
-            a.href = url;
-            a.target = '_blank';
-            a.rel = 'noopener noreferrer';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
         // --- CONSTANTS & CONFIG ---
         const JOB_TITLES = [
             "Founder & Managing Director", 
@@ -625,21 +614,20 @@
             "Support Operations Executive": "crew"
         };
 
-        const DEFAULT_COMMISSION_RATES = {
-            "Founder & Managing Director": 0.05,
-            "Project & Client Manager": 0.04,
-            "Account / Operations / Marketing Manager": 0.04,
-            "Finance / Billing Executive": 0.0,
-            "People / Team Operations Executive": 0.0,
-            "Business Development Executive": 0.125,
-            "Sales Executive": 0.125,
-            "Client Success Coordinator": 0.025,
-            "Client Experience Executive": 0.025,
-            "Technical Specialist": 0.04,
-            "Web Developer": 0.04,
-            "Full Stack Developer": 0.05,
-            "Automation & AI Specialist": 0.05,
-            "Support Operations Executive": 0.025
+        // --- COMMISSION CONFIGURATION ---
+        // Defines which Category a job title belongs to (Sales, Tech, Support, Ops)
+        const COMMISSION_CATEGORY_MAP = {
+            "Sales Executive": "sales",
+            "Business Development Executive": "sales",
+            "Technical Specialist": "tech",
+            "Web Developer": "tech",
+            "Full Stack Developer": "tech",
+            "Automation & AI Specialist": "tech",
+            "Client Success Coordinator": "success",
+            "Client Experience Executive": "success",
+            "Support Operations Executive": "success",
+            "Finance / Billing Executive": "ops",
+            "People / Team Operations Executive": "ops"
         };
 
         // --- PERMISSION SYSTEM ---
@@ -662,7 +650,7 @@
             BYPASS_APPROVAL: 'bypass_approval'
         };
 
-        function getDefaultRate(title) { return DEFAULT_COMMISSION_RATES[title] || 0.0; }
+        function getDefaultRate(title) { return 0.0; } // Default 0, calculated dynamically now
 
         // --- FIREBASE SETUP ---
         const firebaseConfig = {
@@ -882,7 +870,6 @@
             e.preventDefault();
             if(!currentUser) return;
             
-            // Simple confirm dialog for pinning
             const isPinned = userPinnedMenus.includes(path);
             if(isPinned) {
                 if(confirm(`Unpin "${name}" from sidebar?`)) {
@@ -945,7 +932,6 @@
             const q = query.toLowerCase();
             let html = '';
 
-            // Search Orders
             try {
                 const oSnap = await db.collection("orders").orderBy("customerName").startAt(q).endAt(q + '\uf8ff').limit(3).get();
                 oSnap.forEach(doc => {
@@ -957,7 +943,6 @@
                 });
             } catch(e) {}
 
-            // Search Clients
             try {
                 const cSnap = await db.collection("users").where("role", "==", "user").orderBy("name").startAt(q).endAt(q + '\uf8ff').limit(3).get();
                 cSnap.forEach(doc => {
@@ -969,7 +954,6 @@
                 });
             } catch(e) {}
 
-            // Search Tickets
             try {
                 const tSnap = await db.collection("tickets").orderBy("ticketId").startAt(q).endAt(q + '\uf8ff').limit(3).get();
                 tSnap.forEach(doc => {
@@ -986,7 +970,6 @@
             resultsContainer.classList.add('active');
         }
 
-        // Close search when clicking outside
         document.addEventListener('click', (e) => {
             const container = document.querySelector('.header-search');
             if(!container.contains(e.target)) {
@@ -1227,7 +1210,7 @@
             }
         }
 
-        // --- 1. OVERVIEW (Enhanced) ---
+        // --- 1. OVERVIEW ---
         function renderOverview() {
             const main = document.getElementById('main');
             if(!main) return;
@@ -1237,7 +1220,6 @@
                     <h2 style="font-size:1.5rem; font-weight:800; letter-spacing:-0.5px;">Dashboard Overview</h2>
                 </div>
                 
-                <!-- QUICK ACTIONS -->
                 <div class="quick-actions-grid">
                     <div class="quick-action-card" onclick="navigateTo('/orders')"><i class="ri-shopping-cart-2-line"></i><span>New Order</span></div>
                     <div class="quick-action-card" onclick="navigateTo('/clients')"><i class="ri-user-add-line"></i><span>Add Client</span></div>
@@ -1324,13 +1306,14 @@
                                     <th>Date</th>
                                     <th>Client</th>
                                     <th>Package</th>
+                                    <th>Cycle</th> <!-- Added Cycle -->
                                     <th>Total</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="orders-tbody">
-                                <tr><td colspan="6" class="text-center"><div class="loading-spinner"></div></td></tr>
+                                <tr><td colspan="7" class="text-center"><div class="loading-spinner"></div></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1340,7 +1323,7 @@
                 const tbody = document.getElementById('orders-tbody');
                 if(!tbody) return;
                 if(snap.empty) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No orders found</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No orders found</td></tr>';
                     return;
                 }
 
@@ -1370,6 +1353,7 @@
                         <td style="white-space:nowrap;">${formatDateTime(d.timestamp)}</td>
                         <td><strong>${d.customerName}</strong><br>${domainDisplay}</td>
                         <td>${d.package}</td>
+                        <td><span class="badge badge-user">${d.billingCycle || 'One-time'}</span></td>
                         <td>${d.total}</td>
                         <td><span class="badge" style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}25">${d.status}</span></td>
                         <td>
@@ -1453,7 +1437,8 @@
                 let cleanPhone = d.customerPhone ? d.customerPhone.replace(/^0/, '60') : '60123456789';
                 if(!cleanPhone.startsWith('+')) cleanPhone = '+' + cleanPhone;
                 
-                openWA(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`);
+                // FIX: Direct window.open for mobile compatibility
+                window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
                 
                 showToast("Opening WhatsApp...", "success");
                 logActivity(`Sent payment reminder for Order #${orderRef}`);
@@ -1503,12 +1488,11 @@
                 </div>
                 <div class="mb-4 p-2" style="background:#f3f4f6; border-radius:8px; border:1px solid var(--border);">
                     <div class="flex justify-between items-center">
-                        <span style="font-size:0.8rem; color:var(--text-muted);">Billing Cycle</span>
+                        <span style="font-size:0.8rem; color:var(--text-muted);">Billing Cycle (Affects Commission)</span>
                         <span class="font-bold" style="color:var(--primary);">${d.billingCycle || '-'}</span>
                     </div>
                 </div>
                 
-                <!-- INTERNAL NOTES FEATURE -->
                 <div class="mb-4">
                     <label>Internal Notes (Staff Only)</label>
                     <textarea id="o-notes" rows="3" placeholder="Add notes about this order...">${d.internalNotes || ''}</textarea>
@@ -1516,9 +1500,9 @@
                 </div>
 
                 <div class="mb-4">
-                    <label>Sales Representatives (Multiple)</label>
+                    <label>Sales Representatives (Commission will split automatically)</label>
                     ${salesRepHTML}
-                    <small class="text-muted">Select all employees entitled to commission for this order.</small>
+                    <small class="text-muted">Select all employees entitled to commission. Rules apply by Job Title (Sales, Tech, etc).</small>
                 </div>
                 <div class="mt-4">
                     <label>Client Domain</label>
@@ -1538,7 +1522,7 @@
             `, `<button class="btn btn-primary" onclick="updateOrderDetails('${id}')">Save Changes</button>`);
         }
 
-        // --- COMMISSION GENERATION LOGIC ---
+        // --- SMART COMMISSION GENERATION ---
         async function generateCommissionsForOrder(orderId, orderData) {
             const existingCommSnap = await db.collection("commission_overview").where("orderId", "==", orderId).get();
             const batch = db.batch();
@@ -1549,7 +1533,6 @@
 
             if(orderData.salesRepIds && orderData.salesRepIds.length > 0) {
                 const commBatch = db.batch();
-                
                 const repIds = orderData.salesRepIds;
                 const usersSnap = await db.collection("users").where(firebase.firestore.FieldPath.documentId(), "in", repIds).get();
                 
@@ -1559,30 +1542,71 @@
                 const orderTotal = parseFloat(orderData.total.replace('RM ', '')) || 0;
                 const orderDate = orderData.timestamp || firebase.firestore.FieldValue.serverTimestamp();
                 
+                // 1. Determine Team Rate based on Billing Cycle
+                const cycle = (orderData.billingCycle || 'one-time').toLowerCase();
+                let teamPercentage = 0.0;
+                if(cycle.includes('month')) teamPercentage = 0.10;      // 10% for monthly
+                else if(cycle.includes('year')) teamPercentage = 0.12;  // 12% for yearly
+                else teamPercentage = 0.20;                             // 20% for one-time
+
+                const totalTeamCommission = orderTotal * teamPercentage;
+                
+                // 2. Define Split Percentages for Categories
+                const SALES_SPLIT = 0.50;  // 50% of Team Pot
+                const TECH_SPLIT = 0.20;    // 20% of Team Pot
+                const SUCCESS_SPLIT = 0.15; // 15% of Team Pot
+                const OPS_SPLIT = 0.05;     // 5% of Team Pot
+                // Buffer (10%) is effectively kept by company as unassigned or reallocated if desired.
+
                 repIds.forEach(repId => {
                     const rep = usersMap[repId];
                     if(rep) {
-                        const rate = rep.commissionRate || 0;
-                        const amount = orderTotal * rate;
+                        // Determine Category based on Job Title
+                        const category = COMMISSION_CATEGORY_MAP[rep.jobTitle] || 'other';
+                        let sharePercentage = 0.0;
+
+                        if (category === 'sales') sharePercentage = SALES_SPLIT;
+                        else if (category === 'tech') sharePercentage = TECH_SPLIT;
+                        else if (category === 'success') sharePercentage = SUCCESS_SPLIT;
+                        else if (category === 'ops') sharePercentage = OPS_SPLIT;
+                        else sharePercentage = 0.0; // Roles like Founder/Admin might need manual override or 0%
+
+                        // Formula: Final Amount = (Order Total * Team Rate) * Category Split
+                        // Note: If multiple people in Sales, they SPLIT the Sales Portion?
+                        // The prompt implies "Sales commission = team commission x 50%". Usually this is split.
+                        // We will implement Equal Split within category for now.
                         
-                        const newCommRef = db.collection("commission_overview").doc();
-                        commBatch.set(newCommRef, {
-                            orderId: orderId,
-                            crewId: repId,
-                            crewName: rep.name,
-                            amount: parseFloat(amount.toFixed(2)),
-                            orderDate: orderDate,
-                            status: 'unpaid', 
-                            paidAt: null,
-                            paidBy: null,
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                        });
+                        const categoryPortion = totalTeamCommission * sharePercentage;
+                        
+                        // Count people in this category to split the portion
+                        const peopleInCategory = repIds.filter(id => {
+                             const u = usersMap[id];
+                             const cat = COMMISSION_CATEGORY_MAP[u.jobTitle] || 'other';
+                             return cat === category;
+                        }).length;
+
+                        const finalAmount = categoryPortion / peopleInCategory;
+                        
+                        if (finalAmount > 0) {
+                            const newCommRef = db.collection("commission_overview").doc();
+                            commBatch.set(newCommRef, {
+                                orderId: orderId,
+                                crewId: repId,
+                                crewName: rep.name,
+                                amount: parseFloat(finalAmount.toFixed(2)),
+                                orderDate: orderDate,
+                                status: 'unpaid', 
+                                paidAt: null,
+                                paidBy: null,
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        }
                     }
                 });
 
                 await commBatch.commit();
-                console.log(`Generated ${repIds.length} commission records for order ${orderId} in 'commission_overview'`);
-                showToast(`Generated ${repIds.length} commission records.`, "success");
+                console.log(`Generated commission records for order ${orderId}`);
+                showToast(`Commissions calculated based on ${cycle} rules.`, "success");
             }
         }
 
@@ -1596,7 +1620,7 @@
                 total: document.getElementById('o-total').value,
                 domain: document.getElementById('o-domain').value.replace(/^https?:\/\//, ''), 
                 status: document.getElementById('upd-status').value,
-                internalNotes: document.getElementById('o-notes').value // Save Internal Notes
+                internalNotes: document.getElementById('o-notes').value 
             };
             
             const checkboxes = document.querySelectorAll('.rep-checkbox:checked');
@@ -1626,7 +1650,7 @@
             });
         }
 
-        // --- 3. CLIENTS (Enhanced with Timeline) ---
+        // --- 3. CLIENTS ---
         function renderClients() {
             const main = document.getElementById('main');
             if(!main) return;
@@ -1659,7 +1683,6 @@
                         buttons += `<button class="btn btn-sm btn-secondary" onclick="editClient('${doc.id}')">Edit</button>`;
                         buttons += `<button class="btn btn-sm btn-primary" onclick="openAssignVoucherModal('${doc.id}', '${u.name}')">Assign Voucher</button>`;
                     }
-                    // TIMELINE BUTTON
                     buttons += `<button class="btn btn-sm btn-info" onclick="viewClientTimeline('${doc.id}', '${u.name}')"><i class="ri-history-line"></i> Timeline</button>`;
                     buttons += `<button class="btn btn-sm btn-secondary" onclick="resetPassword('${u.email}')">Reset PW</button>`;
                     if (isSuperAdmin()) buttons += `<button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}', 'Client')"><i class="ri-delete-bin-line"></i></button>`;
@@ -1677,14 +1700,12 @@
             });
         }
         
-        // --- CLIENT TIMELINE FEATURE ---
         async function viewClientTimeline(uid, name) {
             showModal(`Client Timeline: ${name}`, `<div class="loading-spinner"></div>`, `<button class="btn btn-secondary" onclick="closeModal()">Close</button>`);
             
             let timelineHTML = `<div class="timeline-container">`;
             
             try {
-                // 1. Get Orders
                 const oSnap = await db.collection("orders").where("customerEmail", "==", (await db.collection("users").doc(uid).get()).data().email).orderBy("timestamp", "desc").get();
                 oSnap.forEach(doc => {
                     const d = doc.data();
@@ -1697,7 +1718,6 @@
                     `;
                 });
 
-                // 2. Get Tickets
                 const tSnap = await db.collection("tickets").where("email", "==", (await db.collection("users").doc(uid).get()).data().email).orderBy("timestamp", "desc").get();
                 tSnap.forEach(doc => {
                     const d = doc.data();
@@ -1710,7 +1730,6 @@
                     `;
                 });
                 
-                // 3. Get Requests
                 const rSnap = await db.collection("customer_requests").where("userId", "==", uid).orderBy("timestamp", "desc").get();
                 rSnap.forEach(doc => {
                     const d = doc.data();
@@ -1773,8 +1792,8 @@
                 </div>
                 <div class="table-container">
                     <div class="table-responsive">
-                        <table><thead><tr><th>Crew ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Work Loc</th><th>Role</th><th>Job Title</th><th>Comm. Rate</th><th>Status</th><th>Actions</th></tr></thead><tbody id="crew-tbody">
-                        <tr><td colspan="10" class="text-center"><div class="loading-spinner"></div></td></tr>
+                        <table><thead><tr><th>Crew ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Work Loc</th><th>Role</th><th>Job Title</th><th>Status</th><th>Actions</th></tr></thead><tbody id="crew-tbody">
+                        <tr><td colspan="9" class="text-center"><div class="loading-spinner"></div></td></tr>
                         </tbody></table>
                     </div>
                 </div>`;
@@ -1783,9 +1802,7 @@
                 if(!tbody) return;
                 tbody.innerHTML = snap.docs.map(doc => {
                     const u = doc.data();
-                    const rate = u.commissionRate ? (u.commissionRate * 100).toFixed(1) + '%' : '0%';
                     const workLoc = u.workLocation || '-';
-                    
                     const isSuspended = u.isSuspended || false;
                     const statusBadge = isSuspended 
                         ? `<span class="badge" style="background:#fef2f2; color:var(--danger); border:1px solid #fecaca">Suspended</span>` 
@@ -1811,7 +1828,6 @@
                         <td><span class="badge badge-${u.workLocation === 'HQ' ? 'admin' : 'crew'}">${workLoc}</span></td>
                         <td><span class="badge badge-${u.role==='super_admin'?'admin':(u.role==='admin'?'admin':'crew')}">${u.role}</span></td>
                         <td>${u.jobTitle||'-'}</td>
-                        <td><span class="badge" style="background:#ecfdf5; color:var(--success)">${rate}</span></td>
                         <td>${statusBadge}</td>
                         <td>${buttons}</td>
                     </tr>`;
@@ -1831,20 +1847,17 @@
                 <div class="mb-4"><label>Email Address</label><input type="email" id="c-email"></div>
                 <div class="mb-4"><label>Phone Number (Optional)</label><input type="tel" id="c-phone" placeholder="01XXXXXXXXX"></div>
                 <div class="mb-4">
-                    <label>Job Title (Auto-Sets Role)</label>
-                    <select id="c-job" onchange="autoSetRoleAndRate()">
+                    <label>Job Title (Auto-Sets Role & Category)</label>
+                    <select id="c-job">
                         <option value="">Select Job Title...</option>
                         ${jobOptions}
                     </select>
+                    <small class="text-muted">Category determines commission share (Sales=50%, Tech=20%, etc)</small>
                 </div>
                 <div class="flex gap-4 mb-4">
                     <div style="flex:1">
                         <label>Role</label>
                         <input type="text" id="c-role" readonly style="background:#f9fafb">
-                    </div>
-                    <div style="flex:1">
-                        <label>Comm. Rate (%)</label>
-                        <input type="number" step="0.1" id="c-rate" readonly style="background:#f9fafb">
                     </div>
                 </div>
                 <div class="mb-4">
@@ -1857,16 +1870,12 @@
                 <div class="mb-4"><label>Temporary Password</label><input type="password" id="c-pass" placeholder="Set password"></div>
             `, `<button class="btn btn-primary" onclick="saveCrew('${newCrewId}')">Create Crew</button>`);
         }
-
-        function autoSetRoleAndRate() {
+        
+        function autoSetRole() {
             const title = document.getElementById('c-job').value;
             const roleInput = document.getElementById('c-role');
-            const rateInput = document.getElementById('c-rate');
             const dbRole = JOB_ROLE_MAP[title] || 'crew'; 
             roleInput.value = dbRole.toUpperCase();
-            
-            const defaultRate = getDefaultRate(title);
-            rateInput.value = (defaultRate * 100).toFixed(1);
         }
 
         async function saveCrew(newId) {
@@ -1877,7 +1886,6 @@
             const phone = document.getElementById('c-phone').value; 
             const pass = document.getElementById('c-pass').value;
             const job = document.getElementById('c-job').value;
-            const rateVal = parseFloat(document.getElementById('c-rate').value);
             const workLoc = document.getElementById('c-work-loc').value;
 
             if(!name || !email || !pass || !job) return showToast("Please fill all required fields", "error");
@@ -1895,7 +1903,6 @@
                     phone: phone, 
                     role: dbRole, 
                     jobTitle: job,
-                    commissionRate: isNaN(rateVal) ? 0.0 : (rateVal / 100),
                     workLocation: workLoc, 
                     permissions: {},
                     bankDetails: bankDetails,
@@ -1999,12 +2006,12 @@
                     <div class="mb-4"><label>Email Address</label><input id="e-c-email" value="${u.email}"></div>
                     <div class="mb-4"><label>Phone Number</label><input id="e-c-phone" value="${u.phone||''}"></div>
                     <div class="mb-4">
-                        <label>Job Title (Auto-Sets Role & Rate)</label>
-                        <select id="e-c-job" onchange="autoSetEditRoleAndRate()">
+                        <label>Job Title (Auto-Sets Role)</label>
+                        <select id="e-c-job" onchange="autoSetEditRole()">
                             <option value="">Select Job Title...</option>
                             ${jobOptions}
                         </select>
-                        <small style="color:var(--info)">Changing Job Title will auto-update Role and Commission Rate.</small>
+                        <small style="color:var(--info)">Changing Job Title will auto-update Role.</small>
                     </div>
                     <div class="mb-4">
                         <label>System Role</label>
@@ -2016,7 +2023,6 @@
                         </select>
                         ${!canEditRole ? '<small class="text-danger text-sm">Only Super Admins can change roles.</small>' : ''}
                     </div>
-                     <div class="mb-4"><label>Commission Rate (%)</label><input type="number" step="0.1" id="e-c-rate" value="${(u.commissionRate*100).toFixed(1)}"></div>
                      <div class="mb-4">
                         <label>Work Location</label>
                         <select id="e-c-work-loc">
@@ -2030,22 +2036,15 @@
             });
         }
 
-        function autoSetEditRoleAndRate() {
+        function autoSetEditRole() {
             const title = document.getElementById('e-c-job').value;
             const roleSelect = document.getElementById('e-c-role');
-            const rateInput = document.getElementById('e-c-rate');
-            
             const dbRole = JOB_ROLE_MAP[title] || 'crew'; 
             roleSelect.value = dbRole;
-            
-            const defaultRate = getDefaultRate(title);
-            rateInput.value = (defaultRate * 100).toFixed(1);
         }
 
         async function updateCrewData(uid) {
             if(!checkAccessOrActionAllowed(PERMISSION_KEYS.EDIT_CREW)) return showToast("Access Denied", "error");
-
-            const rateVal = parseFloat(document.getElementById('e-c-rate').value);
             
             const newPerms = {};
             document.querySelectorAll('.perm-toggle').forEach(cb => {
@@ -2071,7 +2070,6 @@
                 email: document.getElementById('e-c-email').value,
                 phone: document.getElementById('e-c-phone').value, 
                 jobTitle: document.getElementById('e-c-job').value,
-                commissionRate: isNaN(rateVal) ? 0.0 : (rateVal / 100),
                 permissions: newPerms,
                 bankDetails: bankData,
                 bypassApproval: bypassVal,
@@ -2421,7 +2419,7 @@
             }).catch(err => { showToast("Error updating: " + err.message, "error"); btn.innerHTML = originalHTML; });
         }
 
-        // --- 8. CONFIG (Updated with Maintenance) ---
+        // --- 8. CONFIG ---
         async function renderConfig() {
             const main = document.getElementById('main');
             if(!main) return;
@@ -3096,7 +3094,15 @@
                 return;
             }
 
-            tbody.innerHTML = data.map(item => {
+            // Check if all currently shown are unpaid
+            const allUnpaid = data.every(item => (item.status || 'unpaid') === 'unpaid');
+            const bulkPayBtn = (!isMyView && allUnpaid && canAccessFinanceTools()) 
+                ? `<div style="margin-bottom:10px; display:flex; justify-content:flex-end;">
+                    <button class="btn btn-success" style="touch-action: manipulation; cursor: pointer;" onclick="bulkMarkPaid()">Mark All Shown as Paid</button>
+                   </div>` 
+                : '';
+
+            tbody.innerHTML = bulkPayBtn + data.map(item => {
                 const d = item;
                 const status = d.status || 'unpaid';
                 const isPaid = status === 'paid';
@@ -3112,13 +3118,13 @@
 
                 let actionsHTML = '';
                 if(!isMyView && canAccessFinanceTools()) {
-                    // FIX: Added 'touch-action: manipulation' to ensure buttons fire instantly on touch devices
+                    // FIX: Direct window.open for mobile, large touch targets
                     actionsHTML = `
-                        <button class="btn btn-sm ${isPaid?'btn-secondary':'btn-success'}" style="touch-action: manipulation; cursor: pointer;" onclick="markCommissionPaid('${d.id}', '${d.crewId}')" title="${isPaid?'Mark Unpaid':'Mark Paid'}">
+                        <button class="btn btn-sm ${isPaid?'btn-secondary':'btn-success'}" style="touch-action: manipulation; cursor: pointer; min-width:40px;" onclick="markCommissionPaid('${d.id}', '${d.crewId}')" title="${isPaid?'Mark Unpaid':'Mark Paid'}">
                             <i class="${isPaid?'ri-arrow-go-back-line':'ri-checkbox-circle-line'}"></i> ${isPaid?'Undo':'Pay'}
                         </button>
-                        <button class="btn btn-sm btn-info" style="touch-action: manipulation; cursor: pointer;" onclick="waCrewCommission('${d.crewId}', 'RM ${d.amount.toFixed(2)}')" title="WhatsApp Crew">
-                            <i class="ri-whatsapp-line"></i> WA
+                        <button class="btn btn-sm btn-info" style="touch-action: manipulation; cursor: pointer; min-width:40px;" onclick="waCrewCommission('${d.crewId}', 'RM ${d.amount.toFixed(2)}')" title="WhatsApp Crew">
+                            <i class="ri-whatsapp-line"></i>
                         </button>
                     `;
                 }
@@ -3165,6 +3171,60 @@
             }
         }
 
+        async function bulkMarkPaid() {
+            if(!confirm("Mark all currently listed commissions as Paid?")) return;
+            
+            // We use the filtered data currently displayed
+            const tbody = document.getElementById('comm-tbody');
+            // We need to get the IDs from the raw data that passed the filter
+            // A bit tricky because rawFinanceData has all, we need to re-apply logic or parse DOM? 
+            // Better: Re-run applyFilters logic inside this function to get the subset.
+            
+            const filterRef = document.getElementById('filter-ref').value.toLowerCase();
+            const filterStatus = document.getElementById('filter-status').value;
+            const filterStart = document.getElementById('filter-date-start').value;
+            const filterEnd = document.getElementById('filter-date-end').value;
+            const filterAmount = document.getElementById('filter-amount').value;
+
+            const idsToPay = rawFinanceData
+                .filter(item => {
+                    const dateObj = item.orderDate ? item.orderDate.toDate() : new Date(0);
+                    const dateStr = formatDateTime(dateObj).toLowerCase();
+                    const refStr = (item.orderId || '').substring(0,6).toLowerCase();
+                    const crewName = (item.crewName || '').toLowerCase();
+                    const paidBy = (item.paidBy || '').toLowerCase();
+                    const status = (item.status || '').toLowerCase();
+
+                    const matchesSearch = !filterRef || refStr.includes(filterRef) || crewName.includes(filterRef) || paidBy.includes(filterRef);
+                    const matchesStatus = !filterStatus || status === filterStatus;
+                    const matchesAmount = !filterAmount || item.amount >= parseFloat(filterAmount);
+                    let matchesDate = true;
+                    if(filterStart) { if (dateObj < new Date(filterStart)) matchesDate = false; }
+                    if(filterEnd) { const endObj = new Date(filterEnd); endObj.setHours(23, 59, 59, 999); if (dateObj > endObj) matchesDate = false; }
+                    return matchesSearch && matchesStatus && matchesAmount && matchesDate;
+                })
+                .map(item => item.id);
+
+            const batch = db.batch();
+            idsToPay.forEach(id => {
+                batch.update(db.collection("commission_overview").doc(id), {
+                    status: 'paid',
+                    paidAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    paidBy: userData.name
+                });
+            });
+
+            try {
+                await batch.commit();
+                showToast(`${idsToPay.length} commissions marked as Paid`, "success");
+                logActivity(`Bulk paid ${idsToPay.length} commissions`);
+                applyFilters(); // Re-render
+            } catch(e) {
+                console.error(e);
+                showToast("Error bulk paying", "error");
+            }
+        }
+
         async function waCrewCommission(crewId, amount) {
             if(!canAccessFinanceTools()) return showToast("Access Denied", "error");
             
@@ -3181,7 +3241,8 @@
 
                 const msg = `Hi ${crewData.name}, this is Finance.\n\n Your commission of ${amount} has been processed.\n\nPlease check your bank account.\n\n\ [Auto-generated from DDNet System]`;
                 
-                openWA(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`);
+                // FIX: Direct window.open for mobile
+                window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
             } catch(e) {
                 console.error(e);
                 showToast("Error fetching crew details", "error");
