@@ -649,6 +649,10 @@
         // --- FIX: HIDE AUTH SCREEN IMMEDIATELY TO PREVENT REFRESH FLASH ---
         document.getElementById('auth-screen').classList.add('hidden');
 
+        // --- GLOBAL FILTER STATE ---
+        // This ensures filters persist when Firestore updates the table DOM
+        window.savedTableFilters = window.savedTableFilters || {};
+
         // --- CONSTANTS & CONFIG ---
         const JOB_TITLES = [
             "Founder & Managing Director", 
@@ -1735,6 +1739,10 @@
                         </td>
                     </tr>`;
                 }).join('');
+                
+                // FIX: Re-apply filter if it exists
+                const savedSearch = window.savedTableFilters && window.savedTableFilters['orders-tbody'];
+                if(savedSearch) filterTable('orders-tbody', savedSearch);
             });
         }
 
@@ -2072,6 +2080,10 @@
                         </td>
                     </tr>`;
                 }).join('');
+                
+                // FIX: Re-apply filter if it exists
+                const savedSearch = window.savedTableFilters && window.savedTableFilters['client-tbody'];
+                if(savedSearch) filterTable('client-tbody', savedSearch);
             });
         }
         
@@ -2674,6 +2686,10 @@
                         </td>
                     </tr>`;
                 }).join('');
+                
+                // FIX: Re-apply filter if it exists
+                const savedSearch = window.savedTableFilters && window.savedTableFilters['supp-tbody'];
+                if(savedSearch) filterTable('supp-tbody', savedSearch);
             });
         }
 
@@ -3350,6 +3366,10 @@
                         <td>${actions}</td>
                     </tr>`;
                 }).join('');
+                
+                // FIX: Re-apply filter if it exists
+                const savedSearch = window.savedTableFilters && window.savedTableFilters['req-tbody'];
+                if(savedSearch) filterTable('req-tbody', savedSearch);
             });
         }
         function viewRequestDetails(id) {
@@ -3500,7 +3520,7 @@
             const main = document.getElementById('main');
             if(!main) return;
 
-            const canManageFinance = canAccessFinanceTools(); 
+                        const canManageFinance = canAccessFinanceTools(); 
             const isMyView = !canManageFinance; 
 
             if(!canManageFinance && (!currentUser || !currentUser.uid)) {
@@ -3580,7 +3600,7 @@
                             <h3>Commission Rate Configuration</h3>
                             <span class="badge badge-user">Finance Access</span>
                         </div>
-                        <p class="text-muted text-sm mb-4">Set the percentage distribution of the team commission pot. Total must equal 100%.</p>
+                        <p class="text-muted text-sm mb-4">Set percentage distribution of the team commission pot. Total must equal 100%.</p>
                         <div class="price-grid">
                             <div>
                                 <label>Sales Split (%)</label>
@@ -3833,7 +3853,7 @@
             const tbody = document.getElementById('comm-tbody');
             // We need to get the IDs from the raw data that passed the filter
             // A bit tricky because rawFinanceData has all, we need to re-apply logic or parse DOM? 
-            // Better: Re-run applyFilters logic inside this function to get the subset.
+            // Better: Re-run applyFilters logic inside this function to get subset.
             
             const filterRef = document.getElementById('filter-ref').value.toLowerCase();
             const filterStatus = document.getElementById('filter-status').value;
@@ -4121,13 +4141,36 @@
                     <p class="text-center text-muted text-sm mt-4">Profile is read-only.</p>
                 </div>`;
         }
+
+        // --- FIX: UPDATED FILTER TABLE ---
         function filterTable(id, text) {
-            const trs = document.querySelectorAll(`#${id} tr`);
+            const tbody = document.getElementById(id);
+            if(!tbody) return;
+            
+            const rows = tbody.querySelectorAll('tr');
             text = text.toLowerCase();
-            trs.forEach(tr => tr.style.display = tr.innerText.toLowerCase().includes(text)?'':'none');
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                // Convert to array and remove the last cell (Actions column)
+                const searchCells = Array.from(cells).slice(0, -1); 
+                
+                let match = false;
+                searchCells.forEach(cell => {
+                    if(cell.innerText.toLowerCase().includes(text)) {
+                        match = true;
+                    }
+                });
+                
+                row.style.display = match ? '' : 'none';
+            });
+
+            // Save to global state to persist during DB refreshes
+            if(!window.savedTableFilters) window.savedTableFilters = {};
+            window.savedTableFilters[id] = text;
         }
         
-        // NEW: Generic Sort Helper
+        // --- GENERIC SORT HELPER ---
         function genericSort(tableId, field) {
             const table = document.querySelector(`#${tableId}`);
             if(!table) return;
@@ -4145,8 +4188,7 @@
             rows.forEach(row => tbody.appendChild(row));
         }
 
-                // --- VOUCHER WHATSAPP HELPERS ---
-
+        // --- VOUCHER WHATSAPP HELPERS ---
         function notifyVoucherExpiryAdmin(voucherCode, expiryDate, customerName) {
             const msg = `Hi Admin Team,\n\nA customer’s voucher (${voucherCode}) will expire on ${expiryDate}.\nCustomer: ${customerName}\n\nPlease follow up with them and try to close the sale.\n\nThank you.\n\n> [Auto-generated from DDNet System]`;
             
@@ -4176,7 +4218,6 @@
                 window.location.href = url;
             }
         }
-
 </script>
 </body>
 </html>
