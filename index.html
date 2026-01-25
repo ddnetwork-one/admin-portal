@@ -1449,10 +1449,10 @@
 
                 let msg = "";
                 if (d.status === "Pending" || d.status === "Cancelled" || !d.status) {
-                    msg = `Hi ${d.customerName},\n\nThis is a friendly reminder that we are still awaiting payment for your recent order with DDNetwork.\n\nOrder ID: #${orderRef}\nAmount: ${d.total}\n\nPlease proceed with payment at your convenience so we can continue processing your order. If you’ve already made the payment, kindly ignore this message.\n\nThank you for your support.\n\n[Auto-generated from DDNet System]`;
+                    msg = `Hi ${d.customerName},\n\nThis is a friendly reminder that we are still awaiting payment for your recent order with DDNetwork.\n\nOrder ID: #${orderRef}\nAmount: ${d.total}\n\nPlease proceed with payment at your convenience so we can continue processing your order. If you’ve already made the payment, kindly ignore this message.\n\nThank you for your support.\n\n> [Auto-generated from DDNet System]`;
                 } 
                 else { 
-                    msg = `Hi ${d.customerName},\n\nWe noticed that payment for your recent order with DDNetwork was not completed successfully.\n\nOrder ID: #${orderRef}\nOutstanding Amount: ${d.total}\n\nTo avoid any delay or cancellation, please complete the payment as soon as possible. If you encountered any issues during payment, let us know and we will assist you.\n\nThank you for your understanding.\n\n[Auto-generated from DDNet System]`;
+                    msg = `Hi ${d.customerName},\n\nWe noticed that payment for your recent order with DDNetwork was not completed successfully.\n\nOrder ID: #${orderRef}\nOutstanding Amount: ${d.total}\n\nTo avoid any delay or cancellation, please complete the payment as soon as possible. If you encountered any issues during payment, let us know and we will assist you.\n\nThank you for your understanding.\n\n> [Auto-generated from DDNet System]`;
                 }
 
                 // Robust Phone Cleaning
@@ -3276,7 +3276,7 @@
                     return showToast("Crew has invalid phone number", "error");
                 }
 
-                const msg = `Hi ${crewData.name}, this is Finance.\n\n Your commission of ${amount} has been processed.\n\nPlease check your bank account.\n\n\ [Auto-generated from DDNet System]`;
+                const msg = `Hi ${crewData.name}, this is DDNet-Finance.\n\nYour commission of ${amount} has been processed.\n\nPlease check your bank account.\n\n\> [Auto-generated from DDNet System]`;
                 
                 const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
                 
