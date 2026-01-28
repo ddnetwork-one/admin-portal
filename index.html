@@ -377,6 +377,8 @@
         .badge-upgrade { background: #ecfdf5; color: var(--success); border: 1px solid #a7f3d0; }
         .badge-renew { background: #f5f3ff; color: var(--ticket); border: 1px solid #ddd6fe; }
         .badge-remove { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
+        /* New badge for Website Request */
+        .badge-website { background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; }
 
         .diff-viewer { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-family: var(--font-mono); font-size: 0.8rem; margin-top: 5px; }
         .diff-line { display: flex; border-bottom:1px solid #e2e8f0; padding: 4px 0; }
@@ -432,6 +434,14 @@
         .access-denied-title { font-size: 1.5rem; color: var(--text-main); margin-bottom: 0.5rem; }
         .access-denied-desc { font-size: 1rem; max-width: 400px; line-height: 1.5; margin-bottom: 2rem; }
 
+        /* --- REQUEST DETAIL MODAL GRID --- */
+        .req-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+        .req-col { display: flex; flex-direction: column; gap: 0.5rem; }
+        .req-field { display: flex; flex-direction: column; }
+        .req-field label { font-size: 0.7rem; color: var(--text-faint); margin-bottom: 2px; text-transform: uppercase; font-weight: 700; }
+        .req-value { font-size: 0.9rem; color: var(--text-main); }
+        .req-full-width { grid-column: 1 / -1; }
+
         /* RESPONSIVE BREAKPOINTS */
         @media(max-width: 1024px) {
             aside { transform: translateX(-100%); width: 280px; box-shadow: 20px 0 40px rgba(0,0,0,0.1); }
@@ -439,7 +449,7 @@
             main { margin-left: 0 !important; width: 100% !important; padding: 1rem; padding-top: 5rem; }
             .header-brand span { display: none; }
             .notif-dropdown { right: 0; width: 90vw; }
-            /* On mobile, search bar might take too much space, hide text */
+            .req-grid { grid-template-columns: 1fr; }
             .header-search { max-width: 150px; }
         }
         @media(min-width: 1025px) and (max-width: 1440px) { .invoice-paper { transform: scale(0.85); } }
@@ -1825,6 +1835,13 @@
                     const d = doc.data();
                     timelineHTML += `<div class="timeline-item"><div class="timeline-date">${formatDateTime(d.timestamp)}</div><div class="timeline-title">Support Ticket: ${d.type}</div><div class="timeline-desc">ID: ${d.ticketId} | Status: ${d.status}</div></div>`;
                 });
+                // NEW: Add Customer Requests to timeline
+                const rSnap = await db.collection("customer_requests").where("email", "==", (await db.collection("users").doc(uid).get()).data().email).orderBy("timestamp", "desc").get();
+                rSnap.forEach(doc => {
+                    const d = doc.data();
+                    timelineHTML += `<div class="timeline-item"><div class="timeline-date">${formatDateTime(d.timestamp)}</div><div class="timeline-title">Request: ${d.type}</div><div class="timeline-desc">Company: ${d.company || '-'} | Status: ${d.status}</div></div>`;
+                });
+
                 if(timelineHTML === `<div class="timeline-container">`) timelineHTML += `<p class="text-muted text-center mt-4">No history found for this client.</p>`;
                 else timelineHTML += `</div>`;
                 document.getElementById('modalBody').innerHTML = timelineHTML;
@@ -2505,7 +2522,7 @@
             db.collection("clients_portfolio").doc(docId).delete().then(() => { showToast("Project deleted", "success"); logActivity(`Deleted portfolio project`); }).catch(err => { showToast("Error deleting: " + err.message, "error"); }); 
         }
 
-        // --- 10. CUSTOMER REQUESTS ---
+        // --- 10. CUSTOMER REQUESTS (UPDATED SCHEMA) ---
         function renderRequests() {
             setPageLoading(true);
             const main = document.getElementById('main');
@@ -2513,11 +2530,11 @@
             main.innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <h2 style="font-size:1.25rem; font-weight:800;">Customer Requests</h2>
-                    <input type="text" id="filter-req-search" placeholder="Search Client..." style="width:200px;" onkeyup="TableEngine.setFilter('req-tbody', 'search', this.value)">
+                    <input type="text" id="filter-req-search" placeholder="Search Client, Company..." style="width:250px;" onkeyup="TableEngine.setFilter('req-tbody', 'search', this.value)">
                 </div>
                 <div class="table-container">
                     <div class="table-responsive">
-                        <table><thead><tr><th>Date</th><th>Client</th><th>Type</th><th>Summary</th><th>Status</th><th>Action</th></tr></thead><tbody id="req-tbody"><tr><td colspan="6" class="text-center"><div class="loading-spinner"></div></td></tr></tbody></table>
+                        <table><thead><tr><th>Date</th><th>Client</th><th>Company</th><th>Type</th><th>Source</th><th>Summary</th><th>Status</th><th>Action</th></tr></thead><tbody id="req-tbody"><tr><td colspan="8" class="text-center"><div class="loading-spinner"></div></td></tr></tbody></table>
                         <div id="req-tbody-pagination"></div>
                     </div>
                 </div>
@@ -2527,29 +2544,104 @@
                 TableEngine.updateData('req-tbody', data);
             });
             window.customTableRenderers['req-tbody'] = function(data) {
-                if(data.length === 0) return '<tr><td colspan="6" class="text-center text-muted">No requests found</td></tr>';
+                if(data.length === 0) return '<tr><td colspan="8" class="text-center text-muted">No requests found</td></tr>';
                 return data.map(d => {
-                    const type = d.type || 'content';
-                    let badgeClass = 'badge-content'; let summaryText = '';
-                    if(type === 'content') { summaryText = d.details ? d.details.substring(0, 30) + '...' : 'Update Content'; badgeClass = 'badge-content'; } 
-                    else if (type === 'upgrade') { summaryText = `${d.currentPlan || 'Old'} → ${d.newPlan || 'New'}`; badgeClass = 'badge-upgrade'; } 
-                    else if (type === 'renew') { summaryText = `${d.plan || 'Plan'} (${d.duration || '1yr'})`; badgeClass = 'badge-renew'; } 
-                    else if (type === 'remove') { summaryText = d.details ? 'Remove Content' : 'Remove Item'; badgeClass = 'badge-remove'; }
+                    const type = d.type || 'General Request';
+                    const source = d.source || '-';
+                    const company = d.company || '-';
+                    
+                    // Truncate details for summary
+                    const summaryText = d.details ? d.details.substring(0, 40) + (d.details.length > 40 ? '...' : '') : '-';
+                    
                     const statusColor = d.status === 'Completed' ? 'var(--success)' : 'var(--warning)';
+                    
+                    // Determine badge style based on Type
+                    let badgeClass = 'badge-user';
+                    if(type.includes('Website')) badgeClass = 'badge-website';
+                    else if(type.includes('Content')) badgeClass = 'badge-content';
+                    else if(type.includes('Upgrade')) badgeClass = 'badge-upgrade';
+                    
                     let actions = `<button class="btn btn-sm btn-secondary" onclick="viewRequestDetails('${d.id}')">View</button>`;
                     if (canDelete) actions += `<button class="btn btn-sm btn-danger" onclick="deleteItem('request','${d.id}')"><i class="ri-delete-bin-line"></i></button>`;
-                    return `<tr><td style="white-space:nowrap;">${formatDateTime(d.timestamp)}</td><td><strong>${d.name}</strong><br><small style="color:var(--text-faint)">${d.phone || ''}</small></td><td><span class="badge ${badgeClass}">${type.toUpperCase()}</span></td><td>${summaryText} ${d.hasFile ? '<i class="ri-attachment-line" title="File Attached" style="color:var(--primary)"></i>' : ''}</td><td><span class="badge" style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}25">${d.status}</span></td><td>${actions}</td></tr>`;
+                    
+                    return `<tr>
+                        <td style="white-space:nowrap;">${formatDateTime(d.timestamp)}</td>
+                        <td><strong>${d.name}</strong><br><small style="color:var(--text-faint)">${d.phone || ''}</small></td>
+                        <td>${company}</td>
+                        <td><span class="badge ${badgeClass}">${type}</span></td>
+                        <td><small>${source}</small></td>
+                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${d.details}">${summaryText}</td>
+                        <td><span class="badge" style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}25">${d.status}</span></td>
+                        <td>${actions}</td>
+                    </tr>`;
                 }).join('');
             };
         }
         function viewRequestDetails(id) {
             db.collection("customer_requests").doc(id).get().then(doc => {
-                const d = doc.data(); const type = d.type; let detailsHTML = '';
-                if(type === 'content') { detailsHTML = `<div class="mb-4"><label>Description</label><textarea readonly rows="4">${d.details || 'No description provided.'}</textarea></div><div class="mb-4"><label>Attachments</label><div class="flex items-center gap-2 text-sm"><i class="${d.hasFile ? 'ri-checkbox-circle-fill text-success' : 'ri-close-circle-fill text-muted'}"></i>${d.hasFile ? 'User attached a file via website form.' : 'No file attached.'}</div></div>`; } 
-                else if (type === 'upgrade') { detailsHTML = `<div class="flex gap-4 mb-4"><div style="flex:1"><label>Current Plan</label><input value="${d.currentPlan || '-'}" readonly></div><div style="flex:1"><label>New Plan</label><input value="${d.newPlan || '-'}" readonly></div></div><div class="mb-4"><label>Additional Notes</label><textarea readonly rows="3">${d.details || '-'}</textarea></div>`; } 
-                else if (type === 'renew') { detailsHTML = `<div class="flex gap-4 mb-4"><div style="flex:1"><label>Plan to Renew</label><input value="${d.plan || '-'}" readonly></div><div style="flex:1"><label>Duration</label><input value="${d.duration || '-'}" readonly></div></div>`; } 
-                else if (type === 'remove') { detailsHTML = `<div class="mb-4"><label>Items to Remove</label><textarea readonly rows="3">${d.details || '-'}</textarea></div>`; }
-                showModal(`Request Details (${type.toUpperCase()})`, `<div class="mb-4 p-4" style="background:#f9fafb; border-radius:8px; border:1px solid var(--border)"><div class="text-sm text-muted mb-1">Client Info</div><strong>${d.name}</strong> (${d.phone})<br>${d.userId ? `<small class="text-muted">User ID: ${d.userId}</small>` : ''}</div>${detailsHTML}<div class="mt-4"><label>Update Status</label><select id="req-status-select"><option value="Pending" ${d.status==='Pending'?'selected':''}>Pending</option><option value="Completed" ${d.status==='Completed'?'selected':''}>Completed</option></select></div>`, `<button class="btn btn-primary" onclick="updateRequestStatus('${id}', null, true)">Save Status</button>`);
+                const d = doc.data();
+                
+                // Build Modal HTML based on updated schema
+                const modalBody = `
+                    <div class="req-grid">
+                        <!-- Basic Info -->
+                        <div class="req-field req-full-width">
+                            <label>Company Name</label>
+                            <div class="req-value font-bold">${d.company || '-'}</div>
+                        </div>
+                        
+                        <div class="req-field">
+                            <label>Request Type</label>
+                            <div class="req-value"><span class="badge badge-website">${d.type || 'General'}</span></div>
+                        </div>
+                        <div class="req-field">
+                            <label>Source</label>
+                            <div class="req-value">${d.source || '-'}</div>
+                        </div>
+
+                        <!-- Client Info -->
+                        <div class="req-field">
+                            <label>Client Name</label>
+                            <div class="req-value">${d.name}</div>
+                        </div>
+                        <div class="req-field">
+                            <label>Email</label>
+                            <div class="req-value"><a href="mailto:${d.email}" style="color:var(--primary);">${d.email}</a></div>
+                        </div>
+                        <div class="req-field">
+                            <label>Phone</label>
+                            <div class="req-value">${d.phone || '-'}</div>
+                        </div>
+
+                        <!-- References & Details -->
+                        <div class="req-field req-full-width">
+                            <label>References / Links</label>
+                            <div class="req-value">
+                                ${d.references 
+                                    ? `<a href="${d.references}" target="_blank" class="btn btn-sm btn-info" style="display:inline-flex; align-items:center; gap:5px; margin-right:10px;"><i class="ri-external-link-line"></i> ${d.references}</a>` 
+                                    : '<span class="text-muted">None provided</span>'}
+                            </div>
+                        </div>
+
+                        <div class="req-field req-full-width">
+                            <label>Details / Message</label>
+                            <textarea readonly rows="5" style="background:#f9fafb; font-family:var(--font-main);">${d.details || 'No details provided.'}</textarea>
+                        </div>
+
+                        <!-- Status Update -->
+                        <div class="req-field req-full-width" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--border);">
+                            <label>Update Status</label>
+                            <select id="req-status-select">
+                                <option value="Pending" ${d.status==='Pending'?'selected':''}>Pending</option>
+                                <option value="In Progress" ${d.status==='In Progress'?'selected':''}>In Progress</option>
+                                <option value="Completed" ${d.status==='Completed'?'selected':''}>Completed</option>
+                                <option value="Rejected" ${d.status==='Rejected'?'selected':''}>Rejected</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+
+                showModal(`Request Details (${d.type || 'General'})`, modalBody, `<button class="btn btn-primary" onclick="updateRequestStatus('${id}', null, true)">Save Status</button>`);
             });
         }
         function updateRequestStatus(id, newStatus = null, fromModal = false) {
