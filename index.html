@@ -1593,14 +1593,14 @@
             };
         }
 
-        // --- NEW INVOICE GENERATION LOGIC (APPLE STYLE) ---
+        // --- NEW INVOICE GENERATION LOGIC (MOBILE OPTIMIZED) ---
         async function generateInvoice(orderId) {
             try {
                 const orderDoc = await db.collection("orders").doc(orderId).get();
                 if(!orderDoc.exists) return showToast("Order not found", "error");
                 const d = orderDoc.data();
                 
-                const dateStr = formatDateTime(d.timestamp).split(' ')[0]; // Date only
+                const dateStr = formatDateTime(d.timestamp).split(' ')[0];
                 const orderRef = orderId.substring(0,8).toUpperCase();
                 const total = parseFloat(d.total.replace('RM ', '')).toFixed(2);
                 
@@ -1611,36 +1611,37 @@
                     <head>
                     <meta charset="UTF-8">
                     <title>Invoice | DDNetwork</title>
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
                     <style>
+                      /* --- CORE STYLES --- */
                       * {
                         box-sizing: border-box;
                       }
 
                       body {
-                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-                                     Roboto, Helvetica, Arial, sans-serif;
+                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
                         background: #f2f2f2;
-                        padding: 40px;
+                        padding: 20px; /* Reduced padding for mobile */
                         color: #1d1d1f;
                         margin: 0;
+                        -webkit-print-color-adjust: exact; /* Preserve colors on print */
                       }
 
                       .receipt {
                         max-width: 720px;
                         margin: auto;
                         background: #ffffff;
-                        padding: 48px;
+                        padding: 40px; /* Reduced padding */
                         border-radius: 16px;
                         box-shadow: 0 20px 40px rgba(0,0,0,0.08);
                       }
 
-                      /* Header */
+                      /* --- HEADER --- */
                       .header {
                         display: flex;
                         align-items: center;
                         justify-content: space-between;
-                        margin-bottom: 40px;
+                        margin-bottom: 30px;
                       }
 
                       .brand {
@@ -1667,15 +1668,16 @@
 
                       .invoice-meta span {
                         display: block;
+                        margin-bottom: 2px;
                       }
 
-                      /* Section */
+                      /* --- SECTIONS --- */
                       .section {
-                        margin-bottom: 32px;
+                        margin-bottom: 25px;
                       }
 
                       .section h4 {
-                        font-size: 13px;
+                        font-size: 12px;
                         text-transform: uppercase;
                         letter-spacing: 0.08em;
                         color: #6e6e73;
@@ -1688,25 +1690,25 @@
                         line-height: 1.5;
                       }
 
-                      /* Table */
+                      /* --- TABLE --- */
                       table {
                         width: 100%;
                         border-collapse: collapse;
-                        margin-top: 20px;
+                        margin-top: 15px;
                       }
 
                       table th {
                         text-align: left;
-                        font-size: 13px;
+                        font-size: 12px;
                         color: #6e6e73;
                         font-weight: 500;
-                        padding-bottom: 12px;
+                        padding-bottom: 8px;
                         border-bottom: 1px solid #e5e5ea;
                       }
 
                       table td {
-                        padding: 16px 0;
-                        font-size: 14px;
+                        padding: 12px 0;
+                        font-size: 13px; /* Slightly smaller font for mobile */
                         border-bottom: 1px solid #f0f0f0;
                         vertical-align: top;
                       }
@@ -1714,52 +1716,88 @@
                       .amount {
                         text-align: right;
                         white-space: nowrap;
+                        font-variant-numeric: tabular-nums; /* Align numbers neatly */
                       }
 
-                      /* Summary */
+                      /* --- SUMMARY --- */
                       .summary {
-                        margin-top: 30px;
-                        max-width: 320px;
+                        margin-top: 25px;
+                        max-width: 100%; /* Full width on mobile */
                         margin-left: auto;
                       }
 
                       .summary div {
                         display: flex;
                         justify-content: space-between;
-                        margin-bottom: 10px;
+                        margin-bottom: 8px;
                         font-size: 14px;
                       }
 
                       .summary .total {
-                        font-size: 18px;
+                        font-size: 16px; /* Slightly smaller total on mobile */
                         font-weight: 600;
-                        padding-top: 12px;
+                        padding-top: 10px;
                         border-top: 1px solid #e5e5ea;
                       }
 
-                      /* Footer */
+                      /* --- FOOTER --- */
                       .footer {
-                        margin-top: 50px;
+                        margin-top: 40px;
                         text-align: center;
-                        font-size: 13px;
+                        font-size: 12px;
                         color: #6e6e73;
                       }
 
-                      /* Print Optimisation */
+                      /* --- MOBILE OPTIMIZATION --- */
+                      /* This targets the screen (visual) view on small devices */
+                      @media screen and (max-width: 600px) {
+                        body {
+                          padding: 0; /* Remove outer gray padding */
+                          background: #ffffff; /* Remove gray background */
+                        }
+
+                        .receipt {
+                          max-width: 100%; /* Take full width */
+                          padding: 24px; /* Tighter padding */
+                          border-radius: 0;
+                          box-shadow: none; /* Remove shadow for cleaner print */
+                        }
+
+                        .header {
+                          flex-direction: column;
+                          align-items: flex-start;
+                          gap: 10px;
+                        }
+                        
+                        .invoice-meta {
+                          text-align: left;
+                        }
+
+                        table td {
+                          font-size: 12px;
+                          padding: 10px 0;
+                        }
+                      }
+
+                      /* --- PRINT OPTIMIZATION --- */
+                      /* This targets the actual printer/PDF generation */
                       @media print {
                         body {
                           background: none;
                           padding: 0;
+                          -webkit-print-color-adjust: exact;
                         }
 
                         .receipt {
                           box-shadow: none;
                           border-radius: 0;
-                          padding: 32px;
+                          padding: 0; /* Let the printer margins handle spacing */
+                          margin: 0;
+                          max-width: 100%;
                         }
 
                         @page {
-                          margin: 0;
+                          margin: 20px; /* Standard printer margin */
                         }
                       }
                     </style>
@@ -1776,7 +1814,7 @@
                         </div>
 
                         <div class="invoice-meta">
-                          <span>Invoice</span>
+                          <span><strong>Invoice</strong></span>
                           <span>INV-${orderRef}</span>
                           <span>${dateStr}</span>
                         </div>
@@ -1826,22 +1864,26 @@
 
                       <!-- Footer -->
                       <div class="footer">
-                        Thank you for choosing DDNetwork.Wishing great success and growth for your brand.<br>
-                        <p>Payment due within 7 days.<p>
-                        <p>&copy; DDNetworkOne</p>
+                        Thank you for choosing DDNetwork. Wishing great success and growth for your brand.<br>
+                        © DDNetworkOne.
                       </div>
 
                     </div>
 
-                    <script>window.onload = function() { window.print(); }<\/script>
+                    <script>window.onload = function() { setTimeout(() => window.print(), 500); }<\/script>
                     </body>
                     </html>
                 `;
 
-                // Open in new window to print
+                // Open in new window
                 const printWindow = window.open('', '_blank');
-                printWindow.document.write(invoiceContent);
-                printWindow.document.close();
+                if (printWindow) {
+                    printWindow.document.write(invoiceContent);
+                    printWindow.document.close();
+                } else {
+                    // Handle mobile popup blockers
+                    showToast("Please allow popups to view the invoice", "warning");
+                }
 
             } catch (err) {
                 console.error(err);
