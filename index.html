@@ -1593,7 +1593,7 @@
             };
         }
 
-        // --- NEW INVOICE GENERATION LOGIC (MOBILE OPTIMIZED) ---
+        // --- NEW INVOICE GENERATION LOGIC (POPUPS ALLOWED) ---
         async function generateInvoice(orderId) {
             try {
                 const orderDoc = await db.collection("orders").doc(orderId).get();
@@ -1613,30 +1613,27 @@
                     <title>Invoice | DDNetwork</title>
                     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
                     <style>
-                      /* --- CORE STYLES --- */
-                      * {
-                        box-sizing: border-box;
-                      }
+                      * { box-sizing: border-box; }
 
                       body {
                         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
                         background: #f2f2f2;
-                        padding: 20px; /* Reduced padding for mobile */
+                        padding: 20px;
                         color: #1d1d1f;
                         margin: 0;
-                        -webkit-print-color-adjust: exact; /* Preserve colors on print */
+                        -webkit-print-color-adjust: exact;
                       }
 
                       .receipt {
                         max-width: 720px;
                         margin: auto;
                         background: #ffffff;
-                        padding: 40px; /* Reduced padding */
+                        padding: 40px;
                         border-radius: 16px;
                         box-shadow: 0 20px 40px rgba(0,0,0,0.08);
                       }
 
-                      /* --- HEADER --- */
+                      /* Header */
                       .header {
                         display: flex;
                         align-items: center;
@@ -1650,15 +1647,8 @@
                         gap: 12px;
                       }
 
-                      .brand img {
-                        width: 36px;
-                        height: auto;
-                      }
-
-                      .brand strong {
-                        font-size: 18px;
-                        font-weight: 600;
-                      }
+                      .brand img { width: 36px; height: auto; }
+                      .brand strong { font-size: 18px; font-weight: 600; }
 
                       .invoice-meta {
                         text-align: right;
@@ -1666,16 +1656,10 @@
                         color: #6e6e73;
                       }
 
-                      .invoice-meta span {
-                        display: block;
-                        margin-bottom: 2px;
-                      }
+                      .invoice-meta span { display: block; margin-bottom: 2px; }
 
-                      /* --- SECTIONS --- */
-                      .section {
-                        margin-bottom: 25px;
-                      }
-
+                      /* Sections */
+                      .section { margin-bottom: 25px; }
                       .section h4 {
                         font-size: 12px;
                         text-transform: uppercase;
@@ -1683,14 +1667,9 @@
                         color: #6e6e73;
                         margin-bottom: 8px;
                       }
+                      .section p { margin: 0; font-size: 14px; line-height: 1.5; }
 
-                      .section p {
-                        margin: 0;
-                        font-size: 14px;
-                        line-height: 1.5;
-                      }
-
-                      /* --- TABLE --- */
+                      /* Table */
                       table {
                         width: 100%;
                         border-collapse: collapse;
@@ -1708,7 +1687,7 @@
 
                       table td {
                         padding: 12px 0;
-                        font-size: 13px; /* Slightly smaller font for mobile */
+                        font-size: 13px;
                         border-bottom: 1px solid #f0f0f0;
                         vertical-align: top;
                       }
@@ -1716,13 +1695,13 @@
                       .amount {
                         text-align: right;
                         white-space: nowrap;
-                        font-variant-numeric: tabular-nums; /* Align numbers neatly */
+                        font-variant-numeric: tabular-nums;
                       }
 
-                      /* --- SUMMARY --- */
+                      /* Summary */
                       .summary {
                         margin-top: 25px;
-                        max-width: 100%; /* Full width on mobile */
+                        max-width: 100%;
                         margin-left: auto;
                       }
 
@@ -1734,13 +1713,13 @@
                       }
 
                       .summary .total {
-                        font-size: 16px; /* Slightly smaller total on mobile */
+                        font-size: 16px;
                         font-weight: 600;
                         padding-top: 10px;
                         border-top: 1px solid #e5e5ea;
                       }
 
-                      /* --- FOOTER --- */
+                      /* Footer */
                       .footer {
                         margin-top: 40px;
                         text-align: center;
@@ -1748,57 +1727,25 @@
                         color: #6e6e73;
                       }
 
-                      /* --- MOBILE OPTIMIZATION --- */
-                      /* This targets the screen (visual) view on small devices */
+                      /* Mobile Optimization */
                       @media screen and (max-width: 600px) {
-                        body {
-                          padding: 0; /* Remove outer gray padding */
-                          background: #ffffff; /* Remove gray background */
-                        }
-
+                        body { padding: 0; background: #ffffff; }
                         .receipt {
-                          max-width: 100%; /* Take full width */
-                          padding: 24px; /* Tighter padding */
+                          max-width: 100%;
+                          padding: 24px;
                           border-radius: 0;
-                          box-shadow: none; /* Remove shadow for cleaner print */
+                          box-shadow: none;
                         }
-
-                        .header {
-                          flex-direction: column;
-                          align-items: flex-start;
-                          gap: 10px;
-                        }
-                        
-                        .invoice-meta {
-                          text-align: left;
-                        }
-
-                        table td {
-                          font-size: 12px;
-                          padding: 10px 0;
-                        }
+                        .header { flex-direction: column; align-items: flex-start; gap: 10px; }
+                        .invoice-meta { text-align: left; }
+                        table td { font-size: 12px; padding: 10px 0; }
                       }
 
-                      /* --- PRINT OPTIMIZATION --- */
-                      /* This targets the actual printer/PDF generation */
+                      /* Print Optimization */
                       @media print {
-                        body {
-                          background: none;
-                          padding: 0;
-                          -webkit-print-color-adjust: exact;
-                        }
-
-                        .receipt {
-                          box-shadow: none;
-                          border-radius: 0;
-                          padding: 0; /* Let the printer margins handle spacing */
-                          margin: 0;
-                          max-width: 100%;
-                        }
-
-                        @page {
-                          margin: 20px; /* Standard printer margin */
-                        }
+                        body { background: none; padding: 0; -webkit-print-color-adjust: exact; }
+                        .receipt { box-shadow: none; border-radius: 0; padding: 0; margin: 0; max-width: 100%; }
+                        @page { margin: 20px; }
                       }
                     </style>
                     </head>
@@ -1875,15 +1822,10 @@
                     </html>
                 `;
 
-                // Open in new window
+                // Open and write directly (Assuming popups are allowed)
                 const printWindow = window.open('', '_blank');
-                if (printWindow) {
-                    printWindow.document.write(invoiceContent);
-                    printWindow.document.close();
-                } else {
-                    // Handle mobile popup blockers
-                    showToast("Please allow popups to view the invoice", "warning");
-                }
+                printWindow.document.write(invoiceContent);
+                printWindow.document.close();
 
             } catch (err) {
                 console.error(err);
